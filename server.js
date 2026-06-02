@@ -17,12 +17,12 @@ const server = http.createServer(app);
 // ✅ Serve uploads folder (FIXED PATH)
 app.use(
   "/uploads",
-  express.static(path.join(__dirname, "../uploads"))
+  express.static(path.join(__dirname, "uploads"))
 );
 
 // ✅ Serve frontend public folder
 app.use(
-  express.static(path.join(__dirname, "../public"))
+  express.static(path.join(__dirname, "public"))
 );
 
 
@@ -327,10 +327,10 @@ server.listen(PORT, () => {
   console.log("Server running on port:", PORT);
   console.log("http://localhost:" + PORT);
   console.log("Uploads path:",
-    path.join(__dirname, "../uploads")
+    path.join(__dirname, "uploads")
   );
   console.log("Public path:",
-    path.join(__dirname, "../public")
+    path.join(__dirname, "public")
   );
   console.log("=================================");
 

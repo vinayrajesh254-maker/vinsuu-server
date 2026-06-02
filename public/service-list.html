@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Service List - Vinsuu</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+    :root {
+        --primary: #1a3fd4;
+        --primary-dark: #1430b0;
+        --primary-mid: #2b52e0;
+        --primary-light: #e8eeff;
+        --text: #1a1a2e;
+        --gray: #6b7280;
+        --border: #e5e7eb;
+        --light-bg: #f5f7ff;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    /* No copy / no right-click */
+    body {
+        font-family: 'Poppins', sans-serif;
+        background: #eef2ff;
+        color: var(--text);
+        min-height: 100vh;
+        user-select: none;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+    }
+
+    /* ══ TOP HEADER ══ */
+    .topHeader {
+        background: linear-gradient(90deg, var(--primary-mid) 0%, var(--primary-dark) 100%);
+        padding: 14px 20px;
+        display: flex; align-items: center; justify-content: space-between;
+        position: sticky; top: 0; z-index: 100;
+        box-shadow: 0 2px 12px rgba(26,63,212,0.25);
+    }
+    .topHeaderLeft { display: flex; align-items: center; gap: 12px; }
+    .backBtn {
+        background: rgba(255,255,255,0.15); border: none; color: white;
+        width: 34px; height: 34px; border-radius: 50%;
+        font-size: 18px; cursor: pointer;
+        display: flex; align-items: center; justify-content: center;
+        transition: background 0.2s; flex-shrink: 0;
+    }
+    .backBtn:hover { background: rgba(255,255,255,0.25); }
+    .topHeaderTitle { font-size: 17px; font-weight: 700; color: white; }
+    .topHeaderIcon { font-size: 26px; opacity: 0.85; }
+
+    /* ══ PAGE WRAPPER ══ */
+    .container {
+        max-width: 860px;
+        margin: 0 auto;
+        padding: 24px 18px 80px;
+    }
+
+    /* ══ PAGE HEADING + SEARCH ══ */
+    .pageTopRow {
+        display: flex; align-items: flex-start;
+        justify-content: space-between; gap: 16px;
+        margin-bottom: 22px; flex-wrap: wrap;
+    }
+    
+    .pageTitle { font-size: 22px; font-weight: 800; color: var(--text); margin-bottom: 4px; }
+    .pageSub   { font-size: 13px; color: var(--gray); font-weight: 400; }
+
+    .searchBar {
+        display: flex; align-items: center; gap: 10px;
+        background: white; border: 1.5px solid var(--border);
+        border-radius: 12px; padding: 10px 16px;
+        flex: 0 0 280px; transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .searchBar:focus-within {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(26,63,212,0.10);
+    }
+    .searchBar .searchIcon { font-size: 16px; color: var(--gray); flex-shrink: 0; }
+    .searchBar input {
+        border: none; outline: none; background: transparent;
+        font-size: 13.5px; font-family: 'Poppins', sans-serif;
+        color: var(--text); width: 100%;
+    }
+    .searchBar input::placeholder { color: #adb5bd; }
+
+    /* ══ CATEGORY CARD ══ */
+    .categoryBox {
+        background: white; border-radius: 18px;
+        padding: 18px 20px; margin-bottom: 14px;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+        border: 1.5px solid transparent;
+        display: flex; align-items: flex-start;
+        gap: 16px; cursor: pointer;
+        transition: all 0.22s ease;
+        position: relative;
+    }
+    .categoryBox:hover {
+        border-color: rgba(26,63,212,0.18);
+        box-shadow: 0 6px 24px rgba(26,63,212,0.10);
+        transform: translateY(-2px);
+    }
+
+    /* Category icon */
+    .catIcon {
+        width: 72px; height: 72px; flex-shrink: 0;
+        background: var(--primary-light);
+        border-radius: 16px;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 34px;
+        border: 1.5px solid rgba(26,63,212,0.10);
+        transition: background 0.2s;
+    }
+    .categoryBox:hover .catIcon { background: #d4e0ff; }
+
+    /* Category body */
+    .catBody { flex: 1; min-width: 0; }
+    .catName {
+        font-size: 16px; font-weight: 700; color: var(--text);
+        margin-bottom: 8px; line-height: 1.3;
+    }
+    .serviceList {
+        list-style: none; padding: 0; margin: 0;
+        display: flex; flex-direction: column; gap: 4px;
+    }
+    .serviceList li {
+        font-size: 13px; color: var(--gray); font-weight: 400;
+        display: flex; align-items: center; gap: 6px; line-height: 1.5;
+    }
+    .serviceList li::before {
+        content: '•'; color: var(--primary);
+        font-size: 14px; line-height: 1; flex-shrink: 0;
+    }
+
+    /* Right side */
+    .catRight {
+        display: flex; align-items: center; gap: 10px;
+        flex-shrink: 0; margin-left: auto;
+    }
+    .serviceBadge {
+        background: var(--primary-light); color: var(--primary);
+        font-size: 11.5px; font-weight: 700;
+        padding: 5px 12px; border-radius: 20px;
+        white-space: nowrap;
+        border: 1px solid rgba(26,63,212,0.15);
+    }
+    .catChevron {
+        font-size: 18px; color: var(--primary);
+        font-weight: 700; line-height: 1;
+    }
+
+    /* ══ HIDDEN state ══ */
+    .categoryBox.hidden { display: none; }
+
+    /* ══ NO RESULT ══ */
+    .noResult {
+        text-align: center; padding: 50px 20px;
+        color: var(--gray); font-size: 14px;
+    }
+    .noResultIcon { font-size: 44px; margin-bottom: 12px; }
+
+    /* ══ SKELETON LOADER ══ */
+    .skeleton {
+        background: linear-gradient(90deg, #e8eeff 25%, #d8e4ff 50%, #e8eeff 75%);
+        background-size: 200% 100%;
+        animation: shimmer 1.4s infinite; border-radius: 12px;
+    }
+    @keyframes shimmer { 0% { background-position:200% 0; } 100% { background-position:-200% 0; } }
+    .skeletonCard {
+        background: white; border-radius: 18px; padding: 18px 20px;
+        margin-bottom: 14px; display: flex; gap: 16px;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+    }
+    .skeletonIcon { width: 72px; height: 72px; border-radius: 16px; flex-shrink: 0; }
+    .skeletonBody { flex: 1; display: flex; flex-direction: column; gap: 10px; padding-top: 4px; }
+    .skeletonTitle { height: 16px; border-radius: 8px; width: 40%; }
+    .skeletonLine  { height: 12px; border-radius: 8px; }
+
+    /* ══ MOBILE BOTTOM NAV ══ */
+    .bottomNav {
+        display: none;
+        position: fixed; bottom: 0; left: 0; right: 0;
+        background: white; border-top: 1px solid var(--border);
+        justify-content: space-around; padding: 10px 0 12px;
+        z-index: 999; box-shadow: 0 -4px 16px rgba(0,0,0,0.08);
+    }
+    .bnItem {
+        display: flex; flex-direction: column; align-items: center; gap: 3px;
+        font-size: 11.5px; font-weight: 600; color: var(--gray); cursor: pointer;
+        padding: 0 10px; transition: color 0.2s; border: none; background: none;
+        font-family: 'Poppins', sans-serif;
+    }
+    .bnItem.active { color: var(--primary); }
+    .bnIcon { font-size: 22px; }
+
+    /* ══ RESPONSIVE ══ */
+    @media (max-width: 768px) {
+        .container { padding: 18px 14px 80px; }
+        .pageTopRow { flex-direction: column; gap: 12px; }
+        .searchBar { flex: none; width: 100%; }
+        .bottomNav { display: flex; }
+        .catIcon { width: 58px; height: 58px; font-size: 26px; border-radius: 14px; }
+        .catName { font-size: 15px; }
+    }
+
+    @media (max-width: 480px) {
+        .catIcon { width: 52px; height: 52px; font-size: 22px; border-radius: 12px; }
+        .categoryBox { padding: 14px 14px; gap: 12px; }
+        .catName { font-size: 14px; }
+        .serviceList li { font-size: 12.5px; }
+        .serviceBadge { font-size: 11px; padding: 4px 10px; }
+    }
+</style>
+</head>
+
+<body oncontextmenu="return false;">
+
+    <!-- TOP HEADER -->
+    <div class="topHeader">
+        <div class="topHeaderLeft">
+            <button class="backBtn" onclick="history.back()">←</button>
+            <span class="topHeaderTitle">Service List</span>
+        </div>
+        <div class="topHeaderIcon">📋</div>
+    </div>
+
+    <!-- PAGE -->
+    <div class="container">
+
+        <!-- Heading + Search -->
+        <div class="pageTopRow">
+            <div class="pageHeadText">
+                <div class="pageTitle">All Services</div>
+                <div class="pageSub">Browse and explore all available services</div>
+            </div>
+            <div class="searchBar">
+                <span class="searchIcon">🔍</span>
+                <input type="text" id="searchInput" placeholder="Search services..." oninput="filterServices()" autocomplete="off">
+            </div>
+        </div>
+
+        <!-- Service list -->
+        <div id="serviceContainer"></div>
+
+    </div>
+
+    <!-- MOBILE BOTTOM NAV -->
+    <div class="bottomNav">
+        <button class="bnItem" onclick="location.href='index.html'">
+            <span class="bnIcon">🏠</span>Home
+        </button>
+        <button class="bnItem active">
+            <span class="bnIcon">📋</span>Services
+        </button>
+        <button class="bnItem" onclick="location.href='profile.html'">
+            <span class="bnIcon">📝</span>Requests
+        </button>
+        <button class="bnItem" onclick="location.href='profile.html'">
+            <span class="bnIcon">👤</span>Profile
+        </button>
+    </div>
+
+<script>
+    const API = "http://localhost:5000/api";
+
+    // No right-click, no copy
+    document.addEventListener("contextmenu", e => e.preventDefault());
+    document.addEventListener("copy",        e => e.preventDefault());
+    document.addEventListener("cut",         e => e.preventDefault());
+    document.addEventListener("keydown",     e => {
+        if ((e.ctrlKey || e.metaKey) && ["c","x","u","s","a"].includes(e.key.toLowerCase())) e.preventDefault();
+    });
+
+    // Category icons map
+    const iconMap = {
+        "plumber": "🔧", "electrician": "⚡", "electrical": "💡",
+        "cleaning": "🧹", "sofa": "🛋️", "glass": "🪟",
+        "carpenter": "🔨", "painter": "🖌️", "ac": "❄️",
+        "washing": "🫧", "home": "🏠", "tuition": "📚",
+        "car": "🚗", "security": "🛡️", "default": "🔧"
+    };
+
+    function getCatIcon(name) {
+        const lower = (name || "").toLowerCase();
+        for (const key of Object.keys(iconMap)) {
+            if (lower.includes(key)) return iconMap[key];
+        }
+        return iconMap["default"];
+    }
+
+    let groupedData = {};
+
+    // Show skeletons while loading
+    function showSkeletons() {
+        const c = document.getElementById("serviceContainer");
+        c.innerHTML = Array(4).fill('').map(() => `
+            <div class="skeletonCard">
+                <div class="skeleton skeletonIcon"></div>
+                <div class="skeletonBody">
+                    <div class="skeleton skeletonTitle"></div>
+                    <div class="skeleton skeletonLine" style="width:70%"></div>
+                    <div class="skeleton skeletonLine" style="width:55%"></div>
+                </div>
+            </div>`).join('');
+    }
+
+    // Render grouped data
+    function renderServices(filtered) {
+        const container = document.getElementById("serviceContainer");
+        container.innerHTML = "";
+
+        const keys = Object.keys(filtered);
+        if (keys.length === 0) {
+            container.innerHTML = `
+                <div class="noResult">
+                    <div class="noResultIcon">🔍</div>
+                    <p>No services found</p>
+                </div>`;
+            return;
+        }
+
+        keys.forEach(category => {
+            const services = filtered[category];
+            const icon     = getCatIcon(category);
+            const count    = services.length;
+
+            const box = document.createElement("div");
+            box.className = "categoryBox";
+            box.innerHTML = `
+                <div class="catIcon">${icon}</div>
+                <div class="catBody">
+                    <div class="catName">${category}</div>
+                    <ul class="serviceList">
+                        ${services.map(s => `<li>${s.name}</li>`).join("")}
+                    </ul>
+                </div>
+                <div class="catRight">
+                    <span class="serviceBadge">${count} Service${count !== 1 ? "s" : ""}</span>
+                    <span class="catChevron">›</span>
+                </div>`;
+
+            // Click opens category
+            box.onclick = () => {
+                const catId = services[0]?.category_id;
+                if (catId) window.location.href = `category.html?id=${catId}`;
+            };
+
+            container.appendChild(box);
+        });
+    }
+
+    // Filter on search
+    function filterServices() {
+        const q = document.getElementById("searchInput").value.toLowerCase().trim();
+        if (!q) { renderServices(groupedData); return; }
+
+        const filtered = {};
+        Object.keys(groupedData).forEach(cat => {
+            const matched = groupedData[cat].filter(s =>
+                s.name.toLowerCase().includes(q) || cat.toLowerCase().includes(q)
+            );
+            if (matched.length) filtered[cat] = matched;
+        });
+        renderServices(filtered);
+    }
+
+    // Load services from API
+    async function loadServices() {
+        showSkeletons();
+        try {
+            const res      = await fetch(API + "/admin/services");
+            const services = await res.json();
+
+            groupedData = {};
+            services.forEach(service => {
+                const cat = service.category_name || "Others";
+                if (!groupedData[cat]) groupedData[cat] = [];
+                groupedData[cat].push(service);
+            });
+
+            renderServices(groupedData);
+        } catch (err) {
+            console.log(err);
+            document.getElementById("serviceContainer").innerHTML = `
+                <div class="noResult">
+                    <div class="noResultIcon">⚠️</div>
+                    <p>Error loading services. Please try again.</p>
+                </div>`;
+        }
+    }
+
+    loadServices();
+</script>
+
+</body>
+</html>

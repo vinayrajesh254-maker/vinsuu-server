@@ -1,0 +1,1633 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Staff Register - Vinsuu</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+
+    <style>
+        :root {
+            --primary: #1a3fd4;
+            --primary-dark: #1430b0;
+            --primary-mid: #2b52e0;
+            --primary-light: #e8eeff;
+            --text: #1a1a2e;
+            --gray: #6b7280;
+            --border: #e5e7eb;
+            --light-bg: #f5f7ff;
+            --red: #ef4444;
+            --green: #16a34a;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #eef2ff;
+            color: var(--text);
+            min-height: 100vh;
+            padding-bottom: 40px;
+        }
+
+        /* ══ TOP HEADER ══ */
+        .topHeader {
+            background: linear-gradient(90deg, var(--primary-mid) 0%, var(--primary-dark) 100%);
+            padding: 14px 20px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            position: sticky;
+            top: 0;
+            z-index: 200;
+            box-shadow: 0 2px 12px rgba(26, 63, 212, 0.25);
+        }
+
+        .backBtn {
+            background: rgba(255, 255, 255, 0.15);
+            border: none;
+            color: white;
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            font-size: 18px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            transition: background 0.2s;
+        }
+
+        .backBtn:hover {
+            background: rgba(255, 255, 255, 0.25);
+        }
+
+        .topHeaderTitle {
+            font-size: 16px;
+            font-weight: 700;
+            color: white;
+        }
+
+        /* ══ PAGE WRAPPER ══ */
+        .container {
+            max-width: 860px;
+            margin: 0 auto;
+            padding: 22px 18px 50px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        /* ══ SECTION CARD ══ */
+        .sectionCard {
+            background: white;
+            border-radius: 18px;
+            overflow: visible;
+            /* important for dropdown */
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+        }
+
+        .sectionHeader {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 18px 22px 14px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .sectionHeaderIcon {
+            width: 44px;
+            height: 44px;
+            background: var(--primary-light);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+
+        .sectionHeaderTitle {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 2px;
+        }
+
+        .sectionHeaderSub {
+            font-size: 12px;
+            color: var(--gray);
+            font-weight: 400;
+        }
+
+        .sectionBody {
+            padding: 20px 22px;
+        }
+
+        /* ══ FIELD LABEL ══ */
+        .fieldLabel {
+            font-size: 12.5px;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 6px;
+            display: block;
+        }
+
+        .fieldLabel .req {
+            color: var(--red);
+            margin-left: 2px;
+        }
+
+        .formGroup {
+            margin-bottom: 16px;
+        }
+
+        .formRow {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+            margin-bottom: 16px;
+        }
+
+        .formRow3 {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 14px;
+            margin-bottom: 16px;
+        }
+
+        /* ══ INPUTS ══ */
+        input[type="text"],
+        input[type="email"],
+        input[type="tel"],
+        input[type="number"],
+        input[type="file"],
+        select,
+        textarea {
+            width: 100%;
+            padding: 11px 14px;
+            border: 1.5px solid var(--border);
+            border-radius: 12px;
+            font-size: 13.5px;
+            font-family: 'Poppins', sans-serif;
+            color: var(--text);
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+            background: var(--light-bg);
+            -webkit-appearance: none;
+            appearance: none;
+        }
+
+        input:focus,
+        select:focus,
+        textarea:focus {
+            border-color: var(--primary);
+            background: white;
+            box-shadow: 0 0 0 3px rgba(26, 63, 212, 0.10);
+        }
+
+        input[readonly],
+        input:disabled,
+        select:disabled,
+        textarea:disabled {
+            background: #f0f3ff;
+            color: var(--gray);
+            cursor: default;
+        }
+
+        input::placeholder,
+        textarea::placeholder {
+            color: #adb5bd;
+        }
+
+        input.error,
+        select.error,
+        textarea.error,
+        input[type="file"].error {
+            border-color: var(--red) !important;
+            background: #fef2f2 !important;
+            box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.10) !important;
+        }
+
+        /* ══ SERVICE DROPDOWN ══ */
+        .dropdownBox {
+            position: relative;
+        }
+
+        .serviceSearchInput {
+            width: 100%;
+            padding: 11px 40px 11px 14px;
+            border: 1.5px solid var(--border);
+            border-radius: 12px;
+            font-size: 13.5px;
+            font-family: 'Poppins', sans-serif;
+            color: var(--text);
+            outline: none;
+            background: var(--light-bg);
+            cursor: pointer;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .serviceSearchInput:focus {
+            border-color: var(--primary);
+            background: white;
+            box-shadow: 0 0 0 3px rgba(26, 63, 212, 0.10);
+        }
+
+        .dropdownArrow {
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 14px;
+            color: var(--gray);
+            pointer-events: none;
+        }
+
+        .dropdownList {
+            display: none;
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: calc(100% + 6px);
+            background: white;
+            border: 1.5px solid var(--border);
+            border-radius: 14px;
+            box-shadow: 0 10px 36px rgba(0, 0, 0, 0.14);
+            max-height: 260px;
+            overflow-y: auto;
+            z-index: 9999;
+            /* high enough to show above everything */
+            animation: slideDown 0.2s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-8px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        #searchInput {
+            width: calc(100% - 20px);
+            margin: 10px;
+            padding: 9px 12px;
+            border: 1.5px solid var(--border);
+            border-radius: 10px;
+            font-size: 13px;
+            font-family: 'Poppins', sans-serif;
+            outline: none;
+        }
+
+        #searchInput:focus {
+            border-color: var(--primary);
+        }
+
+        .serviceItem {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 11px 14px;
+            border-bottom: 1px solid var(--border);
+            transition: background 0.15s;
+        }
+
+        .serviceItem:last-child {
+            border-bottom: none;
+        }
+
+        .serviceItem:hover {
+            background: var(--light-bg);
+        }
+
+        .serviceItem span {
+            font-size: 13.5px;
+            font-weight: 500;
+            color: var(--text);
+        }
+
+        .btnGroup {
+            display: flex;
+            gap: 8px;
+        }
+
+        .detailsBtn,
+        .addBtn {
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            font-family: 'Poppins', sans-serif;
+            transition: all 0.2s;
+        }
+
+        .detailsBtn {
+            background: var(--light-bg);
+            color: var(--primary);
+            border: 1.5px solid rgba(26, 63, 212, 0.2);
+        }
+
+        .detailsBtn:hover {
+            background: var(--primary-light);
+        }
+
+        .addBtn {
+            background: var(--primary);
+            color: white;
+        }
+
+        .addBtn:hover {
+            background: var(--primary-dark);
+        }
+
+        /* ══ SELECTED SERVICE CARDS ══ */
+        .selectedCard {
+            background: var(--light-bg);
+            border: 1.5px solid var(--border);
+            border-radius: 14px;
+            padding: 14px 16px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+        }
+
+        .selectedCardNum {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: var(--primary-light);
+            border: 1.5px solid rgba(26, 63, 212, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--primary);
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .selectedCardContent {
+            flex: 1;
+        }
+
+        .selectedCardName {
+            font-size: 13.5px;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 8px;
+        }
+
+        .selectedCardContent input {
+            background: white;
+            border: 1.5px solid var(--border);
+            border-radius: 10px;
+            padding: 9px 12px;
+            font-size: 13px;
+        }
+
+        .removeBtn {
+            background: none;
+            border: none;
+            color: var(--red);
+            font-size: 18px;
+            cursor: pointer;
+            padding: 2px 4px;
+            flex-shrink: 0;
+            transition: opacity 0.2s;
+        }
+
+        .removeBtn:hover {
+            opacity: 0.7;
+        }
+
+        /* Add Another Service button */
+        .addAnotherBtn {
+            width: 100%;
+            padding: 12px;
+            background: white;
+            border: 1.5px dashed var(--primary);
+            border-radius: 12px;
+            font-size: 13.5px;
+            font-weight: 600;
+            color: var(--primary);
+            cursor: pointer;
+            font-family: 'Poppins', sans-serif;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .addAnotherBtn:hover {
+            background: var(--primary-light);
+        }
+
+        /* ══ LOCATION ROW ══ */
+        .locationRow {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 13px 16px;
+            background: var(--light-bg);
+            border: 1.5px solid var(--border);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-top: 10px;
+        }
+
+        .locationRow:hover {
+            border-color: var(--primary);
+            background: var(--primary-light);
+        }
+
+        .locationRowLeft {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .locationRowTitle {
+            font-size: 13.5px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .locationRowSub {
+            font-size: 12px;
+            color: var(--gray);
+            margin-top: 1px;
+        }
+
+        .locationChevron {
+            font-size: 16px;
+            color: var(--gray);
+        }
+
+        /* ══ PIN TAGS ══ */
+        .pinArea {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+
+        .pinArea input {
+            flex: 1;
+            margin-bottom: 0;
+        }
+
+        .pinAddBtn {
+            padding: 11px 18px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 13.5px;
+            font-weight: 700;
+            cursor: pointer;
+            font-family: 'Poppins', sans-serif;
+            transition: all 0.2s;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        .pinAddBtn:hover {
+            background: var(--primary-dark);
+        }
+
+        .pinTagsRow {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+
+        .pinTag {
+            background: var(--primary-light);
+            border: 1.5px solid rgba(26, 63, 212, 0.2);
+            color: var(--primary);
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12.5px;
+            font-weight: 600;
+        }
+
+        /* ══ UPLOAD ══ */
+        .uploadRow {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .uploadRow input[type="file"] {
+            flex: 1;
+            padding: 9px 12px;
+            font-size: 12.5px;
+            cursor: pointer;
+        }
+
+        .changeBtn {
+            padding: 10px 16px;
+            background: var(--light-bg);
+            color: var(--primary);
+            border: 1.5px solid rgba(26, 63, 212, 0.2);
+            border-radius: 10px;
+            font-size: 12.5px;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: 'Poppins', sans-serif;
+            transition: all 0.2s;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        .changeBtn:hover {
+            background: var(--primary-light);
+        }
+
+        .imageView {
+            margin-top: 12px;
+            background: var(--light-bg);
+            border: 1.5px solid var(--border);
+            border-radius: 14px;
+            padding: 14px;
+            text-align: center;
+        }
+
+        .imageView p {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--gray);
+            margin-bottom: 10px;
+        }
+
+        .imageView img {
+            max-width: 100%;
+            max-height: 220px;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            cursor: pointer;
+            object-fit: contain;
+        }
+
+        /* ══ CAMERA ══ */
+        .cameraRow {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 12px;
+        }
+
+        .cameraBtn {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            padding: 11px 18px;
+            background: var(--light-bg);
+            color: var(--primary);
+            border: 1.5px solid rgba(26, 63, 212, 0.2);
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: 'Poppins', sans-serif;
+            transition: all 0.2s;
+        }
+
+        .cameraBtn:hover {
+            background: var(--primary-light);
+        }
+
+        .captureBtn {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            padding: 11px 18px;
+            background: var(--green);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: 'Poppins', sans-serif;
+            transition: all 0.2s;
+        }
+
+        .captureBtn:hover {
+            background: #15803d;
+        }
+
+        #video {
+            display: none;
+            width: 100%;
+            max-width: 320px;
+            border-radius: 14px;
+            border: 1.5px solid var(--border);
+            margin-top: 12px;
+        }
+
+        /* ══ SELECT WRAP ══ */
+        .selectWrap {
+            position: relative;
+        }
+
+        .selectWrap select {
+            padding-right: 36px;
+        }
+
+        .selectArrow {
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 12px;
+            color: var(--gray);
+            pointer-events: none;
+        }
+
+        /* ══ TERMS ══ */
+        .termsRow {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 16px;
+            background: var(--light-bg);
+            border-radius: 12px;
+            border: 1.5px solid var(--border);
+            cursor: pointer;
+            transition: border-color 0.2s;
+        }
+
+        .termsRow:hover {
+            border-color: var(--primary);
+        }
+
+        .termsRow input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            accent-color: var(--primary);
+            cursor: pointer;
+            flex-shrink: 0;
+            background: none;
+            box-shadow: none;
+            padding: 0;
+            border: none;
+        }
+
+        .termsRow label {
+            font-size: 13.5px;
+            color: var(--text);
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        .termsLink {
+            color: var(--primary);
+            font-weight: 700;
+            text-decoration: underline;
+            cursor: pointer;
+        }
+
+        /* ══ SAVE BUTTON ══ */
+        .saveBtn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, var(--primary-mid), var(--primary-dark));
+            color: white;
+            border: none;
+            border-radius: 14px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            font-family: 'Poppins', sans-serif;
+            transition: all 0.2s;
+            box-shadow: 0 6px 20px rgba(26, 63, 212, 0.30);
+            margin-top: 4px;
+        }
+
+        .saveBtn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 28px rgba(26, 63, 212, 0.40);
+        }
+
+        /* ══ OTP POPUP ══ */
+        .popupOverlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 999;
+            padding: 16px;
+        }
+
+        .popupOverlay.open {
+            display: flex;
+        }
+
+        .popupBox {
+            background: white;
+            width: 100%;
+            max-width: 380px;
+            border-radius: 20px;
+            padding: 28px 24px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            animation: popIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) both;
+        }
+
+        @keyframes popIn {
+            from {
+                opacity: 0;
+                transform: scale(0.92) translateY(16px);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        .popupTitle {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 6px;
+        }
+
+        .popupSub {
+            font-size: 13px;
+            color: var(--gray);
+            margin-bottom: 20px;
+        }
+
+        .popupInput {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1.5px solid var(--border);
+            border-radius: 12px;
+            font-size: 16px;
+            font-family: 'Poppins', sans-serif;
+            text-align: center;
+            outline: none;
+            margin-bottom: 14px;
+            letter-spacing: 4px;
+            transition: border-color 0.2s;
+        }
+
+        .popupInput:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(26, 63, 212, 0.10);
+        }
+
+        .popBtnPrimary {
+            width: 100%;
+            padding: 13px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            font-family: 'Poppins', sans-serif;
+            transition: all 0.2s;
+            margin-bottom: 10px;
+        }
+
+        .popBtnPrimary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+        }
+
+        .popBtnCancel {
+            width: 100%;
+            padding: 11px;
+            background: #fee2e2;
+            color: #dc2626;
+            border: none;
+            border-radius: 12px;
+            font-size: 13.5px;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        /* ══ SERVICE DETAILS MODAL ══ */
+        #serviceDetailsModal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.4);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            padding: 16px;
+        }
+
+        #serviceDetailsBox {
+            background: white;
+            padding: 24px;
+            border-radius: 18px;
+            width: 100%;
+            max-width: 340px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
+        }
+
+        #serviceDetailsBox h3 {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 14px;
+            color: var(--text);
+        }
+
+        #serviceDetailsList {
+            padding-left: 18px;
+        }
+
+        #serviceDetailsList li {
+            font-size: 13.5px;
+            color: var(--gray);
+            margin-bottom: 6px;
+            line-height: 1.6;
+        }
+
+        .modalCloseBtn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            padding: 11px;
+            background: var(--primary-light);
+            color: var(--primary);
+            border: none;
+            border-radius: 10px;
+            font-size: 13.5px;
+            font-weight: 700;
+            cursor: pointer;
+            font-family: 'Poppins', sans-serif;
+            margin-top: 16px;
+            transition: all 0.2s;
+        }
+
+        .modalCloseBtn:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        /* ══ RESPONSIVE ══ */
+        @media (max-width: 600px) {
+            .container {
+                padding: 14px 12px 50px;
+                gap: 12px;
+            }
+
+            .sectionBody {
+                padding: 16px 14px;
+            }
+
+            .sectionHeader {
+                padding: 14px 16px 12px;
+            }
+
+            .formRow {
+                grid-template-columns: 1fr;
+                gap: 0;
+                margin-bottom: 0;
+            }
+
+            .formRow>.formGroup {
+                margin-bottom: 16px;
+            }
+
+            .formRow3 {
+                grid-template-columns: 1fr;
+                gap: 0;
+                margin-bottom: 0;
+            }
+
+            .formRow3>.formGroup {
+                margin-bottom: 16px;
+            }
+
+            .uploadRow {
+                flex-direction: column;
+            }
+
+            .pinArea {
+                flex-direction: column;
+                gap: 8px;
+            }
+
+            .pinAddBtn {
+                width: 100%;
+            }
+        }
+    </style>
+
+    <script>
+        const params = new URLSearchParams(window.location.search);
+        const isViewMode = params.get("mode") === "view";
+
+        const STAFF_API = "http://localhost:5000/api/staff";
+        const ADMIN_API = "http://localhost:5000/api/admin";
+
+        let idImageBase64 = null;
+        let profileImageBase64 = null;
+        let pinCodes = [];
+        let allServices = [];
+        let selectedServices = [];
+        let cameraImageBase64 = null;
+        let selectedLat = null;
+        let selectedLng = null;
+        let existingIdImage = null;
+        let existingProfileImage = null;
+        let existingCameraImage = null;
+        let otpSessionId = null;
+
+        document.addEventListener("DOMContentLoaded", () => {
+            loadServices();
+            if (isViewMode) {
+                setTimeout(loadProfileData, 300);
+                document.querySelector(".topHeaderTitle").textContent = "View / Edit Profile";
+            }
+        });
+
+        // ── SERVICES ──
+        async function loadServices() {
+            try {
+                const res = await fetch(ADMIN_API + "/services");
+                allServices = await res.json();
+                renderServices(allServices);
+            } catch (e) { console.log("Failed to load services"); }
+        }
+
+        function openDropdown(e) {
+            e.stopPropagation();
+            const d = document.getElementById("serviceDropdown");
+            d.style.display = d.style.display === "block" ? "none" : "block";
+        }
+        function hideServiceDropdown() {
+            const d = document.getElementById("serviceDropdown");
+            if (d) d.style.display = "none";
+        }
+        document.addEventListener("click", (e) => {
+            if (!e.target.closest(".dropdownBox")) hideServiceDropdown();
+        });
+
+        function renderServices(list) {
+            const box = document.getElementById("serviceList");
+            box.innerHTML = "";
+            list.forEach(s => {
+                const div = document.createElement("div");
+                div.className = "serviceItem";
+                div.innerHTML = `<span>${s.name}</span>
+                <div class="btnGroup">
+                    <button class="detailsBtn">Details</button>
+                    <button class="addBtn">+ Add</button>
+                </div>`;
+                div.querySelector(".detailsBtn").onclick = (e) => { e.stopPropagation(); hideServiceDropdown(); showDetails(s); };
+                div.querySelector(".addBtn").onclick = (e) => { e.stopPropagation(); hideServiceDropdown(); addService(s); };
+                box.appendChild(div);
+            });
+        }
+
+        function filterServices() {
+            const val = document.getElementById("searchInput").value.toLowerCase();
+            renderServices(allServices.filter(s => s.name.toLowerCase().includes(val)));
+        }
+
+        function addService(service) {
+            if (selectedServices.find(s => s.id === service.id)) { alert("Already added"); return; }
+            selectedServices.push({ id: service.id, name: service.name, experience: "" });
+            renderSelected();
+            document.getElementById("serviceSearch").value = selectedServices.map(s => s.name).join(", ");
+        }
+
+        function renderSelected() {
+            const box = document.getElementById("selectedServices");
+            box.innerHTML = "";
+            selectedServices.forEach((s, i) => {
+                const div = document.createElement("div");
+                div.className = "selectedCard";
+                div.innerHTML = `
+                <div class="selectedCardNum">${i + 1}</div>
+                <div class="selectedCardContent">
+                    <div class="selectedCardName">${s.name}</div>
+                    <input placeholder="Experience (in years)" value="${s.experience || ''}" oninput="updateExp(${i},this.value)">
+                </div>
+                <button class="removeBtn" onclick="removeService(${i})">🗑</button>`;
+                box.appendChild(div);
+            });
+        }
+
+        function updateExp(i, v) { selectedServices[i].experience = v; }
+        function removeService(i) {
+            selectedServices.splice(i, 1); renderSelected();
+            document.getElementById("serviceSearch").value = selectedServices.map(s => s.name).join(", ");
+        }
+
+        function showDetails(service) {
+            const list = document.getElementById("serviceDetailsList");
+            list.innerHTML = "";
+            let arr = [];
+            try { arr = JSON.parse(service.details); } catch { arr = (service.details || "").split(","); }
+            arr.forEach(d => { if (d.trim()) list.innerHTML += `<li>${d}</li>`; });
+            document.getElementById("serviceDetailsModal").style.display = "flex";
+        }
+        function closeDetails() { document.getElementById("serviceDetailsModal").style.display = "none"; }
+
+        // ── LOCATION ──
+        async function useCurrentLocation() {
+            const locationEl = document.getElementById("currentLocationText");
+            const addressInput = document.getElementById("address");
+            if (!navigator.geolocation) return alert("GPS not supported");
+            navigator.geolocation.getCurrentPosition(
+                async (pos) => {
+                    const lat = pos.coords.latitude;
+                    const lng = pos.coords.longitude;
+                    selectedLat = lat; selectedLng = lng;
+                    console.log("STAFF LAT:", lat);
+                    console.log("STAFF LNG:", lng);
+                    console.log("GPS ACCURACY:", pos.coords.accuracy, "meters");
+
+                    locationEl.innerText = "Fetching location...";
+
+                    try {
+
+                        const res = await fetch(
+                            `http://localhost:5000/api/geocode?lat=${lat}&lng=${lng}`
+                        );
+
+                        const data = await res.json();
+
+                        let address =
+                            data.plus_code?.compound_code ||
+                            data.results?.[0]?.formatted_address ||
+                            `${lat}, ${lng}`;
+
+                        addressInput.value = address;
+
+                        locationEl.innerHTML =
+                            `<span style="color:#16a34a;font-weight:bold;">✔ Location updated</span>`;
+
+                        document.getElementById("locationSubText").textContent =
+                            "Location updated";
+
+                    } catch (err) {
+
+                        console.error(err);
+
+                        locationEl.innerHTML =
+                            `<span style="color:#16a34a;font-weight:bold;">✔ Location updated</span>`;
+
+                        document.getElementById("locationSubText").textContent =
+                            "Location updated";
+
+                    }
+
+                },
+
+                () => {
+                    alert("Location permission denied");
+                },
+
+                {
+                    enableHighAccuracy: true,
+                    timeout: 15000,
+                    maximumAge: 0
+                }
+
+            );
+        }
+
+        // ── PIN CODE ──
+        async function addPin() {
+            const pin = document.getElementById("pincode").value.trim();
+            if (pin.length !== 6) return alert("Invalid PIN");
+            if (pinCodes.includes(pin)) return alert("Already added");
+            pinCodes.push(pin);
+            renderPins(); findLocation(pin);
+            document.getElementById("pincode").value = "";
+        }
+        function renderPins() {
+            const box = document.getElementById("pinList");
+            box.innerHTML = "";
+            pinCodes.forEach(p => box.innerHTML += `<span class="pinTag">${p}</span>`);
+        }
+        async function findLocation(pin) {
+            try {
+                const res = await fetch(`https://api.zippopotam.us/in/${pin}`);
+                if (res.ok) {
+                    const data = await res.json();
+                    const place = data.places[0];
+                    document.getElementById("location").value = `${place["place name"]}, ${place["state"]}`;
+                }
+            } catch { document.getElementById("location").value = "Location not found"; }
+        }
+
+        // ── VALIDATION ──
+        function validateCompulsoryFields() {
+            let isValid = true;
+            const fields = ["name", "mobile", "qualification", "email", "address", "id_proof_no"];
+            document.querySelectorAll("input, select").forEach(el => el.classList.remove("error"));
+            fields.forEach(id => { const el = document.getElementById(id); if (!el.value.trim()) { el.classList.add("error"); isValid = false; } });
+            if (!isViewMode) {
+                if (!idImageBase64) { document.getElementById("idUpload").classList.add("error"); isValid = false; }
+                if (!profileImageBase64) { document.getElementById("photoUpload").classList.add("error"); isValid = false; }
+            }
+            if (isViewMode && !cameraImageBase64) { alert("Please capture live photo"); isValid = false; }
+            if (!document.getElementById("agreeTerms").checked) { document.getElementById("agreeTerms").style.outline = "2px solid red"; isValid = false; }
+            return isValid;
+        }
+
+        async function saveStaff() {
+            if (!validateCompulsoryFields()) return;
+            await sendOTP(document.getElementById("mobile").value);
+        }
+
+        async function sendOTP(mobile) {
+            if (mobile.length !== 10) return alert("Enter valid mobile number");
+            const res = await fetch("http://localhost:5000/api/otp/send", {
+                method: "POST", headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ mobile })
+            });
+            const data = await res.json();
+            if (res.ok) {
+                otpSessionId = data.sessionId;
+                localStorage.setItem("staffOtpSessionId", data.sessionId);
+                alert("OTP sent to mobile");
+                document.getElementById("otpBox").classList.add("open");
+            } else { alert(data.error || "Failed to send OTP"); }
+        }
+
+        async function verifyOTP() {
+            const otp = document.getElementById("otpInput").value;
+            const sessionId = otpSessionId || localStorage.getItem("staffOtpSessionId");
+            if (!sessionId) { alert("OTP session expired. Please resend OTP."); return; }
+            const res = await fetch("http://localhost:5000/api/otp/verify", {
+                method: "POST", headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ sessionId, otp })
+            });
+            const data = await res.json();
+            if (res.ok) {
+                localStorage.removeItem("staffOtpSessionId");
+                alert("OTP Verified");
+                document.getElementById("otpBox").classList.remove("open");
+                finalSave();
+            } else { alert(data.error || "Invalid OTP"); }
+        }
+
+        async function finalSave() {
+            const experienceInput = document.getElementById("experience").value || (selectedServices[0] ? selectedServices[0].experience : "");
+            const formData = new FormData();
+            formData.append("service_ids", JSON.stringify(selectedServices.map(s => s.id)));
+            formData.append("service_names", JSON.stringify(selectedServices.map(s => s.name)));
+            formData.append("name", document.getElementById("name").value);
+            formData.append("mobile", document.getElementById("mobile").value);
+            formData.append("alt_mobile", document.getElementById("alt_mobile").value);
+            formData.append("email", document.getElementById("email").value);
+            formData.append("qualification", document.getElementById("qualification").value);
+            formData.append("experience", experienceInput);
+            formData.append("address", document.getElementById("address").value);
+            formData.append("pincodes", JSON.stringify(pinCodes));
+            formData.append("location", JSON.stringify({ lat: selectedLat, lng: selectedLng }));
+            formData.append("id_proof", document.getElementById("id_proof").value);
+            formData.append("id_proof_no", document.getElementById("id_proof_no").value);
+            formData.append("agree_terms", document.getElementById("agreeTerms").checked);
+
+            const idFile = document.getElementById("idUpload").files[0];
+            if (idFile) formData.append("id_image", idFile);
+            else if (existingIdImage) formData.append("existing_id_image", existingIdImage);
+
+            const profileFile = document.getElementById("photoUpload").files[0];
+            if (profileFile) formData.append("profile_image", profileFile);
+            else if (existingProfileImage) formData.append("existing_profile_image", existingProfileImage);
+
+            if (cameraImageBase64) {
+                const blob = await fetch(cameraImageBase64).then(r => r.blob());
+                formData.append("camera_image", blob, "camera.png");
+            } else if (existingCameraImage) { formData.append("existing_camera_image", existingCameraImage); }
+
+            const res = await fetch(STAFF_API + "/register", { method: "POST", body: formData });
+            const data = await res.json();
+
+            if (res.ok) {
+                const realStaffId = data.user?.id || data.id || data.staff_id || data.staff?.id || data.staff?.staff_id || "";
+                const updatedStaffUser = {
+                    id: realStaffId, staff_id: realStaffId,
+                    name: document.getElementById("name").value,
+                    service_names: selectedServices.map(s => s.name),
+                    profile_image: profileImageBase64 || existingProfileImage || data.user?.profile_image || data.profile_image || data.staff?.profile_image || ""
+                };
+                localStorage.setItem("staffId", realStaffId);
+                localStorage.setItem("staffUser", JSON.stringify(updatedStaffUser));
+                localStorage.setItem("user", JSON.stringify(updatedStaffUser));
+                console.log("SAVED STAFF USER:", updatedStaffUser);
+                alert(isViewMode ? "Profile Updated Successfully" : "Registered Successfully");
+                window.location.href = "staff.html";
+            } else { alert(data.error || "Error saving data"); }
+        }
+
+        // ── LOAD PROFILE ──
+        async function loadProfileData() {
+            const token = localStorage.getItem("staffToken");
+            let user = {};
+            try {
+                const res = await fetch("http://localhost:5000/api/staff/profile", { headers: { "Authorization": "Bearer " + token } });
+                console.log("PROFILE API DATA:", user);
+                if (res.ok) { user = await res.json(); console.log("PROFILE API DATA:", user); }
+            } catch (err) { console.log("Profile fetch error:", err); }
+            if (!user || Object.keys(user).length === 0) user = JSON.parse(localStorage.getItem("user") || "{}");
+
+            document.getElementById("name").value = user.name || "";
+            document.getElementById("mobile").value = user.mobile || "";
+            document.getElementById("alt_mobile").value = user.alt_mobile || "";
+            document.getElementById("email").value = user.email || "";
+            document.getElementById("qualification").value = user.qualification || "";
+            document.getElementById("experience").value = user.experience || "";
+            document.getElementById("address").value = user.address || "";
+            document.getElementById("idUpload").disabled = true;
+            document.getElementById("photoUpload").disabled = true;
+
+            let loc = user.location;
+            try { if (typeof loc === "string") loc = JSON.parse(loc); } catch { }
+            if (loc?.lat && loc?.lng) {
+                selectedLat = loc.lat; selectedLng = loc.lng;
+                fetch(`http://localhost:5000/api/geocode?lat=${loc.lat}&lng=${loc.lng}`)
+                    .then(r => r.json())
+                    .then(data => {
+                        let address = data.plus_code?.compound_code || data.results?.[0]?.formatted_address || "";
+                        document.getElementById("location").value = address;
+                        document.getElementById("currentLocationText").innerHTML = `<span style="color:#16a34a;font-weight:bold;">✔ Location updated</span>`;
+                        document.getElementById("locationSubText").textContent = `Lat: ${loc.lat.toFixed(4)}, Lng: ${loc.lng.toFixed(4)}`;
+                    });
+            }
+
+            if (Array.isArray(user.pincodes)) pinCodes = user.pincodes;
+            else if (typeof user.pincodes === "string") pinCodes = user.pincodes.replace(/[{}]/g, "").split(",").map(p => p.trim()).filter(Boolean);
+            else pinCodes = [];
+            renderPins();
+
+            let serviceNames = [], serviceIds = [];
+            if (Array.isArray(user.service_names)) serviceNames = user.service_names;
+            else if (typeof user.service_names === "string") serviceNames = user.service_names.replace(/[{}]/g, "").split(",").map(s => s.trim()).filter(Boolean);
+            if (Array.isArray(user.service_ids)) serviceIds = user.service_ids;
+            else if (typeof user.service_ids === "string") serviceIds = user.service_ids.replace(/[{}]/g, "").split(",").map(id => parseInt(id)).filter(Boolean);
+
+            selectedServices = serviceNames.map((name, i) => ({ id: serviceIds[i] || null, name, experience: user.experience || "" }));
+            renderSelected();
+            document.getElementById("serviceSearch").value = serviceNames.join(", ");
+
+            document.getElementById("id_proof").value = user.id_proof || "";
+            document.getElementById("id_proof_no").value = user.id_proof_no || "";
+            existingIdImage = user.id_image || null;
+            existingProfileImage = user.profile_image || null;
+            existingCameraImage = user.camera_image || null;
+
+            if (user.id_image) {
+                let src = user.id_image;
+                if (!src.startsWith("http") && !src.startsWith("data:")) src = "http://localhost:5000" + src;
+                document.getElementById("idImage").src = src;
+                document.getElementById("idPreview").style.display = "block";
+            }
+            if (user.profile_image) {
+                let src = user.profile_image;
+                if (!src.startsWith("http") && !src.startsWith("data:")) src = "http://localhost:5000" + src;
+                document.getElementById("photoImage").src = src;
+                document.getElementById("photoPreview").style.display = "block";
+            }
+            if (user.camera_image && user.camera_image !== "null") {
+                let src = user.camera_image;
+                if (!src.startsWith("http") && !src.startsWith("data:")) src = "http://localhost:5000" + src;
+                const camImg = document.getElementById("cameraImage");
+                const camPrev = document.getElementById("cameraPreview");
+                if (camImg && camPrev) { camImg.src = src; camPrev.style.display = "block"; }
+            }
+
+            document.getElementById("agreeTerms").checked = user.agree_terms === true || user.agree_terms === "true";
+            document.querySelectorAll("input, select, textarea").forEach(el => el.disabled = true);
+            const btn = document.querySelector(".saveBtn");
+            btn.innerHTML = "✏ Edit Profile"; btn.onclick = enableEditMode;
+        }
+
+        function enableEditMode() {
+            document.querySelectorAll("input, select, textarea").forEach(el => { if (el.id !== "mobile") el.disabled = false; });
+            const btn = document.querySelector(".saveBtn");
+            btn.innerHTML = "💾 Save"; btn.onclick = saveStaff;
+        }
+
+        // ── FILE UPLOAD ──
+        function handleFileUpload(input, previewId) {
+            const previewDiv = document.getElementById(previewId);
+            const imgEl = document.getElementById(previewId.replace("Preview", "Image"));
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    imgEl.src = e.target.result;
+                    previewDiv.style.display = "block";
+                    if (previewId === "idPreview") idImageBase64 = e.target.result;
+                    else profileImageBase64 = e.target.result;
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        let stream;
+        async function startCamera() {
+            const video = document.getElementById("video");
+            try { stream = await navigator.mediaDevices.getUserMedia({ video: true }); video.srcObject = stream; video.style.display = "block"; }
+            catch { alert("Camera access denied or not available"); }
+        }
+        function capturePhoto() {
+            const video = document.getElementById("video");
+            if (!video.srcObject) return alert("Please open camera first");
+            const canvas = document.createElement("canvas");
+            canvas.width = video.videoWidth || 280; canvas.height = video.videoHeight || 210;
+            canvas.getContext("2d").drawImage(video, 0, 0);
+            const imageData = canvas.toDataURL("image/png");
+            document.getElementById("cameraImage").src = imageData;
+            document.getElementById("cameraPreview").style.display = "block";
+            cameraImageBase64 = imageData;
+            if (stream) stream.getTracks().forEach(t => t.stop());
+            video.style.display = "none";
+        }
+
+        function openTerms() { window.location.href = "staff-terms.html"; }
+        function closeTerms() { document.getElementById("termsModal").style.display = "none"; }
+        function acceptTerms() { document.getElementById("agreeTerms").checked = true; closeTerms(); }
+        function enableIdUpload() { document.getElementById("idUpload").disabled = false; }
+        function enablePhotoUpload() { document.getElementById("photoUpload").disabled = false; }
+    </script>
+    <script src="script.js"></script>
+</head>
+
+<body>
+
+    <!-- TOP HEADER -->
+    <div class="topHeader">
+        <button class="backBtn" onclick="history.back()">←</button>
+        <span class="topHeaderTitle">Register Staff for a Service</span>
+    </div>
+
+    <!-- OTP POPUP -->
+    <div id="otpBox" class="popupOverlay">
+        <div class="popupBox">
+            <div style="font-size:36px;margin-bottom:12px;">🔐</div>
+            <div class="popupTitle">Enter OTP</div>
+            <div class="popupSub">OTP sent to your registered mobile</div>
+            <input id="otpInput" class="popupInput" placeholder="• • • • • •" inputmode="numeric">
+            <button class="popBtnPrimary" onclick="verifyOTP()">Verify &amp; Save</button>
+            <button class="popBtnCancel"
+                onclick="document.getElementById('otpBox').classList.remove('open')">Cancel</button>
+        </div>
+    </div>
+
+    <!-- SERVICE DETAILS MODAL -->
+    <div id="serviceDetailsModal"
+        style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.4);justify-content:center;align-items:center;z-index:1000;padding:16px;">
+        <div id="serviceDetailsBox">
+            <h3>Service Details</h3>
+            <ul id="serviceDetailsList"></ul>
+            <button class="modalCloseBtn" onclick="closeDetails()">Close</button>
+        </div>
+    </div>
+
+    <!-- PAGE -->
+    <div class="container">
+
+        <!-- 1. SERVICE DETAILS -->
+        <div class="sectionCard">
+            <div class="sectionHeader">
+                <div class="sectionHeaderIcon">💼</div>
+                <div>
+                    <div class="sectionHeaderTitle">Service Details</div>
+                    <div class="sectionHeaderSub">Enter the service you provide and your expertise.</div>
+                </div>
+            </div>
+            <div class="sectionBody">
+                <div class="formGroup">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+                        <label class="fieldLabel" style="margin-bottom:0;">Service Name</label>
+                        <a href="service-list.html"
+                            style="font-size:12.5px;font-weight:700;color:var(--primary);text-decoration:none;"> Service
+                            List </a>
+                    </div>
+                    <div class="dropdownBox">
+                        <input id="serviceSearch" class="serviceSearchInput" placeholder="Select service..." readonly
+                            onclick="openDropdown(event)">
+                        <span class="dropdownArrow">▼</span>
+                        <div id="serviceDropdown" class="dropdownList">
+                            <input id="searchInput" placeholder="Search services..." oninput="filterServices()"
+                                onclick="event.stopPropagation()">
+                            <div id="serviceList"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. SELECTED SERVICES -->
+        <div class="sectionCard">
+            <div class="sectionHeader">
+                <div class="sectionHeaderIcon">📋</div>
+                <div>
+                    <div class="sectionHeaderTitle">Selected Services &amp; Experience</div>
+                    <div class="sectionHeaderSub">Add the services you can provide with your experience.</div>
+                </div>
+            </div>
+            <div class="sectionBody">
+                <div id="selectedServices"></div>
+
+            </div>
+        </div>
+
+        <!-- 3. PERSONAL INFORMATION -->
+        <div class="sectionCard">
+            <div class="sectionHeader">
+                <div class="sectionHeaderIcon">👤</div>
+                <div>
+                    <div class="sectionHeaderTitle">Personal Information</div>
+                    <div class="sectionHeaderSub">Enter your personal and professional details.</div>
+                </div>
+            </div>
+            <div class="sectionBody">
+                <div class="formGroup">
+                    <label class="fieldLabel">Name <span class="req">*</span></label>
+                    <input type="text" id="name" placeholder="Enter full name">
+                </div>
+                <div class="formRow">
+                    <div class="formGroup">
+                        <label class="fieldLabel">Mob No. <span class="req">*</span></label>
+                        <input type="tel" id="mobile" placeholder="10-digit number">
+                    </div>
+                    <div class="formGroup">
+                        <label class="fieldLabel">Alternate Mob No.</label>
+                        <input type="tel" id="alt_mobile" placeholder="Alternate number">
+                    </div>
+                </div>
+                <div class="formRow">
+                    <div class="formGroup">
+                        <label class="fieldLabel">Qualification <span class="req">*</span></label>
+                        <input type="text" id="qualification" placeholder="e.g. bsc, bcom">
+                    </div>
+                    <div class="formGroup">
+                        <label class="fieldLabel">Email <span class="req">*</span></label>
+                        <input type="email" id="email" placeholder="your@email.com">
+                    </div>
+                </div>
+                <div class="formGroup">
+                    <label class="fieldLabel">Experience (in years)</label>
+                    <input type="number" id="experience" placeholder="e.g. 3">
+                </div>
+                <div class="formGroup">
+                    <label class="fieldLabel">Address <span class="req">*</span></label>
+                    <input type="text" id="address" placeholder="Enter full address">
+                </div>
+                <!-- Location row -->
+                <div class="locationRow" onclick="useCurrentLocation()">
+                    <div class="locationRowLeft">
+                        <span style="font-size:20px;">📍</span>
+                        <div>
+                            <div class="locationRowTitle">Use Current Location</div>
+                            <div class="locationRowSub" id="locationSubText">Tap to detect your location</div>
+                        </div>
+                    </div>
+                    <span class="locationChevron">›</span>
+                </div>
+                <div id="currentLocationText" style="font-size:13px;margin-top:7px;"></div>
+            </div>
+        </div>
+
+        <!-- 4. SERVICE AREA -->
+        <div class="sectionCard">
+            <div class="sectionHeader">
+                <div class="sectionHeaderIcon">🗺️</div>
+                <div>
+                    <div class="sectionHeaderTitle">Service Area</div>
+                    <div class="sectionHeaderSub">Add PIN codes of areas where you provide service.</div>
+                </div>
+            </div>
+            <div class="sectionBody">
+                <div class="pinArea">
+                    <input type="text" id="pincode" placeholder="Enter 6-digit PIN code" maxlength="6"
+                        inputmode="numeric">
+                    <button class="pinAddBtn" onclick="addPin()">+ Add</button>
+                </div>
+                <div class="pinTagsRow" id="pinList"></div>
+                <div class="formGroup">
+                    <label class="fieldLabel">Location</label>
+                    <input type="text" id="location" readonly placeholder="Auto-filled from PIN code">
+                </div>
+            </div>
+        </div>
+
+        <!-- 5. ID PROOF & DOCUMENTS -->
+        <div class="sectionCard">
+            <div class="sectionHeader">
+                <div class="sectionHeaderIcon">🪪</div>
+                <div>
+                    <div class="sectionHeaderTitle">ID Proof &amp; Documents</div>
+                    <div class="sectionHeaderSub">Upload your identity documents for verification.</div>
+                </div>
+            </div>
+            <div class="sectionBody">
+                <div class="formGroup">
+                    <label class="fieldLabel">ID Proof Type</label>
+                    <div class="selectWrap">
+                        <select id="id_proof">
+                            <option>Aadhaar</option>
+                            <option>PAN</option>
+                            <option>Passport</option>
+                            <option>Driving License</option>
+                        </select>
+                        <span class="selectArrow">▼</span>
+                    </div>
+                </div>
+                <div class="formGroup">
+                    <label class="fieldLabel">ID Proof No. <span class="req">*</span></label>
+                    <input type="text" id="id_proof_no" placeholder="Enter ID number">
+                </div>
+                <div class="formGroup">
+                    <label class="fieldLabel">Upload ID Proof <span class="req">*</span></label>
+                    <div class="uploadRow">
+                        <input type="file" id="idUpload" onchange="handleFileUpload(this,'idPreview')" accept="image/*">
+                        <button class="changeBtn" onclick="enableIdUpload()">Change</button>
+                    </div>
+                    <div id="idPreview" class="imageView" style="display:none;">
+                        <p>🪪 ID Proof Preview</p>
+                        <img id="idImage" onclick="window.open(this.src)" alt="ID Proof">
+                    </div>
+                </div>
+                <div class="formGroup">
+                    <label class="fieldLabel">Your Photo <span class="req">*</span></label>
+                    <div class="uploadRow">
+                        <input type="file" id="photoUpload" onchange="handleFileUpload(this,'photoPreview')"
+                            accept="image/*">
+                        <button class="changeBtn" onclick="enablePhotoUpload()">Change</button>
+                    </div>
+                    <div id="photoPreview" class="imageView" style="display:none;">
+                        <p>📷 Profile Photo Preview</p>
+                        <img id="photoImage" onclick="window.open(this.src)" alt="Profile Photo">
+                    </div>
+                </div>
+                <div style="height:1px;background:var(--border);margin:16px 0;"></div>
+                <div class="formGroup">
+                    <label class="fieldLabel">Live Photo (Camera)</label>
+                    <div id="cameraPreview" class="imageView" style="display:none;margin-bottom:12px;">
+                        <p>📸 Camera Photo Preview</p>
+                        <img id="cameraImage" onclick="window.open(this.src)" alt="Camera Photo">
+                    </div>
+                    <div class="cameraRow">
+                        <button class="cameraBtn" onclick="startCamera()">📷 Open Camera</button>
+                        <button class="captureBtn" onclick="capturePhoto()">📸 Capture Photo</button>
+                    </div>
+                    <video id="video" autoplay></video>
+                </div>
+            </div>
+        </div>
+
+        <!-- 6. TERMS & SAVE -->
+        <div class="sectionCard">
+            <div class="sectionBody">
+                <div class="termsRow">
+                    <input type="checkbox" id="agreeTerms">
+                    <label for="agreeTerms">
+                        I agree to the
+                        <span class="termsLink" onclick="openTerms()">Terms &amp; Conditions</span>
+                    </label>
+                </div>
+                <br>
+                <button onclick="saveStaff()" class="saveBtn">💾 Save</button>
+            </div>
+        </div>
+
+    </div><!-- /container -->
+    <script src="script.js"></script>
+</body>
+
+</html>

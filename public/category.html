@@ -1,0 +1,857 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vinsuu - Category</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        :root {
+            --primary: #1a3fd4;
+            --primary-dark: #1430b0;
+            --primary-light: #e8eeff;
+            --text: #1a1a2e;
+            --gray: #6b7280;
+            --light-gray: #f5f7ff;
+            --border: #e5e7eb;
+            --white: #ffffff;
+            --sidebar-w: 200px;
+            --header-h: 60px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html,
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: var(--light-gray);
+            color: var(--text);
+            height: 100%;
+        }
+
+        /* ===== TOP HEADER ===== */
+        .topHeader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: var(--header-h);
+            background: var(--primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            gap: 16px;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+        }
+
+        .topHeader .backBtn {
+            background: rgba(255, 255, 255, 0.15);
+            border: none;
+            color: white;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            font-size: 18px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+            flex-shrink: 0;
+        }
+
+        .topHeader .backBtn:hover {
+            background: rgba(255, 255, 255, 0.25);
+        }
+
+        .topHeader .logo {
+            font-size: 20px;
+            font-weight: 800;
+            text-decoration: none;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-shrink: 0;
+        }
+
+        .topHeader .logoIcon {
+            width: 32px;
+            height: 32px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+
+        .topHeader .searchBar {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            max-width: 500px;
+        }
+
+        .topHeader .searchBar input {
+            flex: 1;
+            border: none;
+            outline: none;
+            padding: 9px 14px;
+            font-size: 13.5px;
+            font-family: 'Poppins', sans-serif;
+            color: var(--text);
+        }
+
+        .topHeader .searchBar button {
+            background: var(--primary-dark);
+            border: none;
+            color: white;
+            padding: 0 16px;
+            height: 100%;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .pageTitle {
+            font-size: 15px;
+            font-weight: 600;
+            color: white;
+            white-space: nowrap;
+        }
+
+        /* ===== LAYOUT WRAPPER ===== */
+        .pageWrapper {
+            display: flex;
+            margin-top: var(--header-h);
+            height: calc(100vh - var(--header-h));
+            overflow: hidden;
+        }
+
+        /* ===== LEFT SIDEBAR ===== */
+        .sidebar {
+            width: var(--sidebar-w);
+            flex-shrink: 0;
+            background: white;
+            border-right: 1px solid var(--border);
+            overflow-y: auto;
+            height: 100%;
+            scrollbar-width: thin;
+            scrollbar-color: var(--border) transparent;
+        }
+
+        .sidebar::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .sidebar::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 2px;
+        }
+
+        .sidebarHead {
+            padding: 14px 14px 10px;
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--gray);
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            background: white;
+            z-index: 10;
+        }
+
+        .catItem {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            padding: 14px 8px;
+            cursor: pointer;
+            border-bottom: 1px solid var(--border);
+            transition: all 0.18s;
+            position: relative;
+            text-align: center;
+        }
+
+        .catItem:hover {
+            background: var(--primary-light);
+        }
+
+        .catItem.active {
+            background: var(--primary-light);
+        }
+
+        .catItem.active::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: var(--primary);
+            border-radius: 0 3px 3px 0;
+        }
+
+        .catItem .catImg {
+            width: 48px;
+            height: 48px;
+            object-fit: cover;
+            border-radius: 50%;
+            border: 2px solid var(--border);
+            transition: border-color 0.18s;
+        }
+
+        .catItem.active .catImg {
+            border-color: var(--primary);
+        }
+
+        .catItem .catName {
+            font-size: 11.5px;
+            font-weight: 600;
+            color: var(--text);
+            line-height: 1.3;
+        }
+
+        .catItem.active .catName {
+            color: var(--primary);
+        }
+
+        /* ===== RIGHT CONTENT ===== */
+        .mainContent {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            height: 100%;
+            background: var(--light-gray);
+        }
+
+        /* Breadcrumb */
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12.5px;
+            color: var(--gray);
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+
+        .breadcrumb a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .breadcrumb span {
+            color: var(--gray);
+        }
+
+        /* Section heading */
+        .sectionHeading {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 18px;
+        }
+
+        .sectionHeading h2 {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text);
+            position: relative;
+            padding-bottom: 8px;
+        }
+
+        .sectionHeading h2::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 36px;
+            height: 3px;
+            background: var(--primary);
+            border-radius: 2px;
+        }
+
+        .sectionHeading .serviceCount {
+            background: var(--primary-light);
+            color: var(--primary);
+            font-size: 12px;
+            font-weight: 700;
+            padding: 4px 12px;
+            border-radius: 20px;
+        }
+
+        /* ===== SERVICE GRID — min 3 per row ===== */
+        .serviceGrid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+        }
+
+        /* ===== SERVICE CARD ===== */
+        .serviceCard {
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+            border: 1.5px solid transparent;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .serviceCard:hover {
+            transform: translateY(-4px);
+            border-color: var(--primary);
+            box-shadow: 0 10px 24px rgba(26, 63, 212, 0.12);
+        }
+
+        .serviceCard .cardImg {
+            width: 100%;
+            height: 130px;
+            object-fit: cover;
+            display: block;
+        }
+
+        .serviceCard .cardBody {
+            padding: 12px 12px 14px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .serviceCard .cardTitle {
+            font-size: 13.5px;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 6px;
+            line-height: 1.35;
+        }
+
+        .serviceCard .cardRating {
+            font-size: 11.5px;
+            color: #f59e0b;
+            font-weight: 600;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .serviceCard .cardRating span {
+            color: var(--gray);
+            font-weight: 500;
+        }
+
+        .serviceCard .cardPrice {
+            font-size: 12px;
+            color: var(--gray);
+            margin-bottom: 10px;
+        }
+
+        .serviceCard .bookBtn {
+            margin-top: auto;
+            background: var(--primary-light);
+            border: none;
+            color: var(--primary);
+            padding: 9px;
+            border-radius: 8px;
+            font-size: 12.5px;
+            font-weight: 700;
+            cursor: pointer;
+            font-family: 'Poppins', sans-serif;
+            transition: all 0.2s;
+            width: 100%;
+            text-align: center;
+        }
+
+        .serviceCard .bookBtn:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        /* ===== EMPTY STATE ===== */
+        .emptyState {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--gray);
+        }
+
+        .emptyState .emptyIcon {
+            font-size: 52px;
+            margin-bottom: 14px;
+        }
+
+        .emptyState h3 {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: var(--text);
+        }
+
+        .emptyState p {
+            font-size: 14px;
+        }
+
+        /* ===== SKELETON LOADER ===== */
+        .skeleton {
+            background: linear-gradient(90deg, #e8eeff 25%, #d1d9ff 50%, #e8eeff 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.4s infinite;
+            border-radius: 10px;
+        }
+
+        @keyframes shimmer {
+            0% {
+                background-position: 200% 0;
+            }
+
+            100% {
+                background-position: -200% 0;
+            }
+        }
+
+        .skeletonCard {
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+        }
+
+        .skeletonImg {
+            height: 130px;
+        }
+
+        .skeletonBody {
+            padding: 12px;
+        }
+
+        .skeletonTitle {
+            height: 14px;
+            margin-bottom: 8px;
+            border-radius: 6px;
+        }
+
+        .skeletonSub {
+            height: 11px;
+            width: 60%;
+            border-radius: 6px;
+        }
+
+        /* ===== RESPONSIVE ===== */
+
+        /* Large screens — 4 columns */
+        @media (min-width: 1200px) {
+            .serviceGrid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+
+        /* Tablet — still 3 columns, narrower sidebar */
+        @media (max-width: 900px) {
+            :root {
+                --sidebar-w: 90px;
+            }
+
+            .topHeader .searchBar {
+                display: none;
+            }
+
+            .catItem .catImg {
+                width: 42px;
+                height: 42px;
+            }
+
+            .catItem .catName {
+                font-size: 10.5px;
+            }
+
+            .serviceGrid {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 12px;
+            }
+
+            .mainContent {
+                padding: 14px;
+            }
+        }
+
+        /* Mobile — 3 columns service, narrower sidebar */
+        @media (max-width: 600px) {
+            :root {
+                --sidebar-w: 78px;
+                --header-h: 54px;
+            }
+
+            .topHeader {
+                padding: 0 12px;
+                gap: 10px;
+            }
+
+            .topHeader .logo span {
+                display: none;
+            }
+
+            .pageTitle {
+                font-size: 13px;
+            }
+
+            .catItem {
+                padding: 10px 4px;
+            }
+
+            .catItem .catImg {
+                width: 38px;
+                height: 38px;
+            }
+
+            .catItem .catName {
+                font-size: 9.5px;
+            }
+
+            .serviceGrid {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 8px;
+            }
+
+            .mainContent {
+                padding: 10px 8px;
+            }
+
+            .serviceCard .cardImg {
+                height: 90px;
+            }
+
+            .serviceCard .cardBody {
+                padding: 8px 8px 10px;
+            }
+
+            .serviceCard .cardTitle {
+                font-size: 11.5px;
+            }
+
+            .serviceCard .cardRating {
+                font-size: 10px;
+            }
+
+            .serviceCard .cardPrice {
+                font-size: 10.5px;
+            }
+
+            .serviceCard .bookBtn {
+                padding: 7px;
+                font-size: 11px;
+            }
+
+            .sectionHeading h2 {
+                font-size: 15px;
+            }
+
+            .breadcrumb {
+                display: none;
+            }
+        }
+
+        /* Very small screens — keep 3 cols */
+        @media (max-width: 380px) {
+            :root {
+                --sidebar-w: 70px;
+            }
+
+            .catItem .catImg {
+                width: 34px;
+                height: 34px;
+            }
+
+            .catItem .catName {
+                font-size: 9px;
+            }
+
+            .serviceGrid {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 6px;
+            }
+        }
+    </style>
+
+    <script>
+        const API = "http://localhost:5000/api";
+        let categoryId = null;
+        let categoryName = "Services";
+
+        document.addEventListener("DOMContentLoaded", () => {
+            const params = new URLSearchParams(window.location.search);
+            categoryId = params.get("id") || params.get("category");
+
+            loadCategories();
+
+            if (categoryId) {
+                showSkeletons();
+                loadServices();
+            } else {
+                showSelectPrompt();
+            }
+        });
+
+        // ===== SKELETON LOADERS =====
+        function showSkeletons() {
+            const grid = document.getElementById("serviceGrid");
+            grid.innerHTML = Array(6).fill('').map(() => `
+                <div class="skeletonCard">
+                    <div class="skeleton skeletonImg"></div>
+                    <div class="skeletonBody">
+                        <div class="skeleton skeletonTitle"></div>
+                        <div class="skeleton skeletonSub"></div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function showSelectPrompt() {
+            document.getElementById("serviceGrid").innerHTML = `
+                <div class="emptyState">
+                    <div class="emptyIcon">👈</div>
+                    <h3>Select a Category</h3>
+                    <p>Choose a category from the left to see available services.</p>
+                </div>
+            `;
+        }
+
+        // ===== LOAD CATEGORIES =====
+        async function loadCategories() {
+            try {
+                const res = await fetch(API + "/admin/categories");
+                const cats = await res.json();
+                const sidebar = document.getElementById("categoryList");
+                sidebar.innerHTML = "";
+
+                if (!cats.length) {
+                    sidebar.innerHTML = `<div style="padding:14px;font-size:12px;color:#94a3b8;text-align:center;">No categories</div>`;
+                    return;
+                }
+
+                cats.forEach(cat => {
+                    const div = document.createElement("div");
+                    div.className = "catItem" + (String(cat.id) === String(categoryId) ? " active" : "");
+                    div.innerHTML = `
+                       <img class="catImg"
+     src="${
+        cat.image?.startsWith('http')
+        ? cat.image
+        : 'http://localhost:5000' + (cat.image || '')
+     }"
+     alt="${cat.name}"
+     onerror="this.src='https://cdn-icons-png.flaticon.com/512/1246/1246640.png'">
+                        <span class="catName">${cat.name}</span>
+                    `;
+                    div.onclick = () => {
+                        document.querySelectorAll(".catItem").forEach(el => el.classList.remove("active"));
+                        div.classList.add("active");
+                        categoryId = cat.id;
+                        categoryName = cat.name;
+                        updateBreadcrumb(cat.name);
+                        updateSectionTitle(cat.name);
+                        showSkeletons();
+                        loadServices();
+                        // smooth scroll services into view on mobile
+                        document.getElementById("mainContent").scrollTo({ top: 0, behavior: 'smooth' });
+                    };
+
+                    if (String(cat.id) === String(categoryId)) {
+                        categoryName = cat.name;
+                        updateBreadcrumb(cat.name);
+                        updateSectionTitle(cat.name);
+                    }
+
+                    sidebar.appendChild(div);
+                });
+
+                // auto-scroll active item into view in sidebar
+                const activeEl = sidebar.querySelector(".catItem.active");
+                if (activeEl) activeEl.scrollIntoView({ block: "center", behavior: "smooth" });
+
+            } catch (err) { console.log(err); }
+        }
+
+        // ===== LOAD SERVICES =====
+        async function loadServices() {
+            if (!categoryId) return showSelectPrompt();
+
+            try {
+                const res = await fetch(API + "/admin/services");
+                const services = await res.json();
+                const filtered = services.filter(s => String(s.category_id) === String(categoryId));
+
+                const grid = document.getElementById("serviceGrid");
+                const countEl = document.getElementById("serviceCount");
+
+                if (!filtered.length) {
+                    grid.innerHTML = `
+                        <div class="emptyState">
+                            <div class="emptyIcon">🔍</div>
+                            <h3>No Services Found</h3>
+                            <p>No services available in this category yet.</p>
+                        </div>
+                    `;
+                    if (countEl) countEl.textContent = "0 services";
+                    return;
+                }
+
+                if (countEl) countEl.textContent = filtered.length + " service" + (filtered.length !== 1 ? "s" : "");
+
+                grid.innerHTML = filtered.map(service => `
+                    <div class="serviceCard" onclick="window.location.href='request.html?service=${service.id}'">
+                        <img class="cardImg"
+     src="${
+        service.image?.startsWith('http')
+        ? service.image
+        : 'http://localhost:5000' + service.image
+     }"
+     alt="${service.name}"
+                             onerror="this.src='https://via.placeholder.com/300x150?text=Service'">
+                        <div class="cardBody">
+                            <div class="cardTitle">${service.name}</div>
+                            <div class="cardRating">⭐ 4.8 <span>(120+ reviews)</span></div>
+                            <div class="cardPrice">Starting ₹${service.price || 199}</div>
+                            <button class="bookBtn" onclick="event.stopPropagation(); window.location.href='request.html?service=${service.id}'">Book Now</button>
+                        </div>
+                    </div>
+                `).join('');
+
+            } catch (err) {
+                console.log(err);
+                document.getElementById("serviceGrid").innerHTML = `
+                    <div class="emptyState">
+                        <div class="emptyIcon">⚠️</div>
+                        <h3>Something went wrong</h3>
+                        <p>Could not load services. Please try again.</p>
+                    </div>
+                `;
+            }
+        }
+
+        function updateBreadcrumb(name) {
+            const el = document.getElementById("breadcrumbCat");
+            if (el) el.textContent = name;
+        }
+
+        function updateSectionTitle(name) {
+            const el = document.getElementById("sectionTitle");
+            if (el) el.textContent = name;
+        }
+    </script>
+</head>
+
+<body>
+    <!-- SIDE MENU OVERLAY -->
+    <div class="sideOverlay" id="sideOverlay" onclick="closeMenu()"></div>
+
+    <!-- SIDE MENU -->
+    <div class="sideMenu" id="sideMenu">
+        <a href="index.html" onclick="closeMenu()">🏠 Home</a>
+        <a href="#" onclick="closeMenu()">📱 App Download</a>
+        <a href="about.html" onclick="closeMenu()">ℹ️ About Us</a>
+        <a href="#footerContact" onclick="closeMenu()">☎️ Contact Us</a>
+    </div>
+
+    <!-- ========================== DESKTOP ========================== -->
+    <!-- HEADER -->
+    <div class="header">
+        <a href="index.html" class="logo" id="logoBox">
+            <div class="logo-icon">🏠</div>VINSUU
+        </a>
+        <nav class="nav">
+            <a href="index.html">Home</a>
+            <a href="service-list.html">Services </a>
+            <a href="category.html" class="active">Categories</a>
+            <a href="about.html">About Us</a>
+
+        </nav>
+    </div>
+
+    <!-- TOP HEADER -->
+    <div class="topHeader">
+        <button class="backBtn" onclick="window.location.href='index.html'">←</button>
+        <a href="index.html" class="logo">
+            <div class="logoIcon">🏠</div>
+            <span>VINSUU</span>
+        </a>
+        <div class="searchBar">
+            <input type="text" placeholder="Search services...">
+            <button>🔍</button>
+        </div>
+        <span class="pageTitle">All Categories</span>
+    </div>
+
+    <!-- MAIN LAYOUT -->
+    <div class="pageWrapper">
+
+        <!-- LEFT SIDEBAR -->
+        <div class="sidebar">
+            <div class="sidebarHead">Categories</div>
+            <div id="categoryList"></div>
+        </div>
+
+        <!-- RIGHT CONTENT -->
+        <div class="mainContent" id="mainContent">
+
+            <!-- Breadcrumb -->
+            <div class="breadcrumb">
+                <a href="index.html">Home</a>
+                <span>›</span>
+                <a href="category.html">Categories</a>
+                <span>›</span>
+                <span id="breadcrumbCat">All Services</span>
+            </div>
+
+            <!-- Section Heading -->
+            <div class="sectionHeading">
+                <h2 id="sectionTitle">All Services</h2>
+                <div class="serviceCount" id="serviceCount"></div>
+            </div>
+
+            <!-- Service Grid — always min 3 per row -->
+            <div id="serviceGrid" class="serviceGrid"></div>
+
+        </div>
+    </div>
+    <!-- BOTTOM NAV (Mobile) -->
+    <div class="bottomNav">
+        <button class="active" onclick="location.href='index.html'">
+            <span class="bnIcon">🏠</span>Home
+        </button>
+        <button onclick="location.href='category.html'">
+            <span class="bnIcon">📋</span>Category
+        </button>
+        <button onclick="location.href='staff.html'">
+            <span class="bnIcon">👤</span>Staff
+        </button>
+        <button onclick="location.href='profile.html'">
+            <span class="bnIcon">😊</span>Profile
+        </button>
+    </div>
+</body>
+
+</html>

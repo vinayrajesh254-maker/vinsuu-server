@@ -1,0 +1,861 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rating & Feedback - Vinsuu</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+    :root {
+        --primary: #1a3fd4;
+        --primary-dark: #1430b0;
+        --primary-light: #e8eeff;
+        --text: #1a1a2e;
+        --gray: #6b7280;
+        --border: #e5e7eb;
+        --light-bg: #f5f7ff;
+        --star: #f59e0b;
+        --green: #16a34a;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+        font-family: 'Poppins', sans-serif;
+        background: #eef2ff;
+        color: var(--text);
+        min-height: 100vh;
+    }
+
+    /* ══════════════════════
+       DESKTOP TOP NAV
+    ══════════════════════ */
+    .topNav {
+        background: white;
+        padding: 12px 40px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+        position: sticky; top: 0; z-index: 100;
+    }
+    .navLogo {
+        display: flex; align-items: center; gap: 10px;
+        text-decoration: none;
+    }
+    .navLogoIcon {
+        width: 40px; height: 40px;
+        background: var(--primary-light);
+        border: 2px solid rgba(26,63,212,0.15);
+        border-radius: 10px;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 20px;
+    }
+    .navLogoText { line-height: 1.1; }
+    .navLogoName { font-size: 18px; font-weight: 800; color: var(--primary); letter-spacing: 0.5px; }
+    .navLogoTag  { font-size: 8.5px; font-weight: 600; color: var(--gray); letter-spacing: 1px; text-transform: uppercase; }
+    .navRight { display: flex; align-items: center; gap: 16px; }
+    .navNotif {
+        position: relative; font-size: 22px;
+        cursor: pointer; color: var(--gray);
+    }
+    .navBadge {
+        position: absolute; top: -4px; right: -4px;
+        width: 16px; height: 16px;
+        background: #ef4444; border-radius: 50%;
+        font-size: 9px; color: white; font-weight: 700;
+        display: flex; align-items: center; justify-content: center;
+    }
+    .navUser {
+        display: flex; align-items: center; gap: 8px;
+        cursor: pointer; font-size: 14px; font-weight: 600; color: var(--text);
+    }
+    .navAvatar {
+        width: 36px; height: 36px; border-radius: 50%;
+        background: var(--primary);
+        display: flex; align-items: center; justify-content: center;
+        color: white; font-weight: 700; font-size: 15px;
+    }
+
+    /* ══════════════════════
+       MOBILE TOP NAV
+    ══════════════════════ */
+    .mobileNav {
+        display: none;
+        background: var(--primary);
+        padding: 14px 18px;
+        align-items: center;
+        justify-content: space-between;
+        position: sticky; top: 0; z-index: 100;
+    }
+    .mobileNavBack {
+        font-size: 22px; color: white; cursor: pointer;
+        background: none; border: none;
+        font-family: 'Poppins', sans-serif;
+    }
+    .mobileNavTitle { font-size: 17px; font-weight: 700; color: white; }
+    .mobileNavNotif {
+        position: relative; font-size: 22px; color: white; cursor: pointer;
+    }
+
+    /* ══════════════════════
+       PAGE WRAPPER
+    ══════════════════════ */
+    .pageWrap {
+        max-width: 860px;
+        margin: 0 auto;
+        padding: 28px 20px 60px;
+    }
+
+    /* ── PAGE HEADER ── */
+    .pageHeader {
+        display: flex; align-items: center; gap: 16px;
+        margin-bottom: 24px;
+    }
+    .pageHeaderIcon {
+        width: 56px; height: 56px;
+        background: var(--primary);
+        border-radius: 16px;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 26px;
+        box-shadow: 0 6px 20px rgba(26,63,212,0.25);
+        flex-shrink: 0;
+    }
+    .pageHeaderText h1 {
+        font-size: 22px; font-weight: 800; color: var(--text);
+        margin-bottom: 4px; line-height: 1.2;
+    }
+    .pageHeaderText p {
+        font-size: 13.5px; color: var(--gray); font-weight: 400;
+    }
+
+    /* ══════════════════════
+       RATE + FEEDBACK CARD
+    ══════════════════════ */
+    .rateCard {
+        background: white;
+        border-radius: 18px;
+        overflow: hidden;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+        margin-bottom: 24px;
+        display: grid;
+        grid-template-columns: 1fr auto 1fr;
+        align-items: start;
+    }
+
+    /* Left — stars */
+    .rateLeft { padding: 28px 28px 28px; }
+    .rateLeft h3 {
+        font-size: 16px; font-weight: 700; color: var(--text);
+        margin-bottom: 6px;
+    }
+    .rateLeft p {
+        font-size: 13px; color: var(--gray); margin-bottom: 22px; line-height: 1.5;
+    }
+
+    .starsRow {
+        display: flex; gap: 8px; margin-bottom: 10px;
+    }
+    .starBtn {
+        font-size: 36px; cursor: pointer;
+        background: none; border: none;
+        padding: 2px; line-height: 1;
+        transition: transform 0.15s;
+        -webkit-tap-highlight-color: transparent;
+    }
+    .starBtn:hover { transform: scale(1.15); }
+    .starBtn.active { color: var(--star); }
+
+    .rateLabel {
+        font-size: 14px; font-weight: 700;
+        color: var(--star); min-height: 20px;
+    }
+
+    /* Divider */
+    .rateCardDivider {
+        width: 1px;
+        background: var(--border);
+        align-self: stretch;
+        margin: 24px 0;
+    }
+    .rateOrLabel {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0 12px;
+        font-size: 13px;
+        color: var(--gray);
+        align-self: center;
+    }
+
+    /* Right — textarea + submit */
+    .rateRight { padding: 28px 28px 28px; }
+    .rateRight h3 {
+        font-size: 16px; font-weight: 700; margin-bottom: 4px;
+    }
+    .rateRight h3 span { color: var(--primary); }
+    .rateRight > p {
+        font-size: 13px; color: var(--gray); margin-bottom: 16px;
+    }
+
+    .feedbackWrap { position: relative; }
+    textarea {
+        width: 100%;
+        min-height: 120px;
+        resize: vertical;
+        border: 1.5px solid var(--border);
+        border-radius: 12px;
+        padding: 13px 14px;
+        font-size: 13.5px;
+        font-family: 'Poppins', sans-serif;
+        color: var(--text);
+        outline: none;
+        transition: border-color 0.2s, box-shadow 0.2s;
+        line-height: 1.6;
+    }
+    textarea:focus {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(26,63,212,0.10);
+    }
+    textarea::placeholder { color: #adb5bd; }
+    .charCount {
+        position: absolute; bottom: 10px; right: 12px;
+        font-size: 11px; color: var(--gray);
+    }
+
+    .submitBtn {
+        width: 100%;
+        margin-top: 14px;
+        padding: 13px;
+        background: var(--primary);
+        color: white;
+        border: none; border-radius: 12px;
+        font-size: 14.5px; font-weight: 700;
+        cursor: pointer; font-family: 'Poppins', sans-serif;
+        display: flex; align-items: center; justify-content: center; gap: 8px;
+        transition: all 0.2s;
+        box-shadow: 0 4px 14px rgba(26,63,212,0.30);
+    }
+    .submitBtn:hover {
+        background: var(--primary-dark);
+        transform: translateY(-1px);
+        box-shadow: 0 8px 20px rgba(26,63,212,0.40);
+    }
+    .submitBtn:active { transform: scale(0.98); }
+
+    /* ══════════════════════
+       MOBILE RATE CARD
+    ══════════════════════ */
+    .mobileRateCard {
+        display: none;
+        background: white;
+        border-radius: 18px;
+        padding: 24px 20px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+        margin-bottom: 20px;
+        text-align: center;
+    }
+    .mobileRateCard h3 {
+        font-size: 17px; font-weight: 700; margin-bottom: 5px;
+    }
+    .mobileRateCard .mRateSub {
+        font-size: 13px; color: var(--gray); margin-bottom: 18px;
+    }
+    .mobileStarsRow {
+        display: flex; justify-content: center; gap: 10px; margin-bottom: 8px;
+    }
+    .mobileStarBtn {
+        font-size: 40px; cursor: pointer;
+        background: none; border: none; padding: 2px; line-height: 1;
+        transition: transform 0.15s;
+        -webkit-tap-highlight-color: transparent;
+    }
+    .mobileStarBtn:hover { transform: scale(1.1); }
+    .mobileStarBtn.active { color: var(--star); }
+    .mobileRateLabel {
+        font-size: 15px; font-weight: 700;
+        color: var(--star); min-height: 22px; margin-bottom: 24px;
+    }
+
+    .mobileFeedbackSection {
+        display: none;
+        background: white;
+        border-radius: 18px;
+        padding: 24px 20px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+        margin-bottom: 20px;
+    }
+    .mobileFeedbackSection h3 {
+        font-size: 17px; font-weight: 700; margin-bottom: 5px;
+    }
+    .mobileFeedbackSection .mFbSub {
+        font-size: 13px; color: var(--gray); margin-bottom: 16px;
+    }
+
+    /* ══════════════════════
+       CUSTOMER FEEDBACK LIST
+    ══════════════════════ */
+    .feedbackCard {
+        background: white;
+        border-radius: 18px;
+        overflow: hidden;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+    }
+
+    .feedbackHead {
+        display: flex; align-items: center; gap: 10px;
+        padding: 20px 24px 16px;
+        border-bottom: 1px solid var(--border);
+    }
+    .feedbackHeadIcon {
+        width: 36px; height: 36px;
+        background: var(--primary-light);
+        border-radius: 10px;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 17px;
+    }
+    .feedbackHeadTitle {
+        font-size: 17px; font-weight: 700; color: var(--primary);
+    }
+
+    /* Review item */
+    .reviewItem {
+        padding: 18px 24px;
+        border-bottom: 1px solid var(--border);
+        transition: background 0.15s;
+    }
+    .reviewItem:last-child { border-bottom: none; }
+    .reviewItem:hover { background: var(--light-bg); }
+
+    .reviewTop {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 12px;
+        margin-bottom: 10px;
+    }
+    .reviewLeft { display: flex; align-items: center; gap: 12px; }
+    .reviewAvatar {
+        width: 42px; height: 42px; border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 16px; font-weight: 700; color: white;
+        flex-shrink: 0;
+    }
+    .reviewName {
+        font-size: 14.5px; font-weight: 700; color: var(--text);
+        margin-bottom: 4px;
+        display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+    }
+    .verifiedBadge {
+        display: inline-flex; align-items: center; gap: 4px;
+        background: #f0fdf4;
+        border: 1px solid #bbf7d0;
+        color: var(--green);
+        font-size: 11px; font-weight: 600;
+        padding: 2px 9px; border-radius: 20px;
+    }
+    .reviewDate {
+        font-size: 12.5px; color: var(--gray);
+        display: flex; align-items: center; gap: 5px;
+        white-space: nowrap; flex-shrink: 0;
+    }
+
+    .reviewStars {
+        display: flex; align-items: center; gap: 3px;
+        margin-bottom: 8px;
+    }
+    .reviewStar { font-size: 18px; color: var(--star); }
+    .reviewStar.empty { color: #d1d5db; }
+    .reviewRatingLabel {
+        font-size: 13px; color: var(--gray); font-weight: 500; margin-left: 6px;
+    }
+
+    .reviewText {
+        font-size: 13.5px; color: var(--gray); line-height: 1.6;
+    }
+
+    /* Pagination */
+    .pagination {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 18px 24px 16px;
+        border-top: 1px solid var(--border);
+        flex-wrap: wrap;
+        gap: 12px;
+    }
+    .paginationInfo { font-size: 13px; color: var(--gray); }
+    .paginationBtns { display: flex; gap: 6px; align-items: center; }
+    .pageBtn {
+        width: 34px; height: 34px;
+        border-radius: 8px;
+        border: 1.5px solid var(--border);
+        background: white;
+        font-size: 13.5px; font-weight: 600;
+        color: var(--text); cursor: pointer;
+        font-family: 'Poppins', sans-serif;
+        display: flex; align-items: center; justify-content: center;
+        transition: all 0.2s;
+    }
+    .pageBtn:hover { border-color: var(--primary); color: var(--primary); }
+    .pageBtn.active {
+        background: var(--primary); color: white;
+        border-color: var(--primary);
+    }
+    .pageBtn.arrow { font-size: 16px; }
+
+    /* Mobile load more */
+    .loadMoreBtn {
+        display: none;
+        width: 100%;
+        padding: 14px;
+        border: 1.5px solid var(--border);
+        border-radius: 12px;
+        background: white;
+        font-size: 14px; font-weight: 600;
+        color: var(--primary); cursor: pointer;
+        font-family: 'Poppins', sans-serif;
+        transition: all 0.2s;
+        margin-top: 0;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+    }
+    .loadMoreBtn:hover { background: var(--primary-light); }
+
+    /* Avatar colors */
+    .av-blue   { background: var(--primary); }
+    .av-green  { background: #059669; }
+    .av-purple { background: #7c3aed; }
+    .av-orange { background: #ea580c; }
+    .av-pink   { background: #db2777; }
+
+    /* ══════════════════════
+       RESPONSIVE
+    ══════════════════════ */
+    @media (max-width: 768px) {
+        .topNav     { display: none; }
+        .mobileNav  { display: flex; }
+        .pageWrap   { padding: 16px 14px 80px; }
+
+        /* Hide desktop page header icon + show simpler */
+        .pageHeader { display: none; }
+
+        /* Show mobile rate + feedback sections */
+        .rateCard             { display: none; }
+        .mobileRateCard       { display: block; }
+        .mobileFeedbackSection{ display: block; }
+
+        /* Mobile pagination → load more */
+        .pagination   { display: none; }
+        .loadMoreBtn  { display: flex; }
+
+        /* Review item compact */
+        .reviewItem { padding: 14px 16px; }
+        .feedbackHead { padding: 16px 16px 14px; }
+        .reviewTop { flex-direction: column; gap: 6px; }
+        .reviewDate { align-self: flex-end; margin-top: -28px; }
+    }
+
+    @media (max-width: 480px) {
+        .mobileStarBtn { font-size: 34px; }
+        .reviewAvatar  { width: 36px; height: 36px; font-size: 14px; }
+        .reviewName    { font-size: 13.5px; }
+        .reviewStar    { font-size: 16px; }
+    }
+
+    /* Tablet */
+    @media (min-width: 769px) and (max-width: 1024px) {
+        .rateCard {
+            grid-template-columns: 1fr;
+        }
+        .rateCardDivider { width: 100%; height: 1px; margin: 0 24px; align-self: auto; }
+        .rateOrLabel { padding: 12px 0; }
+        .rateLeft, .rateRight { padding: 24px 24px; }
+    }
+</style>
+</head>
+<body>
+
+    <!-- ── DESKTOP NAV ── -->
+    <div class="topNav">
+        <a href="index.html" class="navLogo">
+            <div class="navLogoIcon">🏠</div>
+            <div class="navLogoText">
+                <div class="navLogoName">VINSUU</div>
+                <div class="navLogoTag">Service at your doorstep</div>
+            </div>
+        </a>
+        <div class="navRight">
+            <div class="navNotif">
+                🔔<span class="navBadge">3</span>
+            </div>
+            <div class="navUser">
+    <div class="navAvatar" id="staffAvatar">A</div>
+    <span id="staffName">Staff</span> ▾
+</div>
+        </div>
+    </div>
+
+    <!-- ── MOBILE NAV ── -->
+    <div class="mobileNav">
+        <button class="mobileNavBack" onclick="goBack()">←</button>
+        <div class="mobileNavTitle">Rating &amp; Feedback</div>
+        <div class="mobileNavNotif">🔔<span class="navBadge">3</span></div>
+    </div>
+
+    <!-- ── PAGE ── -->
+    <div class="pageWrap">
+
+        <!-- Desktop page header -->
+        <div class="pageHeader">
+            <div class="pageHeaderIcon">💬</div>
+            <div class="pageHeaderText">
+                <h1>Your Rating &amp; Feedback</h1>
+                <p>We value your feedback to improve our services</p>
+            </div>
+        </div>
+
+        <!-- ══ DESKTOP: RATE + FEEDBACK CARD ══ -->
+        <div class="rateCard">
+            <!-- Left stars -->
+            <div class="rateLeft">
+                <h3>Rate Your Experience</h3>
+                <p>How would you rate your experience with our service?</p>
+                <div class="starsRow" id="starsRow">
+                    <button class="starBtn" data-val="1" onclick="setRating(1)">☆</button>
+                    <button class="starBtn" data-val="2" onclick="setRating(2)">☆</button>
+                    <button class="starBtn" data-val="3" onclick="setRating(3)">☆</button>
+                    <button class="starBtn" data-val="4" onclick="setRating(4)">☆</button>
+                    <button class="starBtn" data-val="5" onclick="setRating(5)">☆</button>
+                </div>
+                <div class="rateLabel" id="rateLabel"></div>
+            </div>
+
+                       
+        </div>
+
+        <!-- ══ MOBILE: RATE CARD ══ -->
+        <div class="mobileRateCard">
+            <h3>Rate Your Experience</h3>
+            <div class="mRateSub">How would you rate our service?</div>
+            <div class="mobileStarsRow" id="mobileStarsRow">
+                <button class="mobileStarBtn" data-val="1" onclick="setMobileRating(1)">☆</button>
+                <button class="mobileStarBtn" data-val="2" onclick="setMobileRating(2)">☆</button>
+                <button class="mobileStarBtn" data-val="3" onclick="setMobileRating(3)">☆</button>
+                <button class="mobileStarBtn" data-val="4" onclick="setMobileRating(4)">☆</button>
+                <button class="mobileStarBtn" data-val="5" onclick="setMobileRating(5)">☆</button>
+            </div>
+            <div class="mobileRateLabel" id="mobileRateLabel"></div>
+        </div>
+
+       
+       
+
+        <!-- ══ CUSTOMER FEEDBACK LIST ══ -->
+        <div class="feedbackCard">
+            <div class="feedbackHead">
+                <div class="feedbackHeadIcon">💬</div>
+                <div class="feedbackHeadTitle">Customer Feedback</div>
+            </div>
+
+            <div id="list"></div>
+
+            <!-- Desktop Pagination -->
+            <div class="pagination" id="paginationBar">
+                <div class="paginationInfo" id="paginationInfo"></div>
+                <div class="paginationBtns" id="paginationBtns"></div>
+            </div>
+
+            <!-- Mobile Load More -->
+            <button class="loadMoreBtn" id="loadMoreBtn" onclick="loadMore()">
+                Load More Reviews ▾
+            </button>
+        </div>
+
+    </div><!-- /pageWrap -->
+
+<script>
+const API   = "http://localhost:5000/api";
+const token = localStorage.getItem("staffToken");
+
+let selectedRating       = 0;
+let selectedMobileRating = 0;
+let allFeedback          = [];
+let currentPage          = 1;
+const perPage            = 4;
+
+const ratingLabels = { 1: "Poor", 2: "Fair", 3: "Good", 4: "Very Good", 5: "Excellent" };
+const avatarColors = ["av-blue","av-green","av-purple","av-orange","av-pink"];
+
+// ── STAR RATING (Desktop) ──
+function setRating(val) {
+    selectedRating = val;
+    document.querySelectorAll("#starsRow .starBtn").forEach((btn, i) => {
+        btn.textContent = i < val ? "★" : "☆";
+        btn.classList.toggle("active", i < val);
+    });
+    document.getElementById("rateLabel").textContent = ratingLabels[val] || "";
+}
+
+// ── STAR RATING (Mobile) ──
+function setMobileRating(val) {
+    selectedMobileRating = val;
+    document.querySelectorAll("#mobileStarsRow .mobileStarBtn").forEach((btn, i) => {
+        btn.textContent = i < val ? "★" : "☆";
+        btn.classList.toggle("active", i < val);
+    });
+    document.getElementById("mobileRateLabel").textContent = ratingLabels[val] || "";
+}
+
+// ── CHAR COUNT ──
+function updateCharCount(el, countId) {
+    document.getElementById(countId).textContent = el.value.length + "/500";
+}
+
+// ── RENDER STARS ──
+function renderStars(rating) {
+    let html = "";
+    for (let i = 1; i <= 5; i++) {
+        html += `<span class="reviewStar${i <= rating ? "" : " empty"}">${i <= rating ? "★" : "★"}</span>`;
+    }
+    return html;
+}
+
+// ── FORMAT DATE ──
+function formatDate(dateStr) {
+    const d = new Date(dateStr);
+    return d.toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" });
+}
+
+// ── RENDER REVIEWS ──
+function renderReviews(page) {
+    currentPage = page;
+    const start   = (page - 1) * perPage;
+    const slice   = allFeedback.slice(start, start + perPage);
+    const total   = allFeedback.length;
+    const totalPages = Math.ceil(total / perPage);
+
+    const box = document.getElementById("list");
+    box.innerHTML = "";
+
+    if (!slice.length) {
+        box.innerHTML = `<div style="padding:40px;text-align:center;color:var(--gray);">No feedback yet.</div>`;
+        document.getElementById("paginationBar").style.display = "none";
+        document.getElementById("loadMoreBtn").style.display   = "none";
+        return;
+    }
+
+    slice.forEach((f, idx) => {
+        const initials  = (f.customer_name || "?").charAt(0).toUpperCase();
+        const colorClass = avatarColors[(start + idx) % avatarColors.length];
+        const dateStr   = f.created_at ? formatDate(f.created_at) : "";
+        const label     = ratingLabels[f.rating] || "";
+
+        box.innerHTML += `
+        <div class="reviewItem">
+            <div class="reviewTop">
+                <div class="reviewLeft">
+                    <div class="reviewAvatar ${colorClass}">${initials}</div>
+                    <div>
+                        <div class="reviewName">
+                            ${f.customer_name || "Customer"}
+                            <span class="verifiedBadge">✔ Verified Customer</span>
+                        </div>
+                        <div class="reviewStars">
+                            ${renderStars(f.rating)}
+                            ${label ? `<span class="reviewRatingLabel">${label}</span>` : ""}
+                        </div>
+                    </div>
+                </div>
+                <div class="reviewDate">📅 ${dateStr}</div>
+            </div>
+            ${f.feedback ? `<div class="reviewText">${f.feedback}</div>` : ""}
+        </div>`;
+    });
+
+    // Pagination info
+    document.getElementById("paginationInfo").textContent =
+        `Showing ${start + 1} to ${Math.min(start + perPage, total)} of ${total} reviews`;
+
+    // Pagination buttons
+    const btns = document.getElementById("paginationBtns");
+    btns.innerHTML = `<button class="pageBtn arrow" onclick="renderReviews(${page - 1})" ${page <= 1 ? "disabled style='opacity:0.4;cursor:not-allowed'" : ""}>‹</button>`;
+
+    for (let p = 1; p <= totalPages; p++) {
+        btns.innerHTML += `<button class="pageBtn${p === page ? " active" : ""}" onclick="renderReviews(${p})">${p}</button>`;
+    }
+
+    btns.innerHTML += `<button class="pageBtn arrow" onclick="renderReviews(${page + 1})" ${page >= totalPages ? "disabled style='opacity:0.4;cursor:not-allowed'" : ""}>›</button>`;
+
+    // Mobile load more
+    const loadMoreBtn = document.getElementById("loadMoreBtn");
+    loadMoreBtn.style.display = start + perPage < total ? "flex" : "none";
+}
+
+// ── MOBILE LOAD MORE ──
+function loadMore() {
+    const start    = currentPage * perPage;
+    const slice    = allFeedback.slice(start, start + perPage);
+    const total    = allFeedback.length;
+    const box      = document.getElementById("list");
+
+    slice.forEach((f, idx) => {
+        const initials   = (f.customer_name || "?").charAt(0).toUpperCase();
+        const colorClass = avatarColors[(start + idx) % avatarColors.length];
+        const dateStr    = f.created_at ? formatDate(f.created_at) : "";
+        const label      = ratingLabels[f.rating] || "";
+
+        box.innerHTML += `
+        <div class="reviewItem">
+            <div class="reviewTop">
+                <div class="reviewLeft">
+                    <div class="reviewAvatar ${colorClass}">${initials}</div>
+                    <div>
+                        <div class="reviewName">
+                            ${f.customer_name || "Customer"}
+                            <span class="verifiedBadge">✔ Verified</span>
+                        </div>
+                        <div class="reviewStars">
+                            ${renderStars(f.rating)}
+                        </div>
+                    </div>
+                </div>
+                <div class="reviewDate">📅 ${dateStr}</div>
+            </div>
+            ${f.feedback ? `<div class="reviewText">${f.feedback}</div>` : ""}
+        </div>`;
+    });
+
+    currentPage++;
+    const loadMoreBtn = document.getElementById("loadMoreBtn");
+    loadMoreBtn.style.display = start + perPage < total ? "flex" : "none";
+}
+
+// ── LOAD FEEDBACK ──
+async function loadFeedback() {
+    try {
+        const res  = await fetch(API + "/staff/feedback", {
+            headers: { "Authorization": "Bearer " + token }
+        });
+        const data = await res.json();
+        allFeedback = Array.isArray(data) ? data : [];
+        renderReviews(1);
+    } catch (err) {
+        console.log(err);
+        document.getElementById("list").innerHTML =
+            `<div style="padding:40px;text-align:center;color:var(--gray);">Error loading feedback.</div>`;
+    }
+}
+
+// ── SUBMIT FEEDBACK (Desktop) ──
+async function submitFeedback() {
+    const feedback = document.getElementById("feedbackText").value.trim();
+    if (!selectedRating) return alert("Please select a rating");
+
+    try {
+        const res = await fetch(API + "/staff/feedback", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": "Bearer " + token
+            },
+            body: JSON.stringify({ rating: selectedRating, feedback })
+        });
+
+        if (res.ok) {
+            alert("Feedback submitted. Thank you!");
+            document.getElementById("feedbackText").value = "";
+            document.getElementById("charCount").textContent = "0/500";
+            setRating(0);
+            selectedRating = 0;
+            loadFeedback();
+        } else {
+            alert("Failed to submit feedback.");
+        }
+    } catch (err) {
+        console.log(err);
+        alert("Server error.");
+    }
+}
+
+// ── SUBMIT FEEDBACK (Mobile) ──
+async function submitMobileFeedback() {
+    const feedback = document.getElementById("mobileFeedbackText").value.trim();
+    if (!selectedMobileRating) return alert("Please select a rating");
+
+    try {
+        const res = await fetch(API + "/staff/feedback", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": "Bearer " + token
+            },
+            body: JSON.stringify({ rating: selectedMobileRating, feedback })
+        });
+
+        if (res.ok) {
+            alert("Feedback submitted. Thank you!");
+            document.getElementById("mobileFeedbackText").value = "";
+            document.getElementById("mobileCharCount").textContent = "0/500";
+            setMobileRating(0);
+            selectedMobileRating = 0;
+            loadFeedback();
+        } else {
+            alert("Failed to submit feedback.");
+        }
+    } catch (err) {
+        console.log(err);
+        alert("Server error.");
+    }
+}
+// Load profile name
+async function loadStaffProfile() {
+
+    try {
+
+        const res = await fetch(
+            API + "/staff/profile",
+            {
+                headers: {
+                    "Authorization": "Bearer " + token
+                }
+            }
+        );
+
+        const data = await res.json();
+
+        if (data.name) {
+
+            document.getElementById("staffName").textContent =
+                data.name;
+
+            document.getElementById("staffAvatar").textContent =
+                data.name.charAt(0).toUpperCase();
+
+        }
+
+    } catch (err) {
+
+        console.log(err);
+
+    }
+
+}
+
+function goBack() {
+
+    if (window.history.length > 1) {
+        window.history.back();
+    } else {
+        window.location.href = "staff.html";
+    }
+
+}
+loadStaffProfile();
+loadFeedback();
+</script>
+
+</body>
+</html>

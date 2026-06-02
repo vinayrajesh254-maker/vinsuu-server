@@ -1,0 +1,1435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vinsuu Admin</title>
+
+<script>
+const API = "http://localhost:5000/api";
+let TOKEN = localStorage.getItem("token");
+
+let serviceCounter = 1;
+let detailsList = [];
+
+// ================= INIT =================
+document.addEventListener("DOMContentLoaded",()=>{
+
+injectCSS();
+loadCategories();
+setServiceId();
+
+});
+
+
+// ================= SERVICE ID AUTO =================
+function setServiceId(){
+
+document.getElementById("serviceId").value = "SVC" + Date.now();
+
+}
+
+
+// ================= CATEGORY UPLOAD =================
+async function uploadCategory(){
+
+const name = document.getElementById("categoryName").value;
+const image = document.getElementById("categoryImage").value;
+
+if(!name) return alert("Enter category name");
+
+await fetch(API+"/admin/add-category",{
+method:"POST",
+headers:{
+"Content-Type":"application/json",
+"Authorization":"Bearer "+TOKEN
+},
+body:JSON.stringify({ name,image })
+});
+
+alert("Category uploaded");
+
+loadCategories();
+
+}
+
+
+// ================= LOAD CATEGORY DROPDOWN =================
+async function loadCategories(){
+
+const res = await fetch(API+"/admin/categories");
+const data = await res.json();
+
+const dropdown = document.getElementById("categoryDropdown");
+dropdown.innerHTML="";
+
+
+data.forEach(cat=>{
+
+const opt=document.createElement("option");
+opt.value=cat.id;
+opt.innerText=cat.name;
+dropdown.appendChild(opt);
+
+});
+
+}
+
+
+// ================= VIEW CATEGORY LIST =================
+async function viewCategoryList(){
+
+const res = await fetch(API+"/admin/categories");
+const data = await res.json();
+
+const box=document.getElementById("categoryListBox");
+box.innerHTML="";
+
+
+data.forEach(cat=>{
+
+const div=document.createElement("div");
+div.innerHTML = cat.name + " <span onclick='deleteCategory("+cat.id+")'>delete</span>";
+box.appendChild(div);
+
+});
+
+box.style.display="block";
+
+}
+
+
+// ================= DELETE CATEGORY =================
+async function deleteCategory(id){
+
+await fetch(API+"/admin/category/"+id,{
+method:"DELETE",
+headers:{"Authorization":"Bearer "+TOKEN}
+});
+
+viewCategoryList();
+loadCategories();
+
+}
+
+
+// ================= ADD DETAIL =================
+function addDetail(){
+
+const val=document.getElementById("detailInput").value;
+
+if(!val) return;
+
+detailsList.push(val);
+
+renderDetails();
+
+}
+
+
+// ================= RENDER DETAILS BOARD =================
+function renderDetails(){
+
+const box=document.getElementById("detailsBoard");
+box.innerHTML="";
+
+
+detailsList.forEach((d,i)=>{
+
+const div=document.createElement("div");
+div.innerHTML = d + " <span onclick='removeDetail("+i+")'>delete</span>";
+box.appendChild(div);
+
+});
+
+}
+
+
+// ================= REMOVE DETAIL =================
+function removeDetail(i){
+
+detailsList.splice(i,1);
+renderDetails();
+
+}
+
+
+// ================= SERVICE UPLOAD =================
+async function uploadService(){
+
+const name=document.getElementById("serviceName").value;
+const image=document.getElementById("serviceImage").value;
+const category_id=document.getElementById("categoryDropdown").value;
+const unit_cost=document.getElementById("unitBalance").value;
+
+await fetch(API+"/admin/add-service",{
+method:"POST",
+headers:{
+"Content-Type":"application/json",
+"Authorization":"Bearer "+TOKEN
+},
+body:JSON.stringify({
+name,
+image,
+category_id,
+unit_cost,
+details:detailsList.join(",")
+})
+});
+
+alert("Service uploaded");
+
+setServiceId();
+detailsList=[];
+renderDetails();
+
+}
+
+
+// ================= CSS =================
+function injectCSS(){
+
+const style=document.createElement("style");
+style.innerHTML=`
+
+body{font-family:"Times New Roman";background:#ddd;margin:0;padding:20px;}
+
+.box{background:#eee;border:1px solid black;padding:10px;margin-bottom:15px;}
+
+.row{display:flex;gap:20px;align-items:center;margin-bottom:10px;}
+
+input,select{padding:5px;font-size:16px;}
+
+button{padding:6px 15px;font-size:16px;cursor:pointer;}
+
+#detailsBoard{border:1px solid black;padding:10px;height:100px;overflow:auto;background:white;}
+
+#categoryListBox{display:none;border:1px solid black;padding:10px;background:white;}
+
+span{color:red;cursor:pointer;margin-left:10px;}
+
+`;
+
+document.head.appendChild(style);
+
+}
+
+</script>
+
+</head>
+
+<body>
+
+<h2>Upload</h2>
+
+<div class="box">
+
+<div class="row">
+<label>Category Name</label>
+<input id="categoryName">
+
+<label>Category Image</label>
+<input id="categoryImage">
+
+<button onclick="uploadCategory()">Upload</button>
+
+<button onclick="viewCategoryList()">View Category list</button>
+
+</div>
+
+<div id="categoryListBox"></div>
+
+</div>
+
+
+<div class="box">
+
+<div class="row">
+<label>Service Id No</label>
+<input id="serviceId" readonly>
+</div>
+
+<div class="row">
+<label>Service Name (in category)</label>
+<input id="serviceName">
+
+<label>Service Image</label>
+<input id="serviceImage">
+</div>
+
+<div class="row">
+<label>Unit balance</label>
+<select id="unitBalance">
+<option>1</option>
+<option>2</option>
+<option>3</option>
+<option>4</option>
+<option>5</option>
+</select>
+
+<label>Category</label>
+<select id="categoryDropdown"></select>
+
+</div>
+
+<div class="row">
+<label>Details board</label>
+<div id="detailsBoard"></div>
+</div>
+
+<div class="row">
+<label>Details</label>
+<input id="detailInput">
+<button onclick="addDetail()">Add</button>
+</div>
+
+<button onclick="uploadService()">Upload</button>
+
+</div>
+
+
+
+<!-- SERVICE LIST PANEL -->
+<div class="box" id="serviceListPanel">
+<h2>Service List</h2>
+
+<table border="1" width="100%" style="background:white;border-collapse:collapse;">
+<thead>
+<tr>
+<th>Service ID</th>
+<th>Name</th>
+<th>Category</th>
+<th>Unit</th>
+<th>Image</th>
+<th>Action</th>
+</tr>
+</thead>
+<tbody id="serviceListBody"></tbody>
+</table>
+
+</div>
+
+<script>
+
+// ================= LOAD SERVICE LIST =================
+async function loadServiceList(){
+
+const res = await fetch(API+"/admin/services");
+const services = await res.json();
+
+const body = document.getElementById("serviceListBody");
+body.innerHTML="";
+
+services.forEach(service=>{
+
+const tr=document.createElement("tr");
+
+tr.innerHTML=`
+<td>${service.id}</td>
+<td>${service.name}</td>
+<td>${service.category_name||''}</td>
+<td>${service.unit_cost}</td>
+<td><img src="${service.image}" width="40"></td>
+<td>
+<button onclick="editService(${service.id})">Edit</button>
+<button onclick="deleteService(${service.id})">Delete</button>
+</td>
+`;
+
+body.appendChild(tr);
+
+});
+
+}
+
+
+// ================= DELETE SERVICE =================
+async function deleteService(id){
+
+if(!confirm("Delete service?")) return;
+
+await fetch(API+"/admin/service/"+id,{
+method:"DELETE",
+headers:{"Authorization":"Bearer "+TOKEN}
+});
+
+loadServiceList();
+
+}
+
+
+// ================= EDIT SERVICE =================
+async function editService(id){
+
+const name = prompt("Enter new service name:");
+if(!name) return;
+
+await fetch(API+"/admin/service/"+id,{
+method:"PUT",
+headers:{
+"Content-Type":"application/json",
+"Authorization":"Bearer "+TOKEN
+},
+body:JSON.stringify({ name })
+});
+
+loadServiceList();
+
+}
+
+
+// LOAD on start
+loadServiceList();
+
+</script>
+
+
+
+<!-- STAFF LIST PANEL -->
+<div class="box" id="staffListPanel">
+
+<h2>Staff list <span style="float:right">Total Staff <span id="totalStaffCount">0</span></span></h2>
+
+<div class="row">
+<input id="searchStaffId" placeholder="Search Staff Id No" onkeyup="filterStaff()">
+<input id="searchStaffName" placeholder="Search Staff Name" onkeyup="filterStaff()">
+<input id="searchStaffPin" placeholder="Search Pin Code" onkeyup="filterStaff()">
+</div>
+
+<table border="1" width="100%" style="background:white;border-collapse:collapse;">
+<thead>
+<tr>
+<th>Sr No</th>
+<th>Id No.</th>
+<th>Staff name</th>
+<th>Service name (In category)</th>
+<th>Location</th>
+<th>Pin Code</th>
+<th>View</th>
+<th>Remove</th>
+</tr>
+</thead>
+<tbody id="staffListBody"></tbody>
+</table>
+
+</div>
+
+<script>
+
+let staffData = [];
+
+// ================= LOAD STAFF =================
+async function loadStaffList(){
+
+const res = await fetch(API+"/admin/staff");
+staffData = await res.json();
+
+renderStaffList(staffData);
+
+}
+
+
+// ================= RENDER STAFF =================
+function renderStaffList(data){
+
+const body = document.getElementById("staffListBody");
+body.innerHTML="";
+
+
+document.getElementById("totalStaffCount").innerText = data.length;
+
+
+data.forEach((staff,i)=>{
+
+const tr=document.createElement("tr");
+
+tr.innerHTML=`
+<td>${i+1}</td>
+<td>${staff.id}</td>
+<td>${staff.name||''}</td>
+<td>${staff.service_name||''}</td>
+<td>${staff.location||''}</td>
+<td>${staff.pin_code||''}</td>
+<td><button onclick="viewStaff(${staff.id})">View</button></td>
+<td><button onclick="removeStaff(${staff.id})" style="color:red">X</button></td>
+`;
+
+body.appendChild(tr);
+
+});
+
+}
+
+
+// ================= FILTER =================
+function filterStaff(){
+
+const id = document.getElementById("searchStaffId").value.toLowerCase();
+const name = document.getElementById("searchStaffName").value.toLowerCase();
+const pin = document.getElementById("searchStaffPin").value.toLowerCase();
+
+const filtered = staffData.filter(staff=>
+
+(staff.id+"").toLowerCase().includes(id) &&
+(staff.name||"").toLowerCase().includes(name) &&
+(staff.pin_code||"").toLowerCase().includes(pin)
+
+);
+
+renderStaffList(filtered);
+
+}
+
+
+// ================= VIEW STAFF PDF =================
+function viewStaff(id){
+
+const staff = staffData.find(s=>s.id==id);
+
+const win = window.open("","_blank");
+
+win.document.write(`
+
+<h2>Staff Details</h2>
+<p>ID: ${staff.id}</p>
+<p>Name: ${staff.name||''}</p>
+<p>Mobile: ${staff.mobile||''}</p>
+<p>Service: ${staff.service_name||''}</p>
+<p>Location: ${staff.location||''}</p>
+<p>Pin Code: ${staff.pin_code||''}</p>
+
+<button onclick="window.print()">Print / Save PDF</button>
+
+`);
+
+}
+
+
+// ================= REMOVE STAFF =================
+async function removeStaff(id){
+
+if(!confirm("Remove staff?")) return;
+
+await fetch(API+"/admin/remove-staff/"+id,{
+method:"DELETE",
+headers:{"Authorization":"Bearer "+TOKEN}
+});
+
+loadStaffList();
+
+}
+
+
+// INIT LOAD
+loadStaffList();
+
+</script>
+
+
+
+<!-- CUSTOMER LIST PANEL -->
+<div class="box" id="customerListPanel">
+
+<h2>Customer list <span style="float:right">Total Customer <span id="totalCustomerCount">0</span></span></h2>
+
+<div class="row">
+<input id="searchCustomerId" placeholder="Search Customer Id No" onkeyup="filterCustomer()">
+<input id="searchCustomerName" placeholder="Search Customer Name" onkeyup="filterCustomer()">
+<input id="searchCustomerPin" placeholder="Search Pin Code" onkeyup="filterCustomer()">
+</div>
+
+<table border="1" width="100%" style="background:white;border-collapse:collapse;">
+<thead>
+<tr>
+<th>Sr No</th>
+<th>Id No.</th>
+<th>Customer name</th>
+<th>Mob. No</th>
+<th>Location</th>
+<th>Pin Code</th>
+<th>View</th>
+<th>Remove</th>
+</tr>
+</thead>
+<tbody id="customerListBody"></tbody>
+</table>
+
+</div>
+
+<script>
+
+let customerData = [];
+
+// ================= LOAD CUSTOMERS =================
+async function loadCustomerList(){
+
+const res = await fetch(API+"/admin/customers");
+customerData = await res.json();
+
+renderCustomerList(customerData);
+
+}
+
+
+// ================= RENDER =================
+function renderCustomerList(data){
+
+const body = document.getElementById("customerListBody");
+body.innerHTML="";
+
+
+document.getElementById("totalCustomerCount").innerText = data.length;
+
+
+data.forEach((cust,i)=>{
+
+const tr=document.createElement("tr");
+
+tr.innerHTML=`
+<td>${i+1}</td>
+<td>${cust.id}</td>
+<td>${cust.name||''}</td>
+<td>${cust.mobile||''}</td>
+<td>${cust.location||''}</td>
+<td>${cust.pin_code||''}</td>
+<td><button onclick="viewCustomer(${cust.id})">View</button></td>
+<td><button onclick="removeCustomer(${cust.id})" style="color:red">X</button></td>
+`;
+
+body.appendChild(tr);
+
+});
+
+}
+
+
+// ================= FILTER =================
+function filterCustomer(){
+
+const id = document.getElementById("searchCustomerId").value.toLowerCase();
+const name = document.getElementById("searchCustomerName").value.toLowerCase();
+const pin = document.getElementById("searchCustomerPin").value.toLowerCase();
+
+const filtered = customerData.filter(c=>
+
+(c.id+"").toLowerCase().includes(id) &&
+(c.name||"").toLowerCase().includes(name) &&
+(c.pin_code||"").toLowerCase().includes(pin)
+
+);
+
+renderCustomerList(filtered);
+
+}
+
+
+// ================= VIEW CUSTOMER PDF =================
+function viewCustomer(id){
+
+const cust = customerData.find(c=>c.id==id);
+
+const win = window.open("","_blank");
+
+win.document.write(`
+
+<h2>Customer Details</h2>
+<p>ID: ${cust.id}</p>
+<p>Name: ${cust.name||''}</p>
+<p>Mobile: ${cust.mobile||''}</p>
+<p>Location: ${cust.location||''}</p>
+<p>Pin Code: ${cust.pin_code||''}</p>
+
+<button onclick="window.print()">Print / Save PDF</button>
+
+`);
+
+}
+
+
+// ================= REMOVE CUSTOMER =================
+async function removeCustomer(id){
+
+if(!confirm("Remove customer?")) return;
+
+await fetch(API+"/admin/remove-customer/"+id,{
+method:"DELETE",
+headers:{"Authorization":"Bearer "+TOKEN}
+});
+
+loadCustomerList();
+
+}
+
+
+// INIT LOAD
+loadCustomerList();
+
+</script>
+
+
+
+<!-- PAYMENT MANAGEMENT PANEL -->
+<div class="box" id="paymentPanel">
+
+<h2>Payment management <span style="float:right">Total Payment <span id="totalPaymentCount">0</span></span></h2>
+
+<div class="row">
+<input id="searchPaymentStaff" placeholder="Search Staff Name" onkeyup="filterPayment()">
+<input id="searchPaymentPin" placeholder="Search Pin Code" onkeyup="filterPayment()">
+<input type="date" id="searchPaymentDate" onchange="filterPayment()">
+<button onclick="togglePaymentHistory()">Payment History</button>
+</div>
+
+<h3>Payment History</h3>
+
+<table border="1" width="100%" style="background:white;border-collapse:collapse;">
+<thead>
+<tr>
+<th>Sr No</th>
+<th>Date</th>
+<th>Id No.</th>
+<th>Staff name</th>
+<th>Service name (In category)</th>
+<th>Pin Code</th>
+<th>Unit Balance</th>
+<th>Payment received</th>
+<th>View</th>
+</tr>
+</thead>
+<tbody id="paymentListBody"></tbody>
+</table>
+
+
+<!-- MONTHLY PAYMENT HISTORY -->
+<div id="paymentHistoryBox" style="display:none;margin-top:20px;">
+
+<h2>Payment History</h2>
+
+<table border="1" width="100%" style="background:white;border-collapse:collapse;">
+<thead>
+<tr>
+<th>Month - Year</th>
+<th>Starting Date</th>
+<th>End date</th>
+<th>Total Payment</th>
+</tr>
+</thead>
+<tbody id="paymentHistoryBody"></tbody>
+</table>
+
+</div>
+
+</div>
+
+<script>
+
+let paymentDataMain = [];
+let paymentHistoryData = [];
+
+// ================= LOAD PAYMENTS =================
+async function loadPaymentList(){
+
+const res = await fetch(API+"/admin/payments");
+paymentDataMain = await res.json();
+
+renderPaymentList(paymentDataMain);
+
+}
+
+
+// ================= LOAD PAYMENT HISTORY =================
+async function loadPaymentHistory(){
+
+const res = await fetch(API+"/admin/payment-history");
+paymentHistoryData = await res.json();
+
+renderPaymentHistory();
+
+}
+
+
+// ================= RENDER PAYMENT HISTORY =================
+function renderPaymentHistory(){
+
+const body=document.getElementById("paymentHistoryBody");
+body.innerHTML="";
+
+paymentHistoryData.forEach(p=>{
+
+const tr=document.createElement("tr");
+
+tr.innerHTML=`
+<td>${p.month_year}</td>
+<td>${new Date(p.start_date).toLocaleDateString()}</td>
+<td>${new Date(p.end_date).toLocaleDateString()}</td>
+<td>${p.total_payment}</td>
+`;
+
+body.appendChild(tr);
+
+});
+
+}
+
+
+// ================= TOGGLE HISTORY =================
+function togglePaymentHistory(){
+
+const box=document.getElementById("paymentHistoryBox");
+
+if(box.style.display==='none'){
+
+box.style.display='block';
+loadPaymentHistory();
+
+}else{
+
+box.style.display='none';
+
+}
+
+}
+
+</script>
+<div class="box" id="paymentPanel">
+
+<h2>Payment management <span style="float:right">Total Payment <span id="totalPaymentCount">0</span></span></h2>
+
+<div class="row">
+<input id="searchPaymentStaff" placeholder="Search Staff Name" onkeyup="filterPayment()">
+<input id="searchPaymentPin" placeholder="Search Pin Code" onkeyup="filterPayment()">
+<input type="date" id="searchPaymentDate" onchange="filterPayment()">
+</div>
+
+<h3>Payment History</h3>
+
+<table border="1" width="100%" style="background:white;border-collapse:collapse;">
+<thead>
+<tr>
+<th>Sr No</th>
+<th>Date</th>
+<th>Id No.</th>
+<th>Staff name</th>
+<th>Service name (In category)</th>
+<th>Pin Code</th>
+<th>Unit Balance</th>
+<th>Payment received</th>
+<th>View</th>
+</tr>
+</thead>
+<tbody id="paymentListBody"></tbody>
+</table>
+
+</div>
+
+<script>
+
+let paymentData = [];
+
+// ================= LOAD PAYMENTS =================
+async function loadPaymentList(){
+
+const res = await fetch(API+"/admin/payments");
+paymentDataMain = await res.json();
+
+renderPaymentList(paymentDataMain);
+
+}
+
+
+// ================= RENDER PAYMENTS =================
+function renderPaymentList(data){
+
+const body = document.getElementById("paymentListBody");
+body.innerHTML="";
+
+let total = 0;
+
+
+data.forEach((pay,i)=>{
+
+const tr=document.createElement("tr");
+
+const date = new Date(pay.created_at).toLocaleDateString();
+
+const amount = pay.amount || 0;
+
+total += amount;
+
+tr.innerHTML=`
+<td>${i+1}</td>
+<td>${date}</td>
+<td>${pay.staff_id}</td>
+<td>${pay.name||''}</td>
+<td>${pay.service_name||''}</td>
+<td>${pay.pin_code||''}</td>
+<td>${pay.unit_balance||''}</td>
+<td>${amount}</td>
+<td><button onclick="viewPayment(${pay.id})">View</button></td>
+`;
+
+body.appendChild(tr);
+
+});
+
+
+document.getElementById("totalPaymentCount").innerText = total;
+
+}
+
+
+// ================= FILTER =================
+function filterPayment(){
+
+const name = document.getElementById("searchPaymentStaff").value.toLowerCase();
+const pin = document.getElementById("searchPaymentPin").value.toLowerCase();
+const date = document.getElementById("searchPaymentDate").value;
+
+const filtered = paymentDataMain.filter(p=>{
+
+const pDate = new Date(p.created_at).toISOString().split("T")[0];
+
+return (
+(p.name||"").toLowerCase().includes(name) &&
+(p.pin_code||"").toLowerCase().includes(pin) &&
+(!date || pDate === date)
+
+);
+
+});
+
+renderPaymentList(filtered);
+
+}
+
+
+// ================= VIEW PAYMENT =================
+function viewPayment(id){
+
+const pay = paymentDataMain.find(p=>p.id==id);
+
+const win = window.open("","_blank");
+
+win.document.write(`
+
+<h2>Payment Details</h2>
+<p>Staff ID: ${pay.staff_id}</p>
+<p>Name: ${pay.name}</p>
+<p>Amount: ${pay.amount}</p>
+<p>Date: ${new Date(pay.created_at).toLocaleString()}</p>
+
+<button onclick="window.print()">Print / Save PDF</button>
+
+`);
+
+}
+
+
+// INIT LOAD
+loadPaymentList();
+
+</script>
+
+
+
+<!-- UNIT BALANCE PANEL -->
+<div class="box" id="unitBalancePanel">
+
+<h2>Unit balance</h2>
+
+<div style="display:flex;gap:40px;flex-wrap:wrap;">
+
+<!-- UNIT RATE TABLE -->
+<div>
+
+<table border="1" style="background:#b7c7df;border-collapse:collapse;min-width:300px;">
+<thead>
+<tr>
+<th>Unit Balance</th>
+<th>Purchase power (Rs.)</th>
+<th>Edit</th>
+</tr>
+</thead>
+<tbody id="unitRateBody"></tbody>
+</table>
+
+<button onclick="saveUnitRates()" style="margin-top:10px;">Save</button>
+
+</div>
+
+
+<!-- ACCOUNT DETAILS -->
+<div>
+
+<h3>Account details</h3>
+
+<div class="row">
+<label>Account holder name</label>
+<input id="accName">
+</div>
+
+<div class="row">
+<label>Account Number</label>
+<input id="accNumber">
+</div>
+
+<div class="row">
+<label>IFSC Code</label>
+<input id="accIFSC">
+</div>
+
+<div class="row">
+<label>Branch Name</label>
+<input id="accBranch">
+</div>
+
+<div class="row">
+<label>UPI Id</label>
+<input id="accUPI">
+</div>
+
+<button onclick="saveAccountDetails()">Save</button>
+
+</div>
+
+</div>
+
+</div>
+
+<script>
+
+let unitRates = [];
+
+// ================= LOAD UNIT RATES =================
+async function loadUnitRates(){
+
+const res = await fetch(API+"/admin/unit-rates");
+unitRates = await res.json();
+
+renderUnitRates();
+
+}
+
+
+// ================= RENDER UNIT RATES =================
+function renderUnitRates(){
+
+const body=document.getElementById("unitRateBody");
+body.innerHTML="";
+
+unitRates.forEach((u,i)=>{
+
+const tr=document.createElement("tr");
+
+tr.innerHTML=`
+<td>${u.units}</td>
+<td><input value="${u.price}" onchange="unitRates[${i}].price=this.value"></td>
+<td><button onclick="editUnit(${i})">Edit</button></td>
+`;
+
+body.appendChild(tr);
+
+});
+
+}
+
+
+// ================= SAVE UNIT RATES =================
+async function saveUnitRates(){
+
+await fetch(API+"/admin/unit-rates",{
+method:"POST",
+headers:{
+"Content-Type":"application/json",
+"Authorization":"Bearer "+TOKEN
+},
+body:JSON.stringify(unitRates)
+});
+
+alert("Unit rates updated");
+
+}
+
+
+// ================= LOAD ACCOUNT DETAILS =================
+async function loadAccountDetails(){
+
+const res = await fetch(API+"/admin/account-details");
+const acc = await res.json();
+
+setVal("accName", acc.name);
+setVal("accNumber", acc.number);
+setVal("accIFSC", acc.ifsc);
+setVal("accBranch", acc.branch);
+setVal("accUPI", acc.upi);
+
+}
+
+
+function setVal(id,val){
+
+const el=document.getElementById(id);
+if(el) el.value=val||"";
+
+}
+
+
+// ================= SAVE ACCOUNT DETAILS =================
+async function saveAccountDetails(){
+
+const data={
+name:getVal("accName"),
+number:getVal("accNumber"),
+ifsc:getVal("accIFSC"),
+branch:getVal("accBranch"),
+upi:getVal("accUPI")
+};
+
+await fetch(API+"/admin/account-details",{
+method:"POST",
+headers:{
+"Content-Type":"application/json",
+"Authorization":"Bearer "+TOKEN
+},
+body:JSON.stringify(data)
+});
+
+alert("Account details saved");
+
+}
+
+
+function getVal(id){
+return document.getElementById(id).value;
+}
+
+
+// INIT LOAD
+loadUnitRates();
+loadAccountDetails();
+
+</script>
+
+
+
+<!-- MESSAGE PANEL -->
+<div class="box" id="messagePanel">
+
+<!-- ABOUT US -->
+<h2>About us</h2>
+
+<div class="row">
+<input type="file" id="aboutFile">
+<input type="date" id="aboutDate">
+<button onclick="uploadAboutPDF()">Upload</button>
+<button onclick="viewAboutPDF()">View</button>
+</div>
+
+<hr>
+
+<!-- CONTACT NUMBER -->
+<h2>Message</h2>
+
+<div class="row">
+<label>Phone</label>
+<input id="contactPhone">
+<button onclick="savePhone()">Save</button>
+</div>
+
+
+<!-- MESSAGE TABLE -->
+<table border="1" width="100%" style="background:white;border-collapse:collapse;">
+<thead>
+<tr>
+<th>Sr No</th>
+<th>Date</th>
+<th>Name</th>
+<th>Mob</th>
+<th>Pin Code</th>
+<th>Message</th>
+<th>View</th>
+</tr>
+</thead>
+<tbody id="messageListBody"></tbody>
+</table>
+
+</div>
+
+<script>
+
+let messageData=[];
+let aboutPDF="";
+
+
+// ================= LOAD MESSAGES =================
+async function loadMessages(){
+
+const res = await fetch(API+"/admin/messages");
+messageData = await res.json();
+
+renderMessages();
+
+}
+
+
+// ================= RENDER =================
+function renderMessages(){
+
+const body=document.getElementById("messageListBody");
+body.innerHTML="";
+
+messageData.forEach((m,i)=>{
+
+const tr=document.createElement("tr");
+
+tr.innerHTML=`
+<td>${i+1}</td>
+<td>${new Date(m.created_at).toLocaleDateString()}</td>
+<td>${m.name}</td>
+<td>${m.mobile}</td>
+<td>${m.pin_code}</td>
+<td>${m.message.substring(0,20)}...</td>
+<td><button onclick="viewMessage(${m.id})">View</button></td>
+`;
+
+body.appendChild(tr);
+
+});
+
+}
+
+
+// ================= VIEW MESSAGE =================
+function viewMessage(id){
+
+const m = messageData.find(x=>x.id==id);
+
+const win=window.open("","_blank");
+
+win.document.write(`
+
+<h2>Customer Message</h2>
+<p>Name: ${m.name}</p>
+<p>Mobile: ${m.mobile}</p>
+<p>Pin Code: ${m.pin_code}</p>
+<p>Message:</p>
+<p>${m.message}</p>
+
+<button onclick="window.print()">Print</button>
+
+`);
+
+}
+
+
+// ================= UPLOAD ABOUT PDF =================
+async function uploadAboutPDF(){
+
+const file=document.getElementById("aboutFile").files[0];
+
+if(!file) return alert("Select PDF");
+
+const form=new FormData();
+form.append("file",file);
+
+await fetch(API+"/admin/about-pdf",{
+method:"POST",
+headers:{"Authorization":"Bearer "+TOKEN},
+body:form
+});
+
+alert("About PDF uploaded");
+
+}
+
+
+// ================= VIEW ABOUT PDF =================
+function viewAboutPDF(){
+
+window.open(API+"/admin/about-pdf");
+
+}
+
+
+// ================= SAVE CONTACT PHONE =================
+async function savePhone(){
+
+const phone=document.getElementById("contactPhone").value;
+
+await fetch(API+"/admin/contact-phone",{
+method:"POST",
+headers:{
+"Content-Type":"application/json",
+"Authorization":"Bearer "+TOKEN
+},
+body:JSON.stringify({ phone })
+});
+
+alert("Phone updated");
+
+}
+
+
+// INIT
+loadMessages();
+
+</script>
+
+
+
+<!-- UPDATE PANEL -->
+<div class="box" id="updatePanel">
+
+<h2>Update <span style="float:right">Total <span id="totalServiceCount">0</span></span></h2>
+
+<div class="row">
+<input id="searchServicePin" placeholder="Search Pin Code" onkeyup="filterService()">
+</div>
+
+<div class="row">
+<button onclick="showServiceTab('all')">Total Service</button>
+<button onclick="showServiceTab('completed')">Complete service</button>
+<button onclick="showServiceTab('pending')">Pending service</button>
+</div>
+
+<table border="1" width="100%" style="background:white;border-collapse:collapse;">
+<thead>
+<tr>
+<th>Sr No</th>
+<th>Customer name</th>
+<th>Mob. No</th>
+<th>Location</th>
+<th>Pin Code</th>
+<th>View</th>
+<th>Status</th>
+<th>Remove</th>
+</tr>
+</thead>
+<tbody id="serviceUpdateBody"></tbody>
+</table>
+
+</div>
+
+<script>
+
+let serviceData=[];
+let currentTab='all';
+
+// ================= LOAD SERVICES =================
+async function loadServiceUpdates(){
+
+const res = await fetch(API+"/admin/service-requests");
+serviceData = await res.json();
+
+renderServiceUpdates();
+
+}
+
+
+// ================= RENDER =================
+function renderServiceUpdates(){
+
+let filtered = serviceData;
+
+if(currentTab==='completed')
+filtered = serviceData.filter(s=>s.status==='completed');
+
+if(currentTab==='pending')
+filtered = serviceData.filter(s=>s.status==='pending');
+
+const pin=document.getElementById("searchServicePin").value.toLowerCase();
+
+filtered = filtered.filter(s=>
+(s.pin_code||"").toLowerCase().includes(pin)
+);
+
+const body=document.getElementById("serviceUpdateBody");
+body.innerHTML="";
+
+
+document.getElementById("totalServiceCount").innerText = filtered.length;
+
+filtered.forEach((s,i)=>{
+
+const statusColor = s.status==='completed' ? 'green' : 'red';
+
+const tr=document.createElement("tr");
+
+tr.innerHTML=`
+<td>${i+1}</td>
+<td>${s.customer_name||''}</td>
+<td>${s.mobile||''}</td>
+<td>${s.location||''}</td>
+<td>${s.pin_code||''}</td>
+<td><button onclick="viewService(${s.id})">View</button></td>
+<td><span style="color:${statusColor};font-size:20px">●</span></td>
+<td><button onclick="removeService(${s.id})" style="color:red">X</button></td>
+`;
+
+body.appendChild(tr);
+
+});
+
+}
+
+
+// ================= FILTER =================
+function filterService(){
+renderServiceUpdates();
+}
+
+
+// ================= TAB =================
+function showServiceTab(tab){
+
+currentTab=tab;
+renderServiceUpdates();
+
+}
+
+
+// ================= VIEW =================
+function viewService(id){
+
+const s = serviceData.find(x=>x.id==id);
+
+const win=window.open("","_blank");
+
+win.document.write(`
+
+<h2>Service Details</h2>
+<p>Name: ${s.customer_name}</p>
+<p>Mobile: ${s.mobile}</p>
+<p>Location: ${s.location}</p>
+<p>Pin Code: ${s.pin_code}</p>
+<p>Status: ${s.status}</p>
+
+<button onclick="window.print()">Print</button>
+
+`);
+
+}
+
+
+// ================= REMOVE =================
+async function removeService(id){
+
+if(!confirm("Remove service?")) return;
+
+await fetch(API+"/admin/service-request/"+id,{
+method:"DELETE",
+headers:{"Authorization":"Bearer "+TOKEN}
+});
+
+loadServiceUpdates();
+
+}
+
+
+// INIT LOAD
+loadServiceUpdates();
+
+</script>
+
+</body>
+</html>

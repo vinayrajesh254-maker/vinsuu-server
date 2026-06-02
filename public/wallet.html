@@ -1,0 +1,1499 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wallet - Vinsuu</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+
+    <style>
+        :root {
+            --primary: #1a3fd4;
+            --primary-dark: #1430b0;
+            --primary-light: #e8eeff;
+            --primary-mid: #2b52e0;
+            --text: #1a1a2e;
+            --gray: #6b7280;
+            --border: #e5e7eb;
+            --light-bg: #f5f7ff;
+            --green: #16a34a;
+            --red: #dc2626;
+            --orange: #f59e0b;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #eef2ff;
+            color: var(--text);
+            min-height: 100vh;
+        }
+
+        /* ══════════════════════════
+           TOP NAV BAR (Desktop)
+        ══════════════════════════ */
+        .topNav {
+            background: white;
+            padding: 14px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .navTitle {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text);
+        }
+
+        .navRight {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .navNotif {
+            position: relative;
+            font-size: 22px;
+            cursor: pointer;
+            color: var(--gray);
+        }
+
+        .navNotifDot {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 8px;
+            height: 8px;
+            background: #ef4444;
+            border-radius: 50%;
+        }
+
+        .navUser {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .navAvatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 15px;
+        }
+
+        /* ══════════════════════════
+           MOBILE TOP BAR
+        ══════════════════════════ */
+        .mobileNav {
+            display: none;
+            background: var(--primary);
+            padding: 14px 18px;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .mobileNavMenu {
+            font-size: 22px;
+            color: white;
+            cursor: pointer;
+        }
+
+        .mobileNavTitle {
+            font-size: 17px;
+            font-weight: 700;
+            color: white;
+        }
+
+        .mobileNavNotif {
+            font-size: 22px;
+            color: white;
+            cursor: pointer;
+        }
+
+        /* ══════════════════════════
+           PAGE WRAPPER
+        ══════════════════════════ */
+        .pageWrap {
+            max-width: 860px;
+            margin: 0 auto;
+            padding: 28px 20px 60px;
+        }
+
+        /* ══════════════════════════
+           WALLET CARD (Blue)
+        ══════════════════════════ */
+        .walletCard {
+            background: linear-gradient(135deg, var(--primary-mid) 0%, var(--primary-dark) 60%, #0f2899 100%);
+            border-radius: 22px;
+            padding: 28px 30px 24px;
+            margin-bottom: 24px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 12px 40px rgba(26, 63, 212, 0.30);
+        }
+
+        /* Decorative circle blobs */
+        .walletCard::before {
+            content: '';
+            position: absolute;
+            width: 260px;
+            height: 260px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.05);
+            top: -80px;
+            right: -60px;
+        }
+
+        .walletCard::after {
+            content: '';
+            position: absolute;
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.04);
+            bottom: -40px;
+            left: 30px;
+        }
+
+        .walletCardInner {
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            gap: 0;
+            align-items: center;
+            position: relative;
+            z-index: 2;
+        }
+
+        /* Left — balance */
+
+        .wBalanceLabel {
+            font-size: 13px;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.75);
+            margin-bottom: 8px;
+        }
+
+        .wBalanceAmount {
+            font-size: 36px;
+            font-weight: 800;
+            color: white;
+            line-height: 1;
+            margin-bottom: 14px;
+            letter-spacing: -0.5px;
+        }
+
+        .wWithdrawStatus {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12.5px;
+            color: rgba(255, 255, 255, 0.85);
+            font-weight: 500;
+            margin-bottom: 20px;
+        }
+
+        .wWithdrawStatus .wsDot {
+            width: 18px;
+            height: 18px;
+            background: #22c55e;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            flex-shrink: 0;
+        }
+
+        .wBtns {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .wBtn {
+            padding: 11px 22px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: 'Poppins', sans-serif;
+            transition: all 0.2s;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .wBtn.outline {
+            background: rgba(255, 255, 255, 0.12);
+            border: 1.5px solid rgba(255, 255, 255, 0.5);
+            color: white;
+        }
+
+        .wBtn.outline:hover {
+            background: rgba(255, 255, 255, 0.22);
+        }
+
+        .wBtn.solid {
+            background: white;
+            border: none;
+            color: var(--primary);
+        }
+
+        .wBtn.solid:hover {
+            background: #f0f4ff;
+        }
+
+        .wBtn:disabled {
+            opacity: 0.45;
+            cursor: not-allowed;
+        }
+
+        /* Center divider */
+        .wDivider {
+            width: 1px;
+            height: 140px;
+            background: rgba(255, 255, 255, 0.18);
+            margin: 0 28px;
+        }
+
+        /* Right — wallet image + unit + QR */
+        .wRightCol {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .wWalletEmoji {
+            font-size: 52px;
+            filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.25));
+        }
+
+        .wUnitQR {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            width: 100%;
+        }
+
+        .wUnitBox,
+        .wQRBox {
+            background: rgba(255, 255, 255, 0.10);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            border-radius: 12px;
+            padding: 10px 12px;
+            text-align: center;
+        }
+
+        .wBoxLabel {
+            font-size: 10.5px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.65);
+            margin-bottom: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .wUnitAmount {
+            font-size: 15px;
+            font-weight: 700;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+        }
+
+        .wCoin {
+            font-size: 16px;
+        }
+
+        .wQRClickable {
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .wQRIcon {
+            font-size: 22px;
+        }
+
+        .wQRLabel {
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.7);
+            font-weight: 500;
+        }
+
+        /* ══════════════════════════
+           TRANSACTION HISTORY CARD
+        ══════════════════════════ */
+        .historyCard {
+            background: white;
+            border-radius: 18px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+            margin-bottom: 24px;
+        }
+
+        .historyHead {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 24px 16px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .historyHeadLeft {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .historyHeadIcon {
+            width: 36px;
+            height: 36px;
+            background: var(--primary-light);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+
+        .historyTitle {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text);
+        }
+
+        .viewAllBtn {
+            padding: 7px 16px;
+            background: var(--primary-light);
+            color: var(--primary);
+            border: none;
+            border-radius: 8px;
+            font-size: 12.5px;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: 'Poppins', sans-serif;
+            transition: all 0.2s;
+        }
+
+        .viewAllBtn:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        /* ── Desktop table ── */
+        .desktopTable {
+            display: block;
+        }
+
+        .mobileList {
+            display: none;
+        }
+
+        .tableWrap {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 560px;
+        }
+
+        thead tr {
+            background: var(--light-bg);
+        }
+
+        th {
+            padding: 12px 18px;
+            font-size: 12.5px;
+            font-weight: 700;
+            color: var(--gray);
+            text-align: left;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        tbody tr {
+            border-bottom: 1px solid var(--border);
+            transition: background 0.15s;
+        }
+
+        tbody tr:last-child {
+            border-bottom: none;
+        }
+
+        tbody tr:hover {
+            background: var(--light-bg);
+        }
+
+        td {
+            padding: 14px 18px;
+            font-size: 13.5px;
+            color: var(--text);
+        }
+
+        .tdDate {
+            font-weight: 500;
+            color: var(--text);
+        }
+
+        .tdAmt {
+            font-weight: 600;
+        }
+
+        .tdRed {
+            color: #dc2626;
+        }
+
+        .tdGreen {
+            color: #16a34a;
+        }
+
+        .tdGray {
+            color: var(--gray);
+        }
+
+        .tdPending {
+            color: var(--orange);
+            font-weight: 600;
+        }
+
+        /* ── Mobile transaction list ── */
+        .txnItem {
+            padding: 14px 18px;
+            border-bottom: 1px solid var(--border);
+            cursor: pointer;
+            transition: background 0.15s;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .txnItem:last-child {
+            border-bottom: none;
+        }
+
+        .txnItem:hover {
+            background: var(--light-bg);
+        }
+
+        .txnDate {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 4px;
+        }
+
+        .txnSub {
+            font-size: 12px;
+            color: var(--gray);
+        }
+
+        .txnSub .txnRed {
+            color: #dc2626;
+            font-weight: 600;
+        }
+
+        .txnSub .txnGreen {
+            color: #16a34a;
+            font-weight: 600;
+        }
+
+        .txnRight {
+            text-align: right;
+            flex-shrink: 0;
+        }
+
+        .txnClosing {
+            font-size: 12px;
+            color: var(--gray);
+            margin-bottom: 2px;
+        }
+
+        .txnClosingAmt {
+            font-size: 13.5px;
+            font-weight: 700;
+            color: var(--text);
+        }
+
+        .txnChevron {
+            color: var(--gray);
+            font-size: 16px;
+            margin-left: 8px;
+        }
+
+        /* ══════════════════════════
+           FOOTER BADGES
+        ══════════════════════════ */
+        .footerBadges {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+        }
+
+        .footerBadge {
+            background: white;
+            border-radius: 14px;
+            padding: 16px 18px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .fBadgeIcon {
+            width: 44px;
+            height: 44px;
+            background: var(--primary-light);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+
+        .fBadgeTitle {
+            font-size: 13.5px;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 3px;
+        }
+
+        .fBadgeSub {
+            font-size: 12px;
+            color: var(--gray);
+            line-height: 1.5;
+        }
+
+        .fBadgeSub a {
+            color: var(--primary);
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        /* ══════════════════════════
+           WITHDRAW POPUP
+        ══════════════════════════ */
+        .popupOverlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+            justify-content: center;
+            align-items: center;
+            padding: 16px;
+        }
+
+        .popupOverlay.open {
+            display: flex;
+        }
+
+        .popupBox {
+            background: white;
+            width: 100%;
+            max-width: 420px;
+            border-radius: 20px;
+            padding: 28px 24px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
+            animation: popIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) both;
+        }
+
+        @keyframes popIn {
+            from {
+                opacity: 0;
+                transform: scale(0.92) translateY(16px);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        .popupTitle {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .popupClose {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: #fee2e2;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            color: #dc2626;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .popLabel {
+            font-size: 11.5px;
+            font-weight: 700;
+            color: var(--gray);
+            text-transform: uppercase;
+            letter-spacing: 0.7px;
+            margin-bottom: 7px;
+        }
+
+        .withdrawRow {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+
+        .inputWrap {
+            position: relative;
+            flex: 1;
+            min-width: 140px;
+        }
+
+        .rupee {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 14px;
+            color: var(--gray);
+            pointer-events: none;
+        }
+
+        input[type="number"],
+        input[type="text"],
+        input[type="tel"] {
+            width: 100%;
+            padding: 11px 14px 11px 28px;
+            border: 1.5px solid var(--border);
+            border-radius: 10px;
+            font-size: 14px;
+            font-family: 'Poppins', sans-serif;
+            color: var(--text);
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            appearance: none;
+            -webkit-appearance: none;
+        }
+
+        input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(26, 63, 212, 0.10);
+        }
+
+        input:disabled {
+            background: var(--light-bg);
+            color: var(--gray);
+            cursor: not-allowed;
+        }
+
+        .walletInfoText {
+            font-size: 12px;
+            color: var(--gray);
+            margin-bottom: 16px;
+        }
+
+        .valid {
+            border-color: #16a34a !important;
+            background: #f0fdf4 !important;
+        }
+
+        .invalid {
+            border-color: #dc2626 !important;
+            background: #fef2f2 !important;
+        }
+
+        .popupQR {
+            display: block;
+            margin: 12px auto;
+            width: 110px;
+            height: 110px;
+            border: 1.5px solid var(--border);
+            border-radius: 10px;
+            object-fit: contain;
+            padding: 5px;
+        }
+
+        .popInput {
+            margin-bottom: 10px;
+        }
+
+        .popInput input {
+            padding-left: 14px;
+        }
+
+        .popBtn {
+            width: 100%;
+            padding: 13px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            font-family: 'Poppins', sans-serif;
+            transition: all 0.2s;
+            border: none;
+        }
+
+        .popBtnPrimary {
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 4px 14px rgba(26, 63, 212, 0.30);
+            margin-bottom: 10px;
+        }
+
+        .popBtnPrimary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+        }
+
+        .popBtnDanger {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
+        .popBtnDanger:hover {
+            background: #fecaca;
+        }
+
+        /* ══════════════════════════
+           PAYMENT POPUP
+        ══════════════════════════ */
+        .payUPIOption {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 13px 16px;
+            border: 1.5px solid var(--border);
+            border-radius: 12px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text);
+            transition: all 0.2s;
+        }
+
+        .payUPIOption:hover {
+            border-color: var(--primary);
+            background: var(--primary-light);
+            color: var(--primary);
+        }
+
+        .payUPIIcon {
+            font-size: 22px;
+        }
+
+        /* Payment success overlay */
+        #paymentSuccess {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+            padding: 16px;
+        }
+
+        #paymentSuccess .successBox {
+            background: white;
+            border-radius: 20px;
+            padding: 36px 28px;
+            text-align: center;
+            max-width: 340px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+        }
+
+        .successIcon {
+            font-size: 52px;
+            margin-bottom: 14px;
+        }
+
+        .successTitle {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 8px;
+        }
+
+        .successSub {
+            font-size: 13.5px;
+            color: var(--gray);
+        }
+
+        /* ══════════════════════════
+           RESPONSIVE
+        ══════════════════════════ */
+        @media (max-width: 768px) {
+            .topNav {
+                display: none;
+            }
+
+            .mobileNav {
+                display: flex;
+            }
+
+            .pageWrap {
+                padding: 16px 14px 80px;
+            }
+
+            /* Wallet card mobile */
+            .walletCardInner {
+                grid-template-columns: 1fr;
+                gap: 0;
+            }
+
+            .wDivider {
+                width: 100%;
+                height: 1px;
+                margin: 20px 0;
+            }
+
+            .wRightCol {
+                flex-direction: row;
+                justify-content: space-between;
+                align-items: center;
+            }
+
+            .wWalletEmoji {
+                font-size: 40px;
+            }
+
+            .wUnitQR {
+                grid-template-columns: 1fr 1fr;
+                flex: 1;
+                margin-left: 12px;
+            }
+
+            .wBalanceAmount {
+                font-size: 30px;
+            }
+
+            /* Table → mobile list */
+            .desktopTable {
+                display: none;
+            }
+
+            .mobileList {
+                display: block;
+            }
+
+            /* Footer badges */
+            .footerBadges {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .walletCard {
+                padding: 22px 20px 20px;
+            }
+
+            .wBalanceAmount {
+                font-size: 26px;
+            }
+
+            .wBtn {
+                padding: 10px 16px;
+                font-size: 13px;
+            }
+
+            .historyHead {
+                padding: 16px 16px 14px;
+            }
+
+            .txnItem {
+                padding: 12px 16px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- ── DESKTOP TOP NAV ── -->
+    <div class="topNav">
+        <div class="navTitle">Wallet</div>
+        <div class="navRight">
+            <div class="navNotif">
+                🔔<span class="navNotifDot"></span>
+            </div>
+            <div class="navUser">
+    <div class="navAvatar" id="navAvatar">A</div>
+    <span id="navUserName">Loading...</span> ▾
+</div>
+        </div>
+    </div>
+
+    <!-- ── MOBILE TOP NAV ── -->
+    <div class="mobileNav">
+        <div class="mobileNavMenu" onclick="window.history.back()">←</div>
+        <div class="mobileNavTitle">Wallet</div>
+        <div class="mobileNavNotif">🔔</div>
+    </div>
+
+    <!-- ── PAGE ── -->
+    <div class="pageWrap">
+
+        <!-- ══ WALLET CARD ══ -->
+        <div class="walletCard">
+            <div class="walletCardInner">
+
+                <!-- Left — balance + buttons -->
+                <div class="wBalanceCol">
+                    <div class="wBalanceLabel">Wallet Balance</div>
+                    <div class="wBalanceAmount" id="walletAmount">₹ 0.00</div>
+                    <div class="wWithdrawStatus" id="withdrawStatus" style="display:none;">
+                        <span class="wsDot">✔</span>
+                        <span id="withdrawStatusText"></span>
+                    </div>
+                    <div class="wBtns">
+                        <button class="wBtn solid" onclick="payNow()">Pay Now</button>
+                        <button class="wBtn outline" id="withdrawBtn" onclick="withdraw()">Withdraw</button>
+                    </div>
+                </div>
+
+                <!-- Divider -->
+                <div class="wDivider"></div>
+
+                <!-- Right — wallet emoji + unit + QR -->
+                <div class="wRightCol">
+                    <div class="wWalletEmoji">👛</div>
+                    <div class="wUnitQR">
+                        <div class="wUnitBox">
+                            <div class="wBoxLabel">Unit Balance</div>
+                            <div class="wUnitAmount">
+                                <span id="unitBalance">0.00</span>
+                                <span class="wCoin">🪙</span>
+                            </div>
+                        </div>
+                        <div class="wQRBox">
+                            <div class="wBoxLabel">Quick Pay</div>
+                            <div class="wQRClickable" onclick="openQR()">
+                                <div class="wQRIcon">📷</div>
+                                <div class="wQRLabel">Scan & Pay</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- ══ TRANSACTION HISTORY ══ -->
+        <div class="historyCard">
+            <div class="historyHead">
+                <div class="historyHeadLeft">
+                    <div class="historyHeadIcon">💳</div>
+                    <span class="historyTitle">Transaction History</span>
+                </div>
+                <button class="viewAllBtn">View All</button>
+            </div>
+
+            <!-- Desktop Table -->
+            <div class="desktopTable">
+                <div class="tableWrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Opening Amount</th>
+                                <th>Withdraw</th>
+                                <th>Deposit</th>
+                                <th>Closing Balance</th>
+                            </tr>
+                        </thead>
+                        <tbody id="txnBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Mobile List -->
+            <div class="mobileList" id="txnMobileList"></div>
+        </div>
+
+        <!-- ══ FOOTER BADGES ══ -->
+        <div class="footerBadges">
+            <div class="footerBadge">
+                <div class="fBadgeIcon">🛡️</div>
+                <div>
+                    <div class="fBadgeTitle">Safe &amp; Secure Payments</div>
+                    <div class="fBadgeSub">We use bank level security to keep your transactions safe.</div>
+                </div>
+            </div>
+            <div class="footerBadge">
+                <div class="fBadgeIcon">🎧</div>
+                <div>
+                    <div class="fBadgeTitle">Need Help?</div>
+                    <div class="fBadgeSub">Contact Support: <a href="tel:9430855987">9430855987</a></div>
+                </div>
+            </div>
+        </div>
+
+    </div><!-- /pageWrap -->
+
+
+    <!-- ══ WITHDRAW POPUP ══ -->
+    <div id="withdrawPopup" class="popupOverlay">
+        <div class="popupBox" id="withdrawPopupBox">
+            <div class="popupTitle">
+                Withdraw Amount
+                <button class="popupClose" onclick="closeWithdraw()">✕</button>
+            </div>
+
+            <div class="popLabel">Withdraw Amount</div>
+            <div class="withdrawRow">
+                <div class="inputWrap">
+                    <span class="rupee">₹</span>
+                    <input id="withdrawInput" type="number" placeholder="Enter amount" oninput="validateWithdraw()">
+                </div>
+            </div>
+            <div class="walletInfoText" id="walletInfo"></div>
+
+            <div class="popLabel">Account Details (Staff)</div>
+
+            <img id="withdrawQR" class="popupQR" style="display:none;">
+
+            <div class="popInput">
+                <input id="withdrawName" type="text" placeholder="Account holder Name" disabled
+                    style="padding-left:14px;">
+            </div>
+            <div class="popInput">
+                <input id="withdrawUPI" type="text" placeholder="UPI Id" disabled style="padding-left:14px;">
+            </div>
+            <div class="popInput">
+                <input id="withdrawMobile" type="tel" placeholder="Mob. No" disabled style="padding-left:14px;">
+            </div>
+
+            <button class="popBtn popBtnPrimary" onclick="submitWithdraw()">
+                Withdraw Request
+            </button>
+            <button class="popBtn popBtnDanger" onclick="closeWithdraw()">
+                Close
+            </button>
+        </div>
+    </div>
+
+    <!-- ══ PAYMENT POPUP ══ -->
+    <div id="paymentPopup" class="popupOverlay">
+        <div class="popupBox">
+            <div class="popupTitle">
+                Payments
+                <button class="popupClose"
+                    onclick="document.getElementById('paymentPopup').classList.remove('open')">✕</button>
+            </div>
+
+            <div style="background:var(--primary-light);border-radius:12px;padding:14px 16px;margin-bottom:16px;">
+                <div style="font-size:13px;color:var(--gray);margin-bottom:4px;">Total Amount</div>
+                <div style="font-size:22px;font-weight:800;color:var(--primary);">₹ <span id="payAmount">0</span></div>
+                <div onclick="enableAmountEdit()"
+                    style="color:var(--primary);font-size:12.5px;font-weight:600;cursor:pointer;margin-top:6px;">✏
+                    Change amount</div>
+            </div>
+
+            <input id="customAmount" type="number" placeholder="₹ Enter amount"
+                style="display:none;margin-bottom:14px;padding-left:14px;">
+
+            <div class="popLabel">Pay via UPI</div>
+
+            <div class="payUPIOption" onclick="payUPI('gpay')">
+                <span class="payUPIIcon">💚</span> Google Pay
+            </div>
+            <div class="payUPIOption" onclick="payUPI('phonepe')">
+                <span class="payUPIIcon">💜</span> PhonePe
+            </div>
+
+            <div style="margin-top:14px;" class="popLabel">Transaction ID</div>
+            <div class="popInput" style="margin-top:6px;">
+                <input id="txnId" type="text" placeholder="Last 6 digits of transaction" style="padding-left:14px;">
+            </div>
+
+            <button class="popBtn popBtnPrimary" onclick="submitPayment()" style="margin-top:6px;">
+                Done
+            </button>
+        </div>
+    </div>
+
+    <!-- ══ PAYMENT SUCCESS ══ -->
+    <div id="paymentSuccess">
+        <div class="successBox">
+            <div class="successIcon">✅</div>
+            <div class="successTitle">Payment Successful!</div>
+            <div class="successSub">Your wallet has been updated.</div>
+            <button class="popBtn popBtnPrimary" style="margin-top:20px;"
+                onclick="document.getElementById('paymentSuccess').style.display='none'">Done</button>
+        </div>
+    </div>
+
+
+    <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+    <script>
+        const API = "http://localhost:5000/api";
+        const token = localStorage.getItem("staffToken");
+        const socket = io("http://localhost:5000");
+
+        const staffId = JSON.parse(atob(token.split(".")[1])).id;
+        socket.emit("joinStaffRoom", staffId);
+
+        socket.on("staff_notification", (data) => {
+            alert("🔔 " + data.message);
+            loadWallet();
+            loadTransactions();
+            loadWithdrawStatus();
+        });
+
+        // ── LOAD WALLET ──
+        async function loadWallet() {
+            const res = await fetch(API + "/staff/wallet", { headers: { Authorization: "Bearer " + token } });
+            const data = await res.json();
+
+            let wallet = Number(data.wallet_balance || 0);
+            let unit = Number(data.unit_balance || 0);
+
+            document.getElementById("walletAmount").innerText = "₹ " + wallet.toFixed(2);
+            document.getElementById("unitBalance").innerText = unit.toFixed(2);
+
+            const btn = document.getElementById("withdrawBtn");
+            if (btn) {
+                btn.disabled = wallet <= 0;
+                btn.style.opacity = wallet <= 0 ? "0.45" : "1";
+            }
+            console.log("WALLET API:", data);
+        }
+
+        // ── LOAD TRANSACTIONS ──
+        async function loadTransactions() {
+            const txnRes = await fetch(API + "/staff/transactions", { headers: { Authorization: "Bearer " + token } });
+            const reqRes = await fetch(API + "/staff/wallet-requests", { headers: { Authorization: "Bearer " + token } });
+
+            const txns = await txnRes.json();
+            const reqs = await reqRes.json();
+
+            // Desktop table
+            const body = document.getElementById("txnBody");
+            body.innerHTML = "";
+
+            // Mobile list
+            const mList = document.getElementById("txnMobileList");
+            mList.innerHTML = "";
+
+            txns.forEach(t => {
+                const isWithdraw = t.type === "withdraw";
+                const isDeposit = t.type === "deposit";
+                const dateStr = new Date(t.created_at).toLocaleString();
+
+                // Desktop row
+                body.innerHTML += `
+                <tr>
+                    <td class="tdDate">${dateStr}</td>
+                    <td class="tdAmt">₹ ${Number(t.opening_balance).toFixed(2)}</td>
+                    <td class="tdAmt tdRed">${isWithdraw ? "- ₹ " + Number(t.amount).toFixed(2) : "<span class='tdGray'>-</span>"}</td>
+                    <td class="tdAmt tdGreen">${isDeposit ? "+ ₹ " + Number(t.amount).toFixed(2) : "<span class='tdGray'>-</span>"}</td>
+                    <td class="tdAmt">₹ ${Number(t.closing_balance).toFixed(2)}</td>
+                </tr>`;
+
+                // Mobile card
+                const subLine = isWithdraw
+                    ? `Opening: ₹ ${Number(t.opening_balance).toFixed(2)} &nbsp; Withdraw: <span class="txnRed">- ₹ ${Number(t.amount).toFixed(2)}</span>`
+                    : `Opening: ₹ ${Number(t.opening_balance).toFixed(2)} &nbsp; Deposit: <span class="txnGreen">+ ₹ ${Number(t.amount).toFixed(2)}</span>`;
+
+                mList.innerHTML += `
+                <div class="txnItem">
+                    <div class="txnLeft">
+                        <div class="txnDate">${dateStr}</div>
+                        <div class="txnSub">${subLine}</div>
+                    </div>
+                    <div class="txnRight">
+                        <div class="txnClosing">Closing:</div>
+                        <div class="txnClosingAmt">₹ ${Number(t.closing_balance).toFixed(2)}</div>
+                    </div>
+                    <span class="txnChevron">›</span>
+                </div>`;
+            });
+
+            // Pending requests
+            reqs.forEach(r => {
+                if (r.status === "pending") {
+                    body.innerHTML += `
+                    <tr style="background:#fff7ed;">
+                        <td class="tdDate">${new Date(r.created_at).toLocaleString()}</td>
+                        <td class="tdGray">-</td>
+                        <td class="tdPending">₹ ${r.amount}</td>
+                        <td class="tdGray">-</td>
+                        <td class="tdPending">Pending</td>
+                    </tr>`;
+
+                    mList.innerHTML += `
+                    <div class="txnItem" style="background:#fff7ed;">
+                        <div class="txnLeft">
+                            <div class="txnDate">${new Date(r.created_at).toLocaleString()}</div>
+                            <div class="txnSub">Withdraw request pending</div>
+                        </div>
+                        <div class="txnRight">
+                            <div class="txnClosingAmt" style="color:var(--orange);">₹ ${r.amount}</div>
+                        </div>
+                    </div>`;
+                }
+            });
+        }
+
+        // ── WITHDRAW STATUS ──
+        async function loadWithdrawStatus() {
+            const res = await fetch(API + "/staff/wallet-requests", { headers: { Authorization: "Bearer " + token } });
+            const data = await res.json();
+
+            const statusBox = document.getElementById("withdrawStatus");
+            const statusText = document.getElementById("withdrawStatusText");
+
+            if (!data.length) { statusBox.style.display = "none"; return; }
+
+            const latest = data[0];
+            statusBox.style.display = "flex";
+
+            if (latest.status === "pending") {
+                statusText.innerText = `Pending Withdraw: ₹ ${latest.amount}`;
+                statusBox.querySelector(".wsDot").style.background = "#f59e0b";
+            }
+            if (latest.status === "completed") {
+                statusText.innerText = `Withdraw Completed: ₹ ${latest.amount}`;
+                statusBox.querySelector(".wsDot").style.background = "#22c55e";
+            }
+        }
+
+        // ── OPEN QR ──
+        function openQR() { window.location.href = "scan-pay.html"; }
+
+        // ── WITHDRAW ──
+        function withdraw() {
+            let walletText = document.getElementById("walletAmount").innerText;
+            let walletAmount = parseFloat(walletText.replace(/[^\d.-]/g, "")) || 0;
+
+            if (walletAmount <= 0) { alert("Insufficient wallet balance"); return; }
+
+            document.getElementById("withdrawPopup").classList.add("open");
+            loadWithdrawDetails();
+        }
+
+        function closeWithdraw() {
+            document.getElementById("withdrawPopup").classList.remove("open");
+        }
+
+        async function loadWithdrawDetails() {
+            let amountText = document.getElementById("walletAmount").innerText;
+            let amount = parseFloat(amountText.replace(/[^\d.-]/g, "")) || 0;
+
+            document.getElementById("walletInfo").innerText = "Available Balance: ₹ " + amount.toFixed(2);
+
+            const res = await fetch(API + "/staff/profile", { headers: { Authorization: "Bearer " + token } });
+            const data = await res.json();
+
+            document.getElementById("withdrawName").value = data.acc_name || "";
+            document.getElementById("withdrawUPI").value = data.upi || "";
+            document.getElementById("withdrawMobile").value = data.acc_mobile || "";
+
+            const qrEl = document.getElementById("withdrawQR");
+            if (data.qr) {
+                qrEl.src = "http://localhost:5000" + data.qr;
+                qrEl.style.display = "block";
+            }
+        }
+
+        async function submitWithdraw() {
+            let walletText = document.getElementById("walletAmount").innerText;
+            let walletAmount = parseFloat(walletText.replace(/[^\d.-]/g, "")) || 0;
+            let withdrawAmount = Number(document.getElementById("withdrawInput").value);
+
+            if (walletAmount <= 0) return alert("No balance available for withdraw");
+            if (!withdrawAmount) return alert("Enter withdraw amount");
+            if (withdrawAmount <= 0) return alert("Invalid amount");
+            if (withdrawAmount > walletAmount) return alert("Amount exceeds wallet balance");
+
+            try {
+                const res = await fetch(API + "/staff/wallet-withdraw", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json", Authorization: "Bearer " + token },
+                    body: JSON.stringify({ amount: withdrawAmount })
+                });
+                const data = await res.json();
+
+                if (!data.success) return alert("Request failed");
+
+                document.getElementById("withdrawPopupBox").innerHTML = `
+                <div style="text-align:center;padding:30px 20px;">
+                    <div style="font-size:52px;margin-bottom:14px;">✅</div>
+                    <h3 style="font-size:18px;font-weight:700;color:var(--text);margin-bottom:8px;">Request Submitted!</h3>
+                    <p style="color:var(--gray);font-size:13.5px;">Processing time: 1–2 hours.</p>
+                    <button class="popBtn popBtnPrimary" style="margin-top:20px;" onclick="closeWithdraw()">Done</button>
+                </div>`;
+            } catch (err) {
+                console.log(err);
+                alert("Server error");
+            }
+        }
+
+        function validateWithdraw() {
+            let walletText = document.getElementById("walletAmount").innerText;
+            let walletAmount = Math.abs(parseFloat(walletText.replace(/[^\d.-]/g, "")) || 0);
+            let input = document.getElementById("withdrawInput");
+            let value = Number(input.value);
+
+            input.classList.remove("valid", "invalid");
+            if (!value) return;
+            input.classList.add(value > 0 && value <= walletAmount ? "valid" : "invalid");
+        }
+
+        // ── PAY NOW ──
+        async function payNow() {
+            let amountText = document.getElementById("walletAmount").innerText;
+            let amount = Math.abs(parseFloat(amountText.replace(/[^\d.-]/g, "")) || 0);
+
+            if (amount <= 0) return alert("Invalid amount");
+
+            const res = await fetch(API + "/payment/create-order", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ amount, staff_id: staffId })
+            });
+            const order = await res.json();
+
+            const options = {
+                key: "rzp_test_ShfyzJVzrxSupy",
+                amount: order.amount,
+                currency: "INR",
+                name: "Vinsuu",
+                description: "Wallet Payment",
+                order_id: order.id,
+                method: { upi: true, card: true, netbanking: true, wallet: true },
+                handler: async function (response) {
+                    const verifyRes = await fetch(API + "/payment/verify-payment", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json", Authorization: "Bearer " + token },
+                        body: JSON.stringify({ ...response, amount, staff_id: staffId })
+                    });
+                    const data = await verifyRes.json();
+                    if (!data.success) return alert("Payment verification failed");
+
+                    document.getElementById("paymentSuccess").style.display = "flex";
+                    await loadWallet();
+                    await loadTransactions();
+                    await loadWithdrawStatus();
+                }
+            };
+
+            const rzp = new Razorpay(options);
+            rzp.on('payment.failed', function (response) {
+                alert("Payment Failed: " + response.error.description);
+            });
+            rzp.open();
+        }
+
+        function enableAmountEdit() {
+            document.getElementById("customAmount").style.display = "block";
+        }
+
+        function payUPI(type) {
+            console.log("Pay via:", type);
+        }
+
+        async function submitPayment() {
+            const txnId = document.getElementById("txnId").value;
+            console.log("txnId:", txnId);
+        }
+
+        // ── INIT ──
+        document.addEventListener("DOMContentLoaded", () => {
+            loadWallet();
+            loadTransactions();
+            loadWithdrawStatus();
+
+            setInterval(() => {
+                loadWallet();
+                loadTransactions();
+                loadWithdrawStatus();
+            }, 5000);
+        });
+        // --- Staff name load----
+        function loadStaffName() {
+    try {
+        const token = localStorage.getItem("staffToken");
+
+        if (!token) return;
+
+        const payload = JSON.parse(atob(token.split(".")[1]));
+
+        // OPTIONAL: if name stored in token
+        if (payload.name) {
+            document.getElementById("navUserName").innerText = payload.name;
+
+            document.getElementById("navAvatar").innerText =
+                payload.name.charAt(0).toUpperCase();
+        } else {
+            // fallback → fetch from API
+            fetch("http://localhost:5000/api/staff/profile", {
+                headers: { Authorization: "Bearer " + token }
+            })
+            .then(res => res.json())
+            .then(data => {
+                const name = data.name || "User";
+
+                document.getElementById("navUserName").innerText = name;
+                document.getElementById("navAvatar").innerText =
+                    name.charAt(0).toUpperCase();
+            });
+        }
+
+    } catch (err) {
+        console.log("Name load error:", err);
+    }
+}
+document.addEventListener("DOMContentLoaded", () => {
+    loadStaffName();
+});
+    </script>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+</body>
+
+</html>

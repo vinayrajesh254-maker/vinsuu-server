@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Login - Vinsuu</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+    :root {
+        --primary: #1a3fd4;
+        --primary-dark: #1430b0;
+        --primary-mid: #2b52e0;
+        --primary-light: #e8eeff;
+        --text: #1a1a2e;
+        --gray: #6b7280;
+        --border: #e5e7eb;
+        --light-bg: #f5f7ff;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+        font-family: 'Poppins', sans-serif;
+        background: #eef2ff;
+        min-height: 100vh;
+        display: flex;
+        align-items: stretch;
+    }
+
+    /* ══ LEFT PANEL (desktop only) ══ */
+    .leftPanel {
+        flex: 0 0 42%;
+        background: linear-gradient(160deg, #3b5bdb 0%, #1a3fd4 40%, #1430b0 100%);
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        padding: 40px;
+    }
+
+    /* Back button */
+    .leftBackBtn {
+        position: absolute; top: 28px; left: 28px;
+        width: 42px; height: 42px; border-radius: 50%;
+        background: rgba(255,255,255,0.20);
+        border: 1.5px solid rgba(255,255,255,0.35);
+        color: white; font-size: 18px; cursor: pointer;
+        display: flex; align-items: center; justify-content: center;
+        transition: background 0.2s; z-index: 10;
+    }
+    .leftBackBtn:hover { background: rgba(255,255,255,0.30); }
+
+    /* Background image overlay */
+    .leftBg {
+        position: absolute; inset: 0;
+        background: url('https://images.unsplash.com/photo-1497366216548-37526070297c?w=800&q=60') center/cover no-repeat;
+        opacity: 0.18;
+    }
+
+    /* Dot pattern overlay */
+    .leftDots {
+        position: absolute; inset: 0;
+        background-image: radial-gradient(circle, rgba(255,255,255,0.08) 1.5px, transparent 1.5px);
+        background-size: 22px 22px;
+    }
+
+    /* Bottom wave */
+    .leftWave {
+        position: absolute; bottom: 0; left: 0; right: 0;
+        height: 120px;
+        background: rgba(255,255,255,0.10);
+        clip-path: ellipse(120% 100% at 50% 100%);
+    }
+
+    /* Security illustration */
+    .securityIllustration {
+        position: relative; z-index: 2;
+        display: flex; flex-direction: column; align-items: center; gap: 0;
+    }
+    .shieldCircle {
+        width: 180px; height: 180px; border-radius: 50%;
+        background: rgba(255,255,255,0.10);
+        border: 2px solid rgba(255,255,255,0.20);
+        display: flex; align-items: center; justify-content: center;
+        position: relative;
+    }
+    .shieldInner {
+        width: 120px; height: 120px; border-radius: 50%;
+        background: rgba(255,255,255,0.08);
+        border: 1.5px dashed rgba(255,255,255,0.30);
+        display: flex; align-items: center; justify-content: center;
+        font-size: 58px;
+    }
+    /* Orbiting icons */
+    .orbitIcon {
+        position: absolute;
+        width: 44px; height: 44px; border-radius: 50%;
+        background: rgba(255,255,255,0.18);
+        border: 1.5px solid rgba(255,255,255,0.30);
+        display: flex; align-items: center; justify-content: center;
+        font-size: 18px;
+    }
+    .orbitTop    { top: -10px; left: 50%; transform: translateX(-50%); }
+    .orbitRight  { right: -14px; top: 50%; transform: translateY(-50%); }
+    .orbitLeft   { left: -14px; top: 50%; transform: translateY(-50%); }
+    /* Orbit ring */
+    .orbitRing {
+        position: absolute; inset: -24px;
+        border: 1.5px dashed rgba(255,255,255,0.20);
+        border-radius: 50%;
+    }
+
+    /* ══ RIGHT PANEL ══ */
+    .rightPanel {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 40px 24px;
+        background: white;
+    }
+
+    .loginCard {
+        width: 100%;
+        max-width: 400px;
+    }
+
+    /* Logo */
+    .logoRow {
+        display: flex; align-items: center; gap: 12px;
+        justify-content: center; margin-bottom: 28px;
+    }
+    .logoIcon { font-size: 36px; }
+
+    .logoTitle {
+        font-size: 22px; font-weight: 800; color: var(--primary);
+        letter-spacing: 1px; line-height: 1;
+    }
+    .logoSub {
+        font-size: 10.5px; font-weight: 700; color: var(--gray);
+        letter-spacing: 3px; text-transform: uppercase;
+    }
+
+    /* Heading */
+    .loginHeading { font-size: 24px; font-weight: 800; color: var(--text); text-align: center; margin-bottom: 6px; }
+    .loginSub     { font-size: 13px; color: var(--gray); text-align: center; margin-bottom: 28px; }
+
+    /* Field */
+    .fieldGroup { margin-bottom: 18px; }
+    .fieldLabel {
+        font-size: 13px; font-weight: 700; color: var(--text);
+        margin-bottom: 7px; display: block;
+    }
+    .inputWrap {
+        display: flex; align-items: center;
+        border: 1.5px solid var(--border); border-radius: 12px;
+        background: var(--light-bg); overflow: hidden;
+        transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .inputWrap:focus-within {
+        border-color: var(--primary); background: white;
+        box-shadow: 0 0 0 3px rgba(26,63,212,0.10);
+    }
+    .iIcon { padding: 0 14px; font-size: 18px; color: var(--gray); flex-shrink: 0; }
+    .inputWrap input {
+        flex: 1; border: none; outline: none; background: transparent;
+        padding: 13px 14px 13px 0;
+        font-size: 13.5px; font-family: 'Poppins', sans-serif; color: var(--text);
+    }
+    .inputWrap input::placeholder { color: #adb5bd; }
+    .eyeBtn {
+        padding: 0 14px; font-size: 18px; color: var(--gray);
+        cursor: pointer; flex-shrink: 0; background: none; border: none;
+        transition: color 0.2s;
+    }
+    .eyeBtn:hover { color: var(--primary); }
+
+    /* OTP section */
+    .otpSection { margin-bottom: 8px; }
+    .otpInputsRow {
+        display: flex; gap: 10px; margin-bottom: 10px;
+    }
+    .otpInputsRow input {
+        flex: 1; height: 52px; text-align: center;
+        font-size: 20px; font-family: 'Poppins', sans-serif; font-weight: 700;
+        border: 1.5px solid var(--border); border-radius: 12px;
+        outline: none; color: var(--primary); background: white;
+        transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .otpInputsRow input:focus {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(26,63,212,0.10);
+    }
+    .otpHint  { font-size: 12px; color: var(--gray); text-align: center; margin-bottom: 8px; }
+    .resendRow { text-align: right; margin-bottom: 4px; }
+    .resendBtn {
+        font-size: 13px; font-weight: 600; color: var(--primary);
+        cursor: pointer; background: none; border: none;
+        font-family: 'Poppins', sans-serif;
+        display: inline-flex; align-items: center; gap: 5px;
+    }
+    .resendBtn:hover { text-decoration: underline; }
+
+    /* Login button */
+    .loginBtn {
+        display: flex; align-items: center; justify-content: center; gap: 10px;
+        width: 100%; padding: 14px;
+        background: linear-gradient(135deg, var(--primary-mid), var(--primary-dark));
+        color: white; border: none; border-radius: 14px;
+        font-size: 16px; font-weight: 700; cursor: pointer;
+        font-family: 'Poppins', sans-serif; transition: all 0.2s;
+        box-shadow: 0 6px 20px rgba(26,63,212,0.30); margin-top: 20px;
+    }
+    .loginBtn:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(26,63,212,0.40); }
+    .loginBtn:active { transform: scale(0.98); }
+    .loginBtnArrow { font-size: 18px; }
+
+    /* Secure badge */
+    .secureBadge {
+        display: flex; align-items: center; justify-content: center; gap: 8px;
+        margin-top: 18px; font-size: 12.5px; color: var(--gray); font-weight: 500;
+    }
+    .secureBadge span { color: var(--gray); }
+    .secureDivider { color: var(--border); margin: 0 4px; }
+
+    /* ══ MOBILE HEADER ══ */
+    .mobileHeader {
+        display: none;
+        position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+        height: 130px;
+        background: linear-gradient(160deg, #3b5bdb 0%, var(--primary-dark) 100%);
+        overflow: hidden;
+    }
+    .mobileHeaderWave {
+        position: absolute; bottom: 0; left: 0; right: 0;
+        height: 60px;
+        background: white;
+        clip-path: ellipse(120% 100% at 50% 100%);
+    }
+    .mobileBackBtn {
+        position: absolute; top: 18px; left: 18px;
+        width: 38px; height: 38px; border-radius: 50%;
+        background: rgba(255,255,255,0.20);
+        border: 1.5px solid rgba(255,255,255,0.35);
+        color: white; font-size: 17px; cursor: pointer;
+        display: flex; align-items: center; justify-content: center;
+    }
+
+    /* ══ RESPONSIVE ══ */
+    @media (max-width: 768px) {
+        body { flex-direction: column; background: white; }
+        .leftPanel  { display: none; }
+        .rightPanel { padding: 150px 22px 40px; align-items: flex-start; background: white; }
+        .mobileHeader { display: block; }
+        .loginCard { max-width: 100%; }
+        .loginHeading { font-size: 20px; }
+    }
+
+    @media (min-width: 769px) and (max-width: 1100px) {
+        .leftPanel { flex: 0 0 38%; }
+    }
+</style>
+</head>
+<body>
+
+    <!-- MOBILE HEADER (hidden on desktop) -->
+    <div class="mobileHeader">
+        <button class="mobileBackBtn" onclick="history.back()">←</button>
+        <div class="mobileHeaderWave"></div>
+    </div>
+
+    <!-- LEFT PANEL -->
+    <div class="leftPanel">
+        <button class="leftBackBtn" onclick="history.back()">←</button>
+        <div class="leftBg"></div>
+        <div class="leftDots"></div>
+        <div class="leftWave"></div>
+
+        <div class="securityIllustration">
+            <div class="shieldCircle">
+                <div class="orbitRing"></div>
+                <div class="orbitIcon orbitTop">👤</div>
+                <div class="orbitIcon orbitRight">🔑</div>
+                <div class="orbitIcon orbitLeft">🔒</div>
+                <div class="shieldInner">🛡️</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- RIGHT PANEL -->
+    <div class="rightPanel">
+        <div class="loginCard">
+
+            <!-- Logo -->
+            <div class="logoRow">
+                <div class="logoIcon">🏠</div>
+                <div class="logoText">
+                    <div class="logoTitle">VINSUU</div>
+                    <div class="logoSub">Admin Portal</div>
+                </div>
+            </div>
+
+            <div class="loginHeading">Welcome Back!</div>
+            <div class="loginSub">Please login to your admin account</div>
+
+            <!-- Admin ID -->
+            <div class="fieldGroup">
+                <label class="fieldLabel">Admin ID</label>
+                <div class="inputWrap">
+                    <span class="iIcon">👤</span>
+                    <input id="user" type="text" placeholder="Enter your admin ID" autocomplete="username">
+                </div>
+            </div>
+
+            <!-- Password -->
+            <div class="fieldGroup">
+                <label class="fieldLabel">Password</label>
+                <div class="inputWrap">
+                    <span class="iIcon">🔒</span>
+                    <input id="pass" type="password" placeholder="Enter your password" autocomplete="current-password">
+                    <button class="eyeBtn" onclick="togglePassword()" id="eyeBtn">🙈</button>
+                </div>
+            </div>
+
+            <!-- OTP Section -->
+            <div id="otpBox" class="otpSection" style="display:none;">
+                <label class="fieldLabel">Verify OTP</label>
+                <div class="otpInputsRow" id="otpInputs">
+                    <input maxlength="1" class="otpDigit" inputmode="numeric">
+                    <input maxlength="1" class="otpDigit" inputmode="numeric">
+                    <input maxlength="1" class="otpDigit" inputmode="numeric">
+                    <input maxlength="1" class="otpDigit" inputmode="numeric">
+                    <input maxlength="1" class="otpDigit" inputmode="numeric">
+                    <input maxlength="1" class="otpDigit" inputmode="numeric">
+                </div>
+                <div class="otpHint">Enter the 6-digit OTP sent to your registered mobile number</div>
+                <div class="resendRow">
+                    <button class="resendBtn" id="resendBtn" onclick="resendOTP()">⏱ Resend OTP in <span id="timerText">00:45</span></button>
+                </div>
+            </div>
+
+            <!-- Login Button -->
+            <button class="loginBtn" onclick="handleAction()">
+                <span id="btnText">Login</span>
+                <span class="loginBtnArrow">→</span>
+            </button>
+
+            <!-- Secure badge -->
+            <div class="secureBadge">
+                <span>🛡️</span>
+                <span>Secure Login</span>
+                <span class="secureDivider">|</span>
+                <span>Your data is protected</span>
+            </div>
+
+        </div>
+    </div>
+
+
+<script>
+    // ── PASSWORD TOGGLE ──
+    function togglePassword() {
+        const pass = document.getElementById("pass");
+        const btn  = document.getElementById("eyeBtn");
+        if (pass.type === "password") { pass.type = "text"; btn.textContent = "👁️"; }
+        else { pass.type = "password"; btn.textContent = "🙈"; }
+    }
+
+    // ── OTP AUTO-ADVANCE ──
+    document.addEventListener("input", e => {
+        if (e.target.classList.contains("otpDigit")) {
+            if (e.target.value.length === 1) {
+                const next = e.target.nextElementSibling;
+                if (next && next.classList.contains("otpDigit")) next.focus();
+            }
+        }
+    });
+    document.addEventListener("keydown", e => {
+        if (e.target.classList.contains("otpDigit") && e.key === "Backspace" && !e.target.value) {
+            const prev = e.target.previousElementSibling;
+            if (prev && prev.classList.contains("otpDigit")) prev.focus();
+        }
+    });
+
+    // ── TIMER ──
+    let timerInterval = null;
+    function startTimer() {
+        let seconds = 45;
+        const resendBtn  = document.getElementById("resendBtn");
+        const timerText  = document.getElementById("timerText");
+        resendBtn.disabled = true;
+        clearInterval(timerInterval);
+        timerInterval = setInterval(() => {
+            seconds--;
+            const m = String(Math.floor(seconds / 60)).padStart(2,"0");
+            const s = String(seconds % 60).padStart(2,"0");
+            timerText.textContent = `${m}:${s}`;
+            if (seconds <= 0) {
+                clearInterval(timerInterval);
+                resendBtn.disabled = false;
+                timerText.textContent = "now";
+                resendBtn.innerHTML = "⏱ Resend OTP";
+            }
+        }, 1000);
+    }
+
+    // ── BUTTON HANDLER ──
+    const otpBox = document.getElementById("otpBox");
+    let otpShown = false;
+
+    function handleAction() {
+        if (!otpShown) { login(); }
+        else           { verifyOTP(); }
+    }
+
+    // ── LOGIN ──
+    async function login() {
+        const res = await fetch("/api/admin-auth/login", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                username: document.getElementById("user").value,
+                password: document.getElementById("pass").value
+            })
+        });
+        const data = await res.json();
+        if (data.success) {
+            otpBox.style.display = "block";
+            document.getElementById("btnText").textContent = "Verify OTP";
+            document.querySelector(".otpDigit").focus();
+            otpShown = true;
+            startTimer();
+        } else {
+            alert(data.message);
+        }
+    }
+
+    // ── VERIFY OTP ──
+    async function verifyOTP() {
+        let otp = "";
+        document.querySelectorAll(".otpDigit").forEach(i => otp += i.value);
+        if (otp.length !== 6) { alert("Enter complete 6-digit OTP"); return; }
+        const res = await fetch("/api/admin-auth/verify-otp", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ otp })
+        });
+        const data = await res.json();
+        if (data.success) { location.href = "/admin-x7q92k-vinsuu.html"; }
+        else { alert("Invalid OTP"); }
+    }
+
+    // ── RESEND OTP ──
+    async function resendOTP() {
+        const res = await fetch("/api/admin-auth/login", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                username: document.getElementById("user").value,
+                password: document.getElementById("pass").value
+            })
+        });
+        const data = await res.json();
+        if (data.success) {
+            document.querySelectorAll(".otpDigit").forEach(i => i.value = "");
+            document.querySelector(".otpDigit").focus();
+            document.getElementById("resendBtn").innerHTML = `⏱ Resend OTP in <span id="timerText">00:45</span>`;
+            startTimer();
+        } else { alert("Failed to resend OTP"); }
+    }
+</script>
+</body>
+</html>

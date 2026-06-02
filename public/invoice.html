@@ -1,0 +1,1125 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invoice - Vinsuu</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+    <style>
+        :root {
+            --primary: #1a3fd4;
+            --primary-dark: #1430b0;
+            --primary-light: #e8eeff;
+            --green: #16a34a;
+            --text: #1a1a2e;
+            --gray: #6b7280;
+            --border: #e5e7eb;
+            --light-bg: #f5f7ff;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #eef2ff;
+            color: var(--text);
+            min-height: 100vh;
+            padding: 24px 16px 40px;
+        }
+
+        /* ── PAGE WRAPPER ── */
+        .pageWrap {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        /* ── ACTION BAR ── */
+        .actionBar {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .downloadBtn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 11px 24px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 4px 14px rgba(26, 63, 212, 0.30);
+        }
+
+        .downloadBtn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(26, 63, 212, 0.40);
+        }
+
+        /* ══════════════════════════
+       INVOICE BOX
+    ══════════════════════════ */
+        .invoice {
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 8px 40px rgba(26, 63, 212, 0.10), 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        /* ── HEADER SECTION ── */
+        .invHeader {
+            padding: 32px 36px 28px;
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            align-items: start;
+            gap: 20px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        /* Left — logo + contacts */
+
+
+        .invLogoRow {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 6px;
+            padding-bottom: 14px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .invLogoIcon {
+            width: 48px;
+            height: 48px;
+            background: var(--primary-light);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            border: 2px solid rgba(26, 63, 212, 0.15);
+        }
+
+        .invLogoText {
+            line-height: 1.1;
+        }
+
+        .invLogoName {
+            font-size: 22px;
+            font-weight: 800;
+            color: var(--primary);
+            letter-spacing: 0.5px;
+        }
+
+        .invLogoTag {
+            font-size: 9.5px;
+            font-weight: 600;
+            color: var(--gray);
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+        }
+
+        .invContacts {
+            display: flex;
+            flex-direction: column;
+            gap: 7px;
+            margin-top: 14px;
+        }
+
+        .invContact {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            font-size: 13px;
+            color: var(--gray);
+        }
+
+        .invContact .cIcon {
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            background: var(--primary-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            flex-shrink: 0;
+        }
+
+        /* Center — INVOICE title */
+        .invTitleCol {
+            text-align: center;
+            padding-top: 8px;
+        }
+
+        .invTitle {
+            font-size: 34px;
+            font-weight: 800;
+            color: var(--text);
+            letter-spacing: 1px;
+        }
+
+        .invThanks {
+            font-size: 13px;
+            color: var(--gray);
+            margin-top: 6px;
+        }
+
+        /* Right — info card */
+        .invInfoCard {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            border-radius: 16px;
+            padding: 20px 22px;
+            color: white;
+            min-width: 220px;
+            box-shadow: 0 8px 24px rgba(26, 63, 212, 0.30);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .invInfoCard::after {
+            content: '';
+            position: absolute;
+            top: -20px;
+            right: -20px;
+            width: 80px;
+            height: 80px;
+            background: rgba(255, 255, 255, 0.07);
+            border-radius: 50%;
+        }
+
+        .invInfoRow {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+            font-size: 13px;
+        }
+
+        .invInfoRow:last-child {
+            margin-bottom: 0;
+        }
+
+        .invInfoLabel {
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.75);
+            min-width: 90px;
+        }
+
+        .invInfoSep {
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        .invInfoVal {
+            font-weight: 600;
+            color: white;
+        }
+
+        /* ── BILL TO + QR ── */
+        .invBillQR {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            padding: 24px 36px;
+            border-bottom: 1px solid var(--border);
+            align-items: start;
+        }
+
+        /* Bill To box */
+        .billToBox {
+            background: var(--light-bg);
+            border-radius: 14px;
+            padding: 20px;
+            border: 1px solid var(--border);
+            position: relative;
+        }
+
+        .billToTag {
+            display: inline-block;
+            background: var(--primary);
+            color: white;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            padding: 5px 14px;
+            border-radius: 6px;
+            margin-bottom: 14px;
+        }
+
+        .billToAvatar {
+            position: absolute;
+            right: 18px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: var(--primary-light);
+            border: 2px solid rgba(26, 63, 212, 0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            color: rgba(26, 63, 212, 0.25);
+        }
+
+        .billRow {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+            font-size: 13.5px;
+        }
+
+        .billRow:last-child {
+            margin-bottom: 0;
+        }
+
+        .billLabel {
+            font-weight: 600;
+            color: var(--text);
+            min-width: 120px;
+        }
+
+        .billSep {
+            color: var(--gray);
+        }
+
+        .billVal {
+            color: var(--gray);
+            font-weight: 500;
+        }
+
+        /* QR box */
+        .qrBox {
+            background: white;
+            border-radius: 14px;
+            padding: 18px 20px;
+            border: 1.5px dashed var(--border);
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .qrImg {
+            width: 90px;
+            height: 90px;
+            background: #f1f5f9;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            color: var(--gray);
+            text-align: center;
+            flex-shrink: 0;
+            border: 1px solid var(--border);
+            overflow: hidden;
+        }
+
+        .qrImg img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .qrText h4 {
+            font-size: 13.5px;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 4px;
+        }
+
+        .qrText p {
+            font-size: 12px;
+            color: var(--gray);
+            line-height: 1.5;
+        }
+
+        .qrText a {
+            font-size: 12px;
+            color: var(--primary);
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        /* ── TABLE ── */
+        .invTableWrap {
+            padding: 0 36px 24px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            border-radius: 14px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        thead tr {
+            background: linear-gradient(90deg, var(--primary) 0%, var(--primary-dark) 100%);
+        }
+
+        th {
+            padding: 14px 16px;
+            font-size: 13px;
+            font-weight: 700;
+            color: white;
+            text-align: left;
+            letter-spacing: 0.3px;
+        }
+
+        th:last-child,
+        th:nth-child(3),
+        th:nth-child(4) {
+            text-align: right;
+        }
+
+        tbody tr {
+            border-bottom: 1px solid var(--border);
+            transition: background 0.15s;
+        }
+
+        tbody tr:last-child {
+            border-bottom: none;
+        }
+
+        tbody tr:hover {
+            background: var(--light-bg);
+        }
+
+        td {
+            padding: 13px 16px;
+            font-size: 13.5px;
+            color: var(--text);
+        }
+
+        td:last-child,
+        td:nth-child(3),
+        td:nth-child(4) {
+            text-align: right;
+        }
+
+        /* Row number badge */
+        .rowNo {
+            width: 26px;
+            height: 26px;
+            background: var(--primary-light);
+            color: var(--primary);
+            border-radius: 6px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        /* ── TOTALS + FOOTER ── */
+        .invBottom {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            padding: 0 36px 28px;
+            align-items: end;
+        }
+
+        /* Left bottom */
+
+
+        .checksPayable {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .checksIcon {
+            width: 42px;
+            height: 42px;
+            background: var(--primary-light);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+
+        .checksText {
+            font-size: 13px;
+            color: var(--gray);
+            line-height: 1.5;
+        }
+
+        .checksText strong {
+            color: var(--primary);
+        }
+
+        .thankYou {
+            text-align: center;
+            margin-top: 8px;
+        }
+
+        .thankYouText {
+            font-family: 'Georgia', serif;
+            font-size: 26px;
+            color: var(--primary);
+            font-style: italic;
+        }
+
+        .thankYouSub {
+            font-size: 12.5px;
+            color: var(--gray);
+            margin-top: 4px;
+        }
+
+        /* Right — totals */
+        .invTotals {
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+        }
+
+        .totalRow {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 11px 18px;
+            font-size: 14px;
+        }
+
+        .totalRow.subtotal {
+            background: var(--light-bg);
+            border-radius: 10px 10px 0 0;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .totalRow.grand {
+            background: linear-gradient(90deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            font-size: 16px;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+        }
+
+        .totalRow.payment {
+            background: var(--primary-light);
+            border-radius: 0 0 10px 10px;
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        /* ── FOOTER BAR ── */
+        .invFooterBar {
+            background: linear-gradient(90deg, var(--primary) 0%, var(--primary-dark) 100%);
+            padding: 20px 36px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .footerBadges {
+            display: flex;
+            gap: 0;
+            align-items: center;
+            flex: 1;
+        }
+
+        .footerBadge {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 0 24px;
+            color: rgba(255, 255, 255, 0.85);
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .footerBadge:not(:last-child) {
+            border-right: 1px solid rgba(255, 255, 255, 0.15);
+        }
+
+        .footerBadge .fBIcon {
+            width: 36px;
+            height: 36px;
+            background: rgba(255, 255, 255, 0.12);
+            border: 1.5px solid rgba(255, 255, 255, 0.20);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+
+        .footerBadge .fBLabel {
+            font-size: 11px;
+            opacity: 0.7;
+            display: block;
+        }
+
+        .footerBadge .fBName {
+            font-size: 13px;
+            font-weight: 600;
+            display: block;
+        }
+
+        .footerHelp {
+            text-align: right;
+            color: white;
+            flex-shrink: 0;
+        }
+
+        .footerHelp p {
+            font-size: 13px;
+            opacity: 0.75;
+            margin-bottom: 2px;
+        }
+
+        .footerHelp .helpNum {
+            font-size: 16px;
+            font-weight: 800;
+            color: white;
+        }
+
+        .footerHelpIcon {
+            font-size: 40px;
+            margin-left: 12px;
+        }
+
+        /* ══════════════════════════
+       RESPONSIVE
+    ══════════════════════════ */
+
+        /* Tablet */
+        @media (max-width: 768px) {
+            body {
+                padding: 16px 12px 32px;
+            }
+
+            .invHeader {
+                grid-template-columns: 1fr;
+                padding: 24px 22px 20px;
+                gap: 20px;
+            }
+
+            .invTitleCol {
+                text-align: left;
+            }
+
+            .invTitle {
+                font-size: 26px;
+            }
+
+            .invInfoCard {
+                min-width: unset;
+            }
+
+            .invBillQR {
+                grid-template-columns: 1fr;
+                padding: 20px 22px;
+                gap: 16px;
+            }
+
+            .invTableWrap {
+                padding: 0 22px 20px;
+            }
+
+            .invBottom {
+                grid-template-columns: 1fr;
+                padding: 0 22px 22px;
+                gap: 20px;
+            }
+
+            .invFooterBar {
+                padding: 18px 22px;
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 16px;
+            }
+
+            .footerBadges {
+                flex-direction: column;
+                gap: 12px;
+                align-items: flex-start;
+            }
+
+            .footerBadge {
+                padding: 0;
+                border: none !important;
+            }
+
+            .footerHelp {
+                text-align: left;
+            }
+        }
+
+        /* Mobile */
+        @media (max-width: 480px) {
+            body {
+                padding: 12px 8px 28px;
+            }
+
+            .invoice {
+                border-radius: 16px;
+            }
+
+            .invHeader {
+                padding: 20px 16px 16px;
+            }
+
+            .invLogoName {
+                font-size: 18px;
+            }
+
+            .invTitle {
+                font-size: 22px;
+            }
+
+            .invInfoRow {
+                font-size: 12px;
+            }
+
+            .invInfoLabel {
+                min-width: 80px;
+            }
+
+            .invBillQR {
+                padding: 16px;
+                gap: 14px;
+            }
+
+            .billLabel {
+                min-width: 100px;
+            }
+
+            .billRow {
+                font-size: 12.5px;
+            }
+
+            .qrBox {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .qrImg {
+                width: 80px;
+                height: 80px;
+            }
+
+            .invTableWrap {
+                padding: 0 16px 16px;
+                overflow-x: auto;
+            }
+
+            table {
+                min-width: 500px;
+            }
+
+            .invBottom {
+                padding: 0 16px 20px;
+                gap: 18px;
+            }
+
+            .totalRow {
+                padding: 10px 14px;
+                font-size: 13px;
+            }
+
+            .totalRow.grand {
+                font-size: 14px;
+            }
+
+            .invFooterBar {
+                padding: 16px;
+            }
+
+            .footerBadge .fBIcon {
+                width: 30px;
+                height: 30px;
+                font-size: 13px;
+            }
+
+            .footerBadge .fBName {
+                font-size: 12px;
+            }
+
+            .actionBar {
+                justify-content: stretch;
+            }
+
+            .downloadBtn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- SIDE MENU OVERLAY -->
+    <div class="sideOverlay" id="sideOverlay" onclick="closeMenu()"></div>
+
+    <!-- SIDE MENU -->
+    <div class="sideMenu" id="sideMenu">
+        <a href="index.html" onclick="closeMenu()">🏠 Home</a>
+        <a href="#" onclick="closeMenu()">📱 App Download</a>
+        <a href="about.html" onclick="closeMenu()">ℹ️ About Us</a>
+        <a href="#footerContact" onclick="closeMenu()">☎️ Contact Us</a>
+    </div>
+
+    <!-- ========================== DESKTOP ========================== -->
+    <!-- HEADER -->
+    <div class="header">
+        <a href="index.html" class="logo" id="logoBox">
+            <div class="logo-icon">🏠</div>VINSUU
+        </a>
+        <nav class="nav">
+            <a href="index.html" class="active">Home</a>
+            <a href="service-list.html">Services </a>
+            <a href="category.html">Categories</a>
+            <a href="about.html">About Us</a>
+            <a href="#footerContact">Contact Us</a>
+        </nav>
+    </div>
+    <div class="pageWrap">
+
+        <!-- ACTION BAR -->
+        <div class="actionBar">
+            <button class="downloadBtn" onclick="downloadPDF()">
+                ⬇ Download Invoice
+            </button>
+        </div>
+
+        <!-- INVOICE BOX -->
+        <div id="invoiceContent" class="invoice">
+
+            <!-- ── HEADER ── -->
+            <div class="invHeader">
+
+                <!-- Logo + Contacts -->
+                <div class="invLogoCol">
+                    <div class="invLogoRow">
+                        <div class="invLogoIcon">🏠</div>
+                        <div class="invLogoText">
+                            <div class="invLogoName">VINSUU</div>
+                            <div class="invLogoTag">Service at your doorstep</div>
+                        </div>
+                    </div>
+                    <div class="invContacts">
+                        <div class="invContact">
+                            <div class="cIcon">📞</div> 9430855987
+                        </div>
+                        <div class="invContact">
+                            <div class="cIcon">🌐</div> www.vinsuu.com
+                        </div>
+                        <div class="invContact">
+                            <div class="cIcon">✉️</div> support@vinsuu.com
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Center Title -->
+                <div class="invTitleCol">
+                    <div class="invTitle">INVOICE</div>
+                    <div class="invThanks">Thank you for choosing Vinsuu</div>
+                </div>
+
+                <!-- Info Card -->
+                <div class="invInfoCard">
+                    <div class="invInfoRow">
+                        <span class="invInfoLabel">Invoice No</span>
+                        <span class="invInfoSep">:</span>
+                        <span class="invInfoVal">#<span id="invoiceNo">—</span></span>
+                    </div>
+                    <div class="invInfoRow">
+                        <span class="invInfoLabel">Date</span>
+                        <span class="invInfoSep">:</span>
+                        <span class="invInfoVal"><span id="date">—</span></span>
+                    </div>
+                    <div class="invInfoRow">
+                        <span class="invInfoLabel">Staff ID</span>
+                        <span class="invInfoSep">:</span>
+                        <span class="invInfoVal"><span id="staffId">—</span></span>
+                    </div>
+                    <div class="invInfoRow">
+                        <span class="invInfoLabel">Staff Name</span>
+                        <span class="invInfoSep">:</span>
+                        <span class="invInfoVal"><span id="staffName">—</span></span>
+                    </div>
+                    <div class="invInfoRow">
+                        <span class="invInfoLabel">Service Time</span>
+                        <span class="invInfoSep">:</span>
+                        <span class="invInfoVal"><span id="serviceTime">—</span></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ── BILL TO + QR ── -->
+            <div class="invBillQR">
+
+                <!-- Bill To -->
+                <div class="billToBox">
+                    <div class="billToTag">BILL TO</div>
+                    <div class="billToAvatar">👤</div>
+                    <div class="billRow">
+                        <span class="billLabel">Customer ID</span>
+                        <span class="billSep">:</span>
+                        <span class="billVal" id="customerId">—</span>
+                    </div>
+                    <div class="billRow">
+                        <span class="billLabel">Customer Name</span>
+                        <span class="billSep">:</span>
+                        <span class="billVal" id="customerName">—</span>
+                    </div>
+                    <div class="billRow">
+                        <span class="billLabel">Phone</span>
+                        <span class="billSep">:</span>
+                        <span class="billVal" id="customerPhone">—</span>
+                    </div>
+                </div>
+
+                <!-- QR Box -->
+                <div class="qrBox">
+                    <div class="qrImg" id="qrImgBox">
+                        <span style="font-size:9px;padding:6px;">QR Code</span>
+                    </div>
+                    <div class="qrText">
+                        <h4>Scan to view<br>this invoice online</h4>
+                        <a href="#" id="invoiceLink">www.vinsuu.com/invoice/<span id="invLinkNo"></span></a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ── TABLE ── -->
+            <div class="invTableWrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width:60px;">No.</th>
+                            <th>Description</th>
+                            <th style="width:80px;">QTY</th>
+                            <th style="width:110px;">Price</th>
+                            <th style="width:110px;">Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody id="itemsBody"></tbody>
+                </table>
+            </div>
+
+            <!-- ── BOTTOM: FOOTER LEFT + TOTALS ── -->
+            <div class="invBottom">
+
+                <!-- Left -->
+                <div class="invBottomLeft">
+                    <div class="checksPayable">
+                        <div class="checksIcon">📋</div>
+                        <div class="checksText">
+                            Make all checks payable to <strong>Vinsuu</strong>
+                        </div>
+                    </div>
+                    <div class="thankYou">
+                        <div class="thankYouText">Thank You!</div>
+                        <div class="thankYouSub">We appreciate your business.</div>
+                    </div>
+                </div>
+
+                <!-- Right — Totals -->
+                <div class="invTotals">
+                    <div class="totalRow subtotal">
+                        <span>Subtotal</span>
+                        <span>₹ <span id="subtotal">0</span></span>
+                    </div>
+                    <div class="totalRow grand">
+                        <span>TOTAL</span>
+                        <span>₹ <span id="total">0</span></span>
+                    </div>
+                    <div class="totalRow payment">
+                        <span>Payment Mode</span>
+                        <span id="paymentMode">—</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ── FOOTER BAR ── -->
+            <div class="invFooterBar">
+                <div class="footerBadges">
+                    <div class="footerBadge">
+                        <div class="fBIcon">🛡️</div>
+                        <div>
+                            <span class="fBLabel">Trusted</span>
+                            <span class="fBName">Professionals</span>
+                        </div>
+                    </div>
+                    <div class="footerBadge">
+                        <div class="fBIcon">⭐</div>
+                        <div>
+                            <span class="fBLabel">Quality</span>
+                            <span class="fBName">Service</span>
+                        </div>
+                    </div>
+                    <div class="footerBadge">
+                        <div class="fBIcon">🎧</div>
+                        <div>
+                            <span class="fBLabel">Customer</span>
+                            <span class="fBName">Support</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="display:flex;align-items:center;gap:10px;">
+                    <div class="footerHelp">
+                        <p>Need Help?</p>
+                        <p>We're here for you!</p>
+                        <div class="helpNum">9430855987</div>
+                    </div>
+                    <div class="footerHelpIcon">🎧</div>
+                </div>
+            </div>
+
+        </div><!-- /invoice -->
+
+    </div><!-- /pageWrap -->
+
+    <!-- BOTTOM NAV (Mobile) -->
+    <div class="bottomNav">
+        <button class="active" onclick="location.href='index.html'">
+            <span class="bnIcon">🏠</span>Home
+        </button>
+        <button onclick="location.href='category.html'">
+            <span class="bnIcon">📋</span>Category
+        </button>
+        <button onclick="location.href='staff.html'">
+            <span class="bnIcon">👤</span>Staff
+        </button>
+        <button onclick="location.href='profile.html'">
+            <span class="bnIcon">😊</span>Profile
+        </button>
+    </div>
+    <script>
+        const API = "http://localhost:5000/api";
+
+        const params = new URLSearchParams(window.location.search);
+        const id = params.get("id");
+        console.log("Invoice ID:", id);
+
+        // ── LOAD DATA ──
+        async function loadInvoice() {
+            try {
+                const token = localStorage.getItem("customerToken");
+
+                if (!token) {
+                    document.getElementById("invoiceContent").innerHTML =
+                        "<div style='padding:40px;text-align:center;'><h3>Please login again</h3></div>";
+                    return;
+                }
+
+                const res = await fetch(API + "/customer/invoice/" + id, {
+                    headers: { "Authorization": "Bearer " + token }
+                });
+
+                if (!res.ok) {
+                    document.getElementById("invoiceContent").innerHTML =
+                        "<div style='padding:40px;text-align:center;'><h3>Invoice not found</h3></div>";
+                    return;
+                }
+
+                const data = await res.json();
+                console.log("INVOICE DATA:", data);
+
+                // Date
+                document.getElementById("date").innerText =
+                    new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
+
+                // Invoice No
+                document.getElementById("invoiceNo").innerText = data.id;
+                document.getElementById("invLinkNo").innerText = data.id;
+                document.getElementById("invoiceLink").href = "www.vinsuu.com/invoice/" + data.id;
+
+                // Staff
+                document.getElementById("staffId").innerText = data.staff_id;
+                document.getElementById("staffName").innerText = data.staff_name;
+                document.getElementById("serviceTime").innerText = data.service_time;
+
+                // Customer
+                document.getElementById("customerId").innerText = data.customer_id;
+                document.getElementById("customerName").innerText = data.customer_name;
+                document.getElementById("customerPhone").innerText = data.customer_phone || "—";
+
+                // QR code
+                const qrBox = document.getElementById("qrImgBox");
+                const invoiceUrl = "https://www.vinsuu.com/invoice/" + data.id;
+                qrBox.innerHTML = `<img src="https://api.qrserver.com/v1/create-qr-code/?size=90x90&data=${encodeURIComponent(invoiceUrl)}" alt="QR" style="width:90px;height:90px;border-radius:6px;">`;
+
+                // Items
+                const body = document.getElementById("itemsBody");
+                body.innerHTML = "";
+                let total = 0;
+
+                data.items.forEach((item, i) => {
+                    total += Number(item.amount);
+                    body.innerHTML += `
+                <tr>
+                    <td><span class="rowNo">${i + 1}</span></td>
+                    <td>${item.name}</td>
+                    <td>${item.qty}</td>
+                    <td>₹ ${item.price}</td>
+                    <td>₹ ${item.amount}</td>
+                </tr>`;
+                });
+
+                document.getElementById("subtotal").innerText = total;
+                document.getElementById("total").innerText = total;
+                document.getElementById("paymentMode").innerText = data.payment_mode;
+
+            } catch (err) {
+                console.log(err);
+                document.getElementById("invoiceContent").innerHTML =
+                    "<div style='padding:40px;text-align:center;'><h3>Error loading invoice</h3></div>";
+            }
+        }
+
+        // ── DOWNLOAD PDF ──
+        function downloadPDF() {
+            const element = document.getElementById("invoiceContent");
+            const opt = {
+                margin: [8, 8, 8, 8],
+                filename: 'vinsuu-invoice.pdf',
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2, useCORS: true },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+            html2pdf().set(opt).from(element).save();
+        }
+
+        // ── VIEW INVOICE ──
+        function openInvoice(id) {
+            window.open("/invoice.html?id=" + id, "_blank");
+        }
+
+        loadInvoice();
+    </script>
+
+</body>
+
+</html>

@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Staff Panel - Vinsuu</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+
+    <style>
+      
+    </style>
+
+    <script>
+   
+    </script>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+</head>
+
+<body>
+
+    <!-- SIDE MENU OVERLAY -->
+    <div class="sideOverlay" id="sideOverlay" onclick="closeMenu()"></div>
+
+    <!-- SIDE MENU -->
+    <div class="sideMenu" id="sideMenu">
+        <a href="index.html" onclick="closeMenu()">🏠 Home</a>
+        <a href="#" onclick="closeMenu()">📱 App Download</a>
+        <a href="about.html" onclick="closeMenu()">ℹ️ About Us</a>
+        <a href="#footerContact" onclick="closeMenu()">☎️ Contact Us</a>
+    </div>
+
+    <!-- ========================== DESKTOP ========================== -->
+    <!-- HEADER -->
+    <div class="header">
+        <a href="index.html" class="logo" id="logoBox">
+            <div class="logo-icon">🏠</div>VINSUU
+        </a>
+        <nav class="nav">
+            <a href="index.html" class="active">Home</a>
+            <a href="service-list.html">Services </a>
+            <a href="category.html">Categories</a>
+            <a href="about.html">About Us</a>
+            <a href="#footerContact">Contact Us</a>
+        </nav>
+    </div>
+    <!-- TOP HEADER -->
+    <div class="topHeader">
+        <div class="topHeaderLeft">
+            <button class="backBtn" onclick="history.back()">←</button>
+            <span class="topHeaderTitle">Staff Profile</span>
+        </div>
+        <div class="dot-staff-menu">
+            <ul class="dot-staff-menu-btn" onclick="toggleStaffMenu(event)">
+                <li></li>
+                <li></li>
+                <li></li>
+            </ul>
+            <div id="staffDropdown" class="dot-staff-menu-dropdown">
+                <button onclick="handleMenuClick(openWallet)">💰 Wallet</button>
+                <button onclick="handleMenuClick(openLoginActivity)">📊 Login Activity</button>
+                <button onclick="handleMenuClick(openAccountDetails)">🏦 Account Details</button>
+                <button onclick="handleMenuClick(openIDCard)">🪪 ID Card</button>
+                <button onclick="handleMenuClick(openTransactions)">📄 Transaction History</button>
+                <button onclick="handleMenuClick(openWorkHistory)">🛠 Work History</button>
+                <button onclick="closeStaffMenu()" style="color:var(--red);">✕ Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- PAGE -->
+    <div class="container">
+        <div id="profileBox"></div>
+
+        <div class="sectionHeading">My Service Requests</div>
+
+        <div class="tabRow">
+            <button id="pendingTab" class="tab activeTab" onclick="switchTab('pending')">Pending Service</button>
+            <button id="completedTab" class="tab" onclick="switchTab('completed')">Complete Service</button>
+        </div>
+
+        <div id="requests"></div>
+    </div>
+
+    <!-- UNIT POPUP -->
+    <div id="unitOverlay" class="unitOverlay" onclick="closeUnitPopup()"></div>
+    <div id="unitPopup" class="unitPopup">
+        <div class="unitHeader">
+            <span>⭐ Unit Balance</span>
+            <button class="unitCloseBtn" onclick="closeUnitPopup()">✕</button>
+        </div>
+        <h3 style="font-size:15px;font-weight:700;margin-bottom:14px;">Purchase Unit Balance</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Unit Balance</th>
+                    <th>Purchase Price (₹)</th>
+                </tr>
+            </thead>
+            <tbody id="unitPopupBody"></tbody>
+        </table>
+    </div>
+    
+<!-- BOTTOM NAV (Mobile) -->
+    <div class="bottomNav">
+        <button class="active" onclick="location.href='index.html'">
+            <span class="bnIcon">🏠</span>Home
+        </button>
+        <button onclick="location.href='category.html'">
+            <span class="bnIcon">📋</span>Category
+        </button>
+        <button onclick="location.href='staff.html'">
+            <span class="bnIcon">👤</span>Staff
+        </button>
+        <button onclick="location.href='profile.html'">
+            <span class="bnIcon">😊</span>Profile
+        </button>
+    </div>
+    <audio id="notifySound">
+        <source src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg" type="audio/ogg">
+    </audio>
+<script src="staffscript.js"></script>
+</body>
+
+</html>

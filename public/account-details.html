@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Account Details - Vinsuu</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<style>
+    :root {
+        --primary: #1a3fd4;
+        --primary-dark: #1430b0;
+        --primary-mid: #2b52e0;
+        --primary-light: #e8eeff;
+        --text: #1a1a2e;
+        --gray: #6b7280;
+        --border: #e5e7eb;
+        --light-bg: #f5f7ff;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+        font-family: 'Poppins', sans-serif;
+        background: #eef2ff;
+        color: var(--text);
+        min-height: 100vh;
+    }
+
+    /* ══ TOP HEADER ══ */
+    .topHeader {
+        background: linear-gradient(90deg, var(--primary-mid) 0%, var(--primary-dark) 100%);
+        padding: 14px 20px;
+        display: flex; align-items: center; justify-content: space-between;
+        position: sticky; top: 0; z-index: 100;
+        box-shadow: 0 2px 12px rgba(26,63,212,0.25);
+    }
+    .topHeaderLeft { display: flex; align-items: center; gap: 12px; }
+    .backBtn {
+        background: rgba(255,255,255,0.15); border: none; color: white;
+        width: 34px; height: 34px; border-radius: 50%;
+        font-size: 18px; cursor: pointer;
+        display: flex; align-items: center; justify-content: center;
+        flex-shrink: 0; transition: background 0.2s;
+    }
+    .backBtn:hover { background: rgba(255,255,255,0.25); }
+    .topHeaderTitle { font-size: 16px; font-weight: 700; color: white; }
+
+    .topHeaderRight { display: flex; align-items: center; gap: 12px; }
+    .notifBtn {
+        position: relative; font-size: 22px; color: white;
+        cursor: pointer; background: none; border: none;
+    }
+    .notifDot {
+        position: absolute; top: 0; right: 0;
+        width: 8px; height: 8px; background: #ef4444; border-radius: 50%;
+    }
+    .staffBadge {
+        display: flex; align-items: center; gap: 8px; cursor: pointer;
+    }
+    .staffAvatarCircle {
+        width: 36px; height: 36px; border-radius: 50%;
+        background: rgba(255,255,255,0.20);
+        border: 1.5px solid rgba(255,255,255,0.4);
+        display: flex; align-items: center; justify-content: center;
+        font-size: 13px; font-weight: 700; color: white;
+    }
+    .staffBadgeText { line-height: 1.2; }
+    .staffBadgeName { font-size: 13px; font-weight: 600; color: white; }
+    .staffBadgeRole { font-size: 11px; color: rgba(255,255,255,0.65); }
+    .staffChevron   { font-size: 12px; color: rgba(255,255,255,0.7); }
+
+    /* ══ PAGE ══ */
+    .container {
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 28px 18px 60px;
+    }
+
+    /* ══ MAIN CARD ══ */
+    .mainCard {
+        background: white;
+        border-radius: 22px;
+        padding: 30px 28px;
+        box-shadow: 0 6px 30px rgba(0,0,0,0.07);
+    }
+
+    /* Hero section */
+    .cardHero {
+        text-align: center;
+        padding-bottom: 24px;
+        margin-bottom: 24px;
+        border-bottom: 1px solid var(--border);
+        position: relative;
+    }
+
+    /* QR circle */
+    .qrCircle {
+        width: 110px; height: 110px; border-radius: 50%;
+        background: var(--primary-light);
+        border: 3px solid rgba(26,63,212,0.15);
+        display: flex; align-items: center; justify-content: center;
+        margin: 0 auto 16px;
+        position: relative; overflow: hidden;
+        box-shadow: 0 4px 18px rgba(26,63,212,0.15);
+    }
+    .qrCircle img {
+        width: 80px; height: 80px;
+        object-fit: contain; border-radius: 8px;
+    }
+    .qrCirclePlaceholder { font-size: 40px; }
+
+    /* Decorative dots around circle */
+    .qrCircle::before {
+        content: '✦ ✦'; position: absolute;
+        top: -6px; left: 50%; transform: translateX(-50%);
+        font-size: 9px; color: var(--primary); opacity: 0.5;
+    }
+
+    .heroTitle { font-size: 20px; font-weight: 800; color: var(--text); margin-bottom: 5px; }
+    .heroSub   { font-size: 13px; color: var(--gray); font-weight: 400; margin-bottom: 20px; }
+
+    /* QR action buttons */
+    .qrSection {
+        display: flex; gap: 16px;
+        align-items: flex-start;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+    .qrBtnGroup { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
+
+    .btnChooseQR {
+        display: flex; align-items: center; gap: 8px;
+        padding: 12px 22px;
+        background: var(--primary); color: white;
+        border: none; border-radius: 12px;
+        font-size: 14px; font-weight: 600;
+        cursor: pointer; font-family: 'Poppins', sans-serif;
+        transition: all 0.2s;
+        box-shadow: 0 4px 14px rgba(26,63,212,0.25);
+    }
+    .btnChooseQR:hover { background: var(--primary-dark); transform: translateY(-1px); }
+
+    .btnUploadQR {
+        display: flex; align-items: center; gap: 8px;
+        padding: 12px 22px;
+        background: white; color: var(--primary);
+        border: 1.5px solid var(--primary); border-radius: 12px;
+        font-size: 14px; font-weight: 600;
+        cursor: pointer; font-family: 'Poppins', sans-serif;
+        transition: all 0.2s;
+    }
+    .btnUploadQR:hover { background: var(--primary-light); }
+
+    /* QR preview box */
+    .qrPreviewBox {
+        background: var(--light-bg);
+        border: 1.5px solid var(--border);
+        border-radius: 16px;
+        padding: 12px;
+        display: flex; align-items: center; justify-content: center;
+        min-width: 130px; min-height: 130px;
+        position: relative;
+    }
+    .qrPreviewBox img {
+        width: 110px; height: 110px;
+        object-fit: contain; border-radius: 10px;
+        display: block;
+    }
+
+    /* ══ FORM FIELDS ══ */
+    .fieldGroup { margin-bottom: 18px; }
+    .fieldLabel {
+        font-size: 13px; font-weight: 700;
+        color: var(--text); margin-bottom: 8px; display: block;
+    }
+    .inputWrap {
+        display: flex; align-items: center;
+        border: 1.5px solid var(--border); border-radius: 12px;
+        background: var(--light-bg); overflow: hidden;
+        transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .inputWrap:focus-within {
+        border-color: var(--primary); background: white;
+        box-shadow: 0 0 0 3px rgba(26,63,212,0.10);
+    }
+    .iIcon {
+        padding: 0 14px; font-size: 18px; color: var(--primary);
+        flex-shrink: 0; pointer-events: none;
+    }
+    .inputWrap input {
+        flex: 1; border: none; outline: none; background: transparent;
+        padding: 13px 14px 13px 0;
+        font-size: 14px; font-family: 'Poppins', sans-serif; color: var(--text);
+    }
+    .inputWrap input::placeholder { color: #adb5bd; }
+    .inputWrap input:disabled { color: var(--gray); cursor: default; }
+
+    /* ══ ACTION BUTTONS ══ */
+    .actionBtns {
+        display: flex; gap: 14px; margin-top: 24px; flex-wrap: wrap;
+    }
+    .btnEdit {
+        flex: 1; min-width: 120px;
+        display: flex; align-items: center; justify-content: center; gap: 7px;
+        padding: 13px;
+        background: white; color: var(--primary);
+        border: 1.5px solid var(--primary); border-radius: 12px;
+        font-size: 14px; font-weight: 700;
+        cursor: pointer; font-family: 'Poppins', sans-serif; transition: all 0.2s;
+    }
+    .btnEdit:hover { background: var(--primary-light); }
+
+    .btnSave {
+        flex: 2; min-width: 140px;
+        display: flex; align-items: center; justify-content: center; gap: 7px;
+        padding: 13px;
+        background: linear-gradient(135deg, var(--primary-mid), var(--primary-dark));
+        color: white; border: none; border-radius: 12px;
+        font-size: 14px; font-weight: 700;
+        cursor: pointer; font-family: 'Poppins', sans-serif; transition: all 0.2s;
+        box-shadow: 0 6px 18px rgba(26,63,212,0.28);
+    }
+    .btnSave:hover { transform: translateY(-1px); box-shadow: 0 8px 24px rgba(26,63,212,0.38); }
+
+    /* ══ RESPONSIVE ══ */
+    @media (max-width: 600px) {
+        .container { padding: 16px 12px 50px; }
+        .mainCard { padding: 22px 16px; }
+        .heroTitle { font-size: 17px; }
+        .qrSection { flex-direction: column; align-items: center; gap: 14px; }
+        .btnChooseQR, .btnUploadQR { width: 100%; justify-content: center; }
+        .qrBtnGroup { width: 100%; flex-direction: column; }
+        .actionBtns { flex-direction: row; }
+        .btnEdit { flex: 1; }
+        .btnSave { flex: 2; }
+        .topHeaderRight .staffBadgeText { display: none; }
+    }
+    @media (max-width: 380px) {
+        .btnEdit, .btnSave { font-size: 13px; padding: 11px; }
+    }
+</style>
+
+</head>
+<body>
+
+     <!-- SIDE MENU OVERLAY -->
+    <div class="sideOverlay" id="sideOverlay" onclick="closeMenu()"></div>
+
+    <!-- SIDE MENU -->
+    <div class="sideMenu" id="sideMenu">
+        <a href="index.html" onclick="closeMenu()">🏠 Home</a>
+        <a href="#" onclick="closeMenu()">📱 App Download</a>
+        <a href="about.html" onclick="closeMenu()">ℹ️ About Us</a>
+        <a href="#footerContact" onclick="closeMenu()">☎️ Contact Us</a>
+    </div>
+
+    <!-- ========================== DESKTOP ========================== -->
+    <!-- HEADER -->
+    <div class="header">
+        <a href="index.html" class="logo" id="logoBox">
+            <div class="logo-icon">🏠</div>VINSUU
+        </a>
+        <nav class="nav">
+            <a href="index.html" >Home</a>
+            <a href="service-list.html">Services </a>
+            <a href="category.html">Categories</a>
+            <a href="about.html">About Us</a>
+           
+            
+        </nav>
+    </div>
+
+
+    <!-- TOP HEADER -->
+    <div class="topHeader">
+        <div class="topHeaderLeft">
+            <button class="backBtn" onclick="history.back()">←</button>
+            <span class="topHeaderTitle">Account Details (Staff)</span>
+        </div>
+        <div class="topHeaderRight">
+            <button class="notifBtn">🔔<span class="notifDot"></span></button>
+            <div class="staffBadge">
+                <div class="staffAvatarCircle" id="staffInitials">RK</div>
+                <div class="staffBadgeText">
+                    <div class="staffBadgeName" id="headerStaffName">Staff</div>
+                    <div class="staffBadgeRole">Staff</div>
+                </div>
+                <span class="staffChevron">▾</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- PAGE -->
+    <div class="container">
+        <div class="mainCard">
+
+            <!-- Hero -->
+            <div class="cardHero">
+                <!-- QR Circle -->
+                <div class="qrCircle" id="qrCircle">
+                    <span class="qrCirclePlaceholder" id="qrCirclePlaceholder">📷</span>
+                    <img id="qrCircleImg" src="" alt="QR" style="display:none;">
+                </div>
+
+                <div class="heroTitle">Account Details (Staff)</div>
+                <div class="heroSub">Manage your QR and account information</div>
+
+                <!-- QR buttons + preview -->
+                <div class="qrSection">
+                    <div class="qrBtnGroup">
+                        <button class="btnChooseQR" onclick="document.getElementById('qrFile').click()">
+                            📷 Choose QR
+                        </button>
+                        <button class="btnUploadQR" onclick="uploadQR()">
+                            ⬆ Upload QR
+                        </button>
+                    </div>
+
+                    <!-- QR preview -->
+                    <div class="qrPreviewBox" id="qrPreviewBox">
+                        <img id="qrPreview" src="" alt="QR Code" style="display:none;">
+                        <span id="qrPreviewPlaceholder" style="font-size:36px;">🔲</span>
+                    </div>
+                </div>
+
+                <!-- Hidden file input -->
+                <input type="file" id="qrFile" accept="image/*" style="display:none;" onchange="previewQR(event)">
+            </div>
+
+            <!-- Account Fields -->
+            <div class="fieldGroup">
+                <label class="fieldLabel">Account Holder Name</label>
+                <div class="inputWrap">
+                    <span class="iIcon">👤</span>
+                    <input id="name" placeholder="Account holder name" disabled>
+                </div>
+            </div>
+
+            <div class="fieldGroup">
+                <label class="fieldLabel">UPI ID</label>
+                <div class="inputWrap">
+                    <span class="iIcon" style="font-size:14px;font-weight:800;color:#6b21a8;">UPI</span>
+                    <input id="upi" placeholder="yourname@upi" disabled>
+                </div>
+            </div>
+
+            <div class="fieldGroup">
+                <label class="fieldLabel">Mobile Number</label>
+                <div class="inputWrap">
+                    <span class="iIcon">📞</span>
+                    <input id="mobile" placeholder="10-digit mobile number" disabled>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="actionBtns">
+                <button class="btnEdit" onclick="enableEdit()">✏ Edit</button>
+                <button class="btnSave" onclick="saveDetails()">💾 Save Changes</button>
+            </div>
+
+        </div>
+    </div>
+
+
+<script>
+const API   = "http://localhost:5000/api";
+const token = localStorage.getItem("staffToken");
+
+// ── LOAD DATA ──
+async function loadDetails() {
+    const params  = new URLSearchParams(window.location.search);
+    const staffId = params.get("staff_id");
+    let url = API + "/staff/profile";
+    if (staffId) url = API + "/admin/staff/" + staffId;
+
+    const res  = await fetch(url, { headers: { Authorization: "Bearer " + token } });
+    const data = await res.json();
+
+    document.getElementById("name").value   = data.acc_name   || "";
+    document.getElementById("upi").value    = data.upi        || "";
+    document.getElementById("mobile").value = data.acc_mobile || "";
+
+    // Set header avatar initials + name
+    if (data.name) {
+        const initials = data.name.split(" ").map(w => w[0]).join("").slice(0,2).toUpperCase();
+        document.getElementById("staffInitials").textContent   = initials;
+        document.getElementById("headerStaffName").textContent = data.name;
+    }
+
+    // Show QR
+    if (data.qr) {
+        const src = data.qr;
+        showQR(src);
+    }
+
+    // Lock fields on load
+    lockFields();
+}
+
+// ── SHOW QR IN BOTH CIRCLE + PREVIEW ──
+function showQR(src) {
+    // Circle
+    const circleImg = document.getElementById("qrCircleImg");
+    const circlePh  = document.getElementById("qrCirclePlaceholder");
+    circleImg.src          = src;
+    circleImg.style.display = "block";
+    circlePh.style.display  = "none";
+
+    // Preview box
+    const previewImg = document.getElementById("qrPreview");
+    const previewPh  = document.getElementById("qrPreviewPlaceholder");
+    previewImg.src          = src;
+    previewImg.style.display = "block";
+    previewPh.style.display  = "none";
+}
+
+// ── PREVIEW QR ON FILE SELECT ──
+function previewQR(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    const url = URL.createObjectURL(file);
+    showQR(url);
+}
+
+// ── UPLOAD QR ──
+async function uploadQR() {
+    const file = document.getElementById("qrFile").files[0];
+    if (!file) return alert("Please choose a QR image first");
+
+    const formData = new FormData();
+    formData.append("qr", file);
+
+    try {
+        const res  = await fetch(API + "/staff/upload-qr", {
+            method: "POST",
+            headers: { Authorization: "Bearer " + token },
+            body: formData
+        });
+        const data = await res.json();
+        if (data.success) { showQR(data.path);alert("QR uploaded successfully");}
+        else alert("Upload failed: " + (data.error || "Unknown error"));
+    } catch (err) { console.log(err); alert("Upload error"); }
+}
+
+// ── SAVE DETAILS ──
+async function saveDetails() {
+    const body = {
+        acc_name:   document.getElementById("name").value,
+        upi:        document.getElementById("upi").value,
+        acc_mobile: document.getElementById("mobile").value
+    };
+
+    try {
+        const res  = await fetch(API + "/staff/account-details", {
+            method: "POST",
+            headers: { "Content-Type": "application/json", Authorization: "Bearer " + token },
+            body: JSON.stringify(body)
+        });
+        const data = await res.json();
+        if (data.success) { alert("Saved successfully"); lockFields(); }
+        else alert("Save failed: " + (data.error || "Unknown error"));
+    } catch (err) { console.log(err); alert("Save error"); }
+}
+
+// ── ENABLE EDIT ──
+function enableEdit() {
+    document.getElementById("name").disabled   = false;
+    document.getElementById("upi").disabled    = false;
+    document.getElementById("mobile").disabled = false;
+    document.getElementById("name").focus();
+}
+
+// ── LOCK FIELDS ──
+function lockFields() {
+    document.getElementById("name").disabled   = true;
+    document.getElementById("upi").disabled    = true;
+    document.getElementById("mobile").disabled = true;
+}
+
+document.addEventListener("DOMContentLoaded", loadDetails);
+</script>
+<!-- BOTTOM NAV (Mobile) -->
+    <div class="bottomNav">
+        <button class="active" onclick="location.href='index.html'">
+            <span class="bnIcon">🏠</span>Home
+        </button>
+        <button onclick="location.href='category.html'">
+            <span class="bnIcon">📋</span>Category
+        </button>
+        <button onclick="location.href='staff.html'">
+            <span class="bnIcon">👤</span>Staff
+        </button>
+        <button onclick="location.href='profile.html'">
+            <span class="bnIcon">😊</span>Profile
+        </button>
+    </div>
+</body>
+</html>

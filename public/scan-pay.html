@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Scan & Pay - Vinsuu</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<style>
+    :root {
+        --primary: #1a3fd4;
+        --primary-dark: #1430b0;
+        --primary-mid: #2b52e0;
+        --primary-light: #e8eeff;
+        --text: #1a1a2e;
+        --gray: #6b7280;
+        --border: #e5e7eb;
+        --light-bg: #f5f7ff;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+        font-family: 'Poppins', sans-serif;
+        background: #eef2ff;
+        color: var(--text);
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+    }
+
+    /* ══ TOP HEADER ══ */
+    .topHeader {
+        background: linear-gradient(90deg, var(--primary-mid) 0%, var(--primary-dark) 100%);
+        padding: 14px 20px;
+        display: flex; align-items: center; gap: 14px;
+        position: sticky; top: 0; z-index: 100;
+        box-shadow: 0 2px 12px rgba(26,63,212,0.25);
+    }
+    .backBtnHeader {
+        background: rgba(255,255,255,0.15); border: none; color: white;
+        width: 34px; height: 34px; border-radius: 50%;
+        font-size: 18px; cursor: pointer;
+        display: flex; align-items: center; justify-content: center;
+        flex-shrink: 0; transition: background 0.2s;
+    }
+    .backBtnHeader:hover { background: rgba(255,255,255,0.25); }
+    .topHeaderTitle { font-size: 17px; font-weight: 700; color: white; }
+
+    /* ══ PAGE WRAPPER ══ */
+    .pageWrap {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 28px 18px 40px;
+    }
+
+    /* ══ MAIN CARD ══ */
+    .qrPage {
+        background: white;
+        border-radius: 24px;
+        padding: 36px 32px 32px;
+        width: 100%;
+        max-width: 480px;
+        text-align: center;
+        box-shadow: 0 8px 40px rgba(26,63,212,0.10), 0 2px 12px rgba(0,0,0,0.05);
+    }
+
+    /* ══ HERO ICON ══ */
+    .heroIcon {
+        width: 80px; height: 80px; border-radius: 50%;
+        background: var(--primary);
+        display: flex; align-items: center; justify-content: center;
+        margin: 0 auto 18px;
+        font-size: 34px;
+        box-shadow: 0 8px 24px rgba(26,63,212,0.30);
+        position: relative;
+    }
+    /* decorative dots around circle */
+    .heroIcon::before {
+        content: '✦';
+        position: absolute; top: -8px; left: -8px;
+        font-size: 10px; color: var(--primary); opacity: 0.5;
+    }
+    .heroIcon::after {
+        content: '✦';
+        position: absolute; bottom: -6px; right: -10px;
+        font-size: 10px; color: var(--primary); opacity: 0.5;
+    }
+    .heroIconDot1 {
+        position: absolute; top: -6px; right: 8px;
+        width: 6px; height: 6px; border-radius: 50%;
+        background: var(--primary); opacity: 0.3;
+    }
+    .heroIconDot2 {
+        position: absolute; bottom: -4px; left: 6px;
+        width: 5px; height: 5px; border-radius: 50%;
+        background: var(--primary); opacity: 0.3;
+    }
+
+    .heroTitle { font-size: 24px; font-weight: 800; color: var(--text); margin-bottom: 6px; }
+    .heroSub   { font-size: 13.5px; color: var(--gray); font-weight: 400; margin-bottom: 24px; }
+
+    /* ══ QR BOX ══ */
+    .qrBox {
+        background: var(--light-bg);
+        border: 1.5px solid var(--border);
+        border-radius: 18px;
+        padding: 20px;
+        margin-bottom: 24px;
+        display: inline-block;
+        width: 100%;
+    }
+    .qrBox img {
+        width: 200px; height: 200px;
+        object-fit: contain; border-radius: 10px;
+        display: block; margin: 0 auto;
+    }
+    .qrPlaceholder {
+        width: 200px; height: 200px;
+        background: var(--border); border-radius: 10px;
+        display: flex; align-items: center; justify-content: center;
+        margin: 0 auto; font-size: 50px;
+    }
+
+    /* ══ SUPPORTED APPS ══ */
+    .appsSection { margin-bottom: 22px; }
+    .appsDivider {
+        display: flex; align-items: center; gap: 12px;
+        margin-bottom: 16px;
+    }
+    .appsDivider::before, .appsDivider::after {
+        content: ''; flex: 1; height: 1px; background: var(--border);
+    }
+    .appsDividerText {
+        font-size: 10.5px; font-weight: 700; color: var(--gray);
+        letter-spacing: 1.2px; text-transform: uppercase; white-space: nowrap;
+    }
+    .appsRow {
+        display: flex; justify-content: center;
+        gap: 18px; flex-wrap: wrap;
+    }
+    .appItem {
+        display: flex; flex-direction: column; align-items: center; gap: 6px;
+        cursor: pointer; transition: transform 0.2s;
+    }
+    .appItem:hover { transform: translateY(-3px); }
+    .appLogo {
+        width: 52px; height: 52px; border-radius: 50%;
+        background: white; border: 1.5px solid var(--border);
+        display: flex; align-items: center; justify-content: center;
+        font-size: 22px; font-weight: 700;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        overflow: hidden;
+    }
+    .appName { font-size: 11px; font-weight: 600; color: var(--gray); }
+
+    /* Paytm logo color */
+    .appLogoPaytm { color: #00BAF2; font-family: serif; font-size: 11px; font-weight: 800; letter-spacing: -0.5px; }
+    /* GPay */
+    .appLogoGpay  { font-size: 20px; }
+    /* BHIM */
+    .appLogoBhim  { font-size: 20px; }
+    /* PhonePe */
+    .appLogoPhone { background: #5f259f; color: white; font-size: 18px; }
+    /* UPI */
+    .appLogoUpi   { font-size: 12px; font-weight: 800; color: #f97316; letter-spacing: -0.5px; }
+
+    /* ══ SECURE BADGE ══ */
+    .secureBadge {
+        display: flex; align-items: center; gap: 12px;
+        background: var(--light-bg);
+        border: 1.5px solid var(--border);
+        border-radius: 14px;
+        padding: 14px 18px;
+        text-align: left;
+        margin-bottom: 22px;
+    }
+    .secureBadgeIcon { font-size: 24px; flex-shrink: 0; }
+    .secureBadgeTitle { font-size: 13.5px; font-weight: 700; color: var(--primary); margin-bottom: 2px; }
+    .secureBadgeSub   { font-size: 12px; color: var(--gray); }
+
+    /* ══ BACK BUTTON ══ */
+    .backBtn {
+        display: flex; align-items: center; justify-content: center; gap: 8px;
+        width: 100%; padding: 14px;
+        background: linear-gradient(135deg, var(--primary-mid), var(--primary-dark));
+        color: white; border: none; border-radius: 14px;
+        font-size: 15px; font-weight: 700; cursor: pointer;
+        font-family: 'Poppins', sans-serif; transition: all 0.2s;
+        box-shadow: 0 6px 20px rgba(26,63,212,0.30);
+    }
+    .backBtn:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(26,63,212,0.40); }
+    .backBtn:active { transform: scale(0.98); }
+
+    /* ══ RESPONSIVE ══ */
+    @media (max-width: 480px) {
+        .pageWrap { padding: 16px 12px 30px; align-items: flex-start; }
+        .qrPage { padding: 28px 18px 24px; border-radius: 20px; }
+        .heroTitle { font-size: 20px; }
+        .qrBox img { width: 180px; height: 180px; }
+        .appLogo { width: 46px; height: 46px; font-size: 18px; }
+        .appsRow { gap: 12px; }
+    }
+</style>
+</head>
+<body>
+
+    <!-- TOP HEADER -->
+    <div class="topHeader">
+        <button class="backBtnHeader" onclick="history.back()">←</button>
+        <span class="topHeaderTitle">Scan &amp; Pay</span>
+    </div>
+
+    <!-- PAGE -->
+    <div class="pageWrap">
+        <div class="qrPage">
+
+            <!-- Hero Icon -->
+            <div style="position:relative;display:inline-block;margin-bottom:18px;">
+                <div class="heroIcon">
+                    📷
+                    <span class="heroIconDot1"></span>
+                    <span class="heroIconDot2"></span>
+                </div>
+            </div>
+
+            <div class="heroTitle">Scan &amp; Pay</div>
+            <div class="heroSub">Scan the QR code using any UPI app</div>
+
+            <!-- QR Code Box -->
+            <div class="qrBox">
+                <img id="qrImage" src="" alt="QR Code" style="display:none;">
+                <div class="qrPlaceholder" id="qrPlaceholder">🔲</div>
+            </div>
+
+            <!-- Supported UPI Apps -->
+            <div class="appsSection">
+                <div class="appsDivider">
+                    <span class="appsDividerText">Supported UPI Apps</span>
+                </div>
+                <div class="appsRow">
+                    <div class="appItem">
+                        <div class="appLogo"><span class="appLogoPaytm">Paytm</span></div>
+                        <span class="appName">Paytm</span>
+                    </div>
+                    <div class="appItem">
+                        <div class="appLogo"><span class="appLogoGpay">🌈</span></div>
+                        <span class="appName">GPay</span>
+                    </div>
+                    <div class="appItem">
+                        <div class="appLogo"><span class="appLogoBhim">🇮🇳</span></div>
+                        <span class="appName">BHIM</span>
+                    </div>
+                    <div class="appItem">
+                        <div class="appLogo appLogoPhone"><span>pe</span></div>
+                        <span class="appName">PhonePe</span>
+                    </div>
+                    <div class="appItem">
+                        <div class="appLogo"><span class="appLogoUpi">UPI</span></div>
+                        <span class="appName">UPI</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Secure Badge -->
+            <div class="secureBadge">
+                <span class="secureBadgeIcon">🛡️</span>
+                <div>
+                    <div class="secureBadgeTitle">100% Secure Payments</div>
+                    <div class="secureBadgeSub">Your payment details are safe and encrypted.</div>
+                </div>
+            </div>
+
+            <!-- Back Button -->
+            <button class="backBtn" onclick="history.back()">← Back</button>
+    
+        </div>
+   
+    </div>
+
+<script>
+const API = "http://localhost:5000/api";
+
+async function loadQR() {
+    try {
+        const res  = await fetch("http://localhost:5000/api/admin/get-qr");
+        const data = await res.json();
+        if (data.success && data.path) {
+            const img = document.getElementById("qrImage");
+            const ph  = document.getElementById("qrPlaceholder");
+            img.src = data.path + "?t=" + Date.now();
+            img.style.display = "block";
+            ph.style.display  = "none";
+        }
+    } catch (err) {
+        console.log("QR failed loading", err);
+    }
+}
+
+async function startPayment() {
+    const amount = localStorage.getItem("selectedAmount");
+    const res = await fetch(API + "/staff/create-order", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer " + localStorage.getItem("staffToken")
+        },
+        body: JSON.stringify({ amount })
+    });
+    const order = await res.json();
+    const options = {
+        key: "YOUR_KEY_ID",
+        amount: order.amount,
+        currency: "INR",
+        name: "Unit Purchase",
+        order_id: order.id,
+        handler: async function (response) {
+            console.log("PAYMENT SUCCESS", response);
+            await fetch(API + "/staff/add-unit", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": "Bearer " + localStorage.getItem("staffToken")
+                },
+                body: JSON.stringify({ unit: Number(localStorage.getItem("selectedUnit")) })
+            });
+            alert("Payment Success ⭐");
+            window.location.href = "staff.html";
+        }
+    };
+    const rzp = new Razorpay(options);
+    rzp.open();
+}
+
+loadQR();
+
+window.onload = function () {
+    startPayment();
+};
+</script>
+ <!-- BOTTOM NAV (Mobile) -->
+    <div class="bottomNav">
+        <button class="active" onclick="location.href='index.html'">
+            <span class="bnIcon">🏠</span>Home
+        </button>
+        <button onclick="location.href='category.html'">
+            <span class="bnIcon">📋</span>Category
+        </button>
+        <button onclick="location.href='staff.html'">
+            <span class="bnIcon">👤</span>Staff
+        </button>
+        <button onclick="location.href='profile.html'">
+            <span class="bnIcon">😊</span>Profile
+        </button>
+    </div>
+</body>
+</html>

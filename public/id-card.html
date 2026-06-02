@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vinsuu ID Card</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+<style>
+    :root {
+        --blue: #1a3fd4;
+        --blue-dark: #1430b0;
+        --blue-mid: #2b52e0;
+        --blue-light: #e8eeff;
+        --text: #1a1a2e;
+        --gray: #6b7280;
+        --border: #e5e7eb;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+        font-family: 'Poppins', sans-serif;
+        background: #eef2ff;
+        min-height: 100vh;
+        padding-bottom: 40px;
+    }
+
+    /* ══ TOP HEADER ══ */
+    .topHeader {
+        background: linear-gradient(90deg, var(--blue-mid) 0%, var(--blue-dark) 100%);
+        padding: 14px 20px;
+        display: flex; align-items: center; gap: 14px;
+        position: sticky; top: 0; z-index: 100;
+        box-shadow: 0 2px 12px rgba(26,63,212,0.25);
+    }
+    .backBtn {
+        background: rgba(255,255,255,0.15); border: none; color: white;
+        width: 34px; height: 34px; border-radius: 50%;
+        font-size: 18px; cursor: pointer;
+        display: flex; align-items: center; justify-content: center;
+        flex-shrink: 0; transition: background 0.2s;
+    }
+    .backBtn:hover { background: rgba(255,255,255,0.25); }
+    .topHeaderTitle { font-size: 17px; font-weight: 700; color: white; }
+
+    /* ══ PAGE ══ */
+    .pageWrap {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 28px 18px;
+    }
+
+    /* ══ SECTION LABEL ══ */
+    .sectionLabel {
+        display: inline-flex; align-items: center; gap: 7px;
+        background: var(--blue); color: white;
+        padding: 6px 18px; border-radius: 20px;
+        font-size: 12.5px; font-weight: 700;
+        letter-spacing: 0.6px; margin-bottom: 14px;
+    }
+
+    /* ══ CARD WRAPPER ══ */
+    .cardWrap {
+        background: white; border-radius: 22px;
+        overflow: hidden; margin-bottom: 30px;
+        box-shadow: 0 8px 40px rgba(26,63,212,0.12);
+    }
+
+    /* ══════════════════════════════
+       FRONT CARD
+    ══════════════════════════════ */
+    .id-front {
+        width: 100%;
+        min-height: 300px;
+        position: relative;
+        padding: 32px 36px;
+        overflow: hidden;
+        background: white;
+    }
+
+    /* Top-right blue wave */
+    .frontTopWave {
+        position: absolute; top: 0; right: 0;
+        width: 50%; height: 120px;
+        background: linear-gradient(135deg, var(--blue-mid), var(--blue-dark));
+        border-bottom-left-radius: 140px;
+        z-index: 0;
+    }
+    /* Dot pattern on wave */
+    .frontTopWave::after {
+        content: '';
+        position: absolute; inset: 0;
+        background-image: radial-gradient(circle, rgba(255,255,255,0.12) 1.5px, transparent 1.5px);
+        background-size: 14px 14px;
+        border-bottom-left-radius: 140px;
+    }
+
+    /* Bottom blue wave */
+    .frontBottomWave {
+        position: absolute; left: 0; bottom: 0; right: 0;
+        height: 100px;
+        background: linear-gradient(135deg, var(--blue-mid), var(--blue-dark));
+        clip-path: polygon(0 38%, 100% 0, 100% 100%, 0 100%);
+        z-index: 0;
+    }
+
+    /* Logo */
+    .frontLogo { position: relative; z-index: 2; }
+    .frontLogoTitle {
+        font-size: 46px; font-weight: 900;
+        color: var(--blue); letter-spacing: 4px; line-height: 1;
+    }
+    .frontLogoSub {
+        font-size: 14px; font-weight: 700;
+        letter-spacing: 7px; color: #333; margin-top: 2px;
+    }
+
+    /* "ID CARD" label top-right */
+    .frontIdLabel {
+        position: absolute; top: 32px; right: 40px;
+        color: white; font-size: 22px; font-weight: 800;
+        letter-spacing: 3px; z-index: 3;
+    }
+
+    /* Content row */
+    .frontContent {
+        position: relative; z-index: 2;
+        display: flex; gap: 32px; align-items: center;
+        margin-top: 28px;
+    }
+
+    /* Profile photo */
+    .frontPhoto {
+        width: 150px; height: 185px; flex-shrink: 0;
+        border-radius: 14px; overflow: hidden;
+        border: 3px solid var(--blue);
+        background: #dde4ff;
+        box-shadow: 0 6px 20px rgba(26,63,212,0.20);
+    }
+    .frontPhoto img { width: 100%; height: 100%; object-fit: cover; }
+
+    /* Details */
+    .frontDetails { flex: 1; }
+    .frontDetail {
+        display: flex; align-items: flex-start; gap: 12px;
+        margin-bottom: 18px;
+    }
+    .frontDetail:last-child { margin-bottom: 0; }
+    .detailIcon {
+        width: 36px; height: 36px; flex-shrink: 0;
+        background: var(--blue); color: white; border-radius: 9px;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 17px;
+    }
+    .detailLabel { font-size: 11.5px; color: var(--gray); font-weight: 500; margin-bottom: 2px; }
+    .detailVal   { font-size: 17px; font-weight: 800; color: var(--text); line-height: 1.2; }
+
+    /* Stamp */
+    .frontStamp {
+        position: absolute; right: 44px; bottom: 56px; z-index: 3;
+        width: 110px; height: 110px;
+        border: 3px solid var(--blue); border-radius: 50%;
+        display: flex; flex-direction: column; align-items: center; justify-content: center;
+        color: var(--blue); font-weight: 800; font-size: 11px;
+        background: rgba(255,255,255,0.92);
+        gap: 1px;
+    }
+    .stampCheck { font-size: 28px; color: var(--blue); line-height: 1; }
+
+    /* Website */
+    .frontWebsite {
+        position: absolute; left: 36px; bottom: 24px; z-index: 3;
+        color: white; font-size: 16px; font-weight: 600;
+        display: flex; align-items: center; gap: 6px;
+    }
+
+    /* ══════════════════════════════
+       BACK CARD
+    ══════════════════════════════ */
+    .id-back {
+        width: 100%;
+        min-height: 300px;
+        position: relative;
+        padding: 32px 36px;
+        overflow: hidden;
+        background: white;
+        display: flex;
+    }
+
+    /* Left blue panel */
+    .backBluePanel {
+        position: absolute; left: 0; top: 0; bottom: 0;
+        width: 35%;
+        background: linear-gradient(180deg, var(--blue-mid) 0%, var(--blue-dark) 100%);
+        border-top-right-radius: 120px;
+        border-bottom-right-radius: 120px;
+        z-index: 0;
+    }
+    .backBluePanel::after {
+        content: '';
+        position: absolute; inset: 0;
+        background-image: radial-gradient(circle, rgba(255,255,255,0.10) 1.5px, transparent 1.5px);
+        background-size: 14px 14px;
+        border-top-right-radius: 120px;
+        border-bottom-right-radius: 120px;
+    }
+
+    .backContent {
+        position: relative; z-index: 2;
+        display: flex; width: 100%; gap: 24px;
+    }
+
+    /* Left side */
+    .backLeft {
+        width: 32%; color: white; flex-shrink: 0;
+    }
+    .backLogoTitle {
+        font-size: 32px; font-weight: 900; letter-spacing: 3px; line-height: 1;
+    }
+    .backLogoSub {
+        font-size: 11px; font-weight: 700; letter-spacing: 5px; margin-bottom: 18px;
+    }
+    .backTermsTitle { font-size: 13px; font-weight: 700; margin-bottom: 10px; }
+    .backTermsList {
+        list-style: disc; padding-left: 16px;
+        font-size: 11.5px; line-height: 1.8; font-weight: 400;
+    }
+
+    /* Right side */
+    .backRight { flex: 1; }
+    .backTopInfo {
+        display: flex; gap: 24px; margin-bottom: 20px;
+        padding-bottom: 16px; border-bottom: 1px solid var(--border);
+    }
+   
+    .backInfoLabel {
+        font-size: 12px; font-weight: 700; color: var(--blue); margin-bottom: 4px;
+    }
+    .backInfoVal {
+        font-size: 13px; font-weight: 600; color: var(--text);
+        display: flex; align-items: center; gap: 5px;
+    }
+
+    /* QR */
+    .backQrBox {
+        background: var(--blue-light); border: 1.5px solid var(--border);
+        border-radius: 14px; padding: 14px;
+        display: inline-block; margin-bottom: 12px;
+    }
+    .backQrBox img { width: 130px; height: 130px; display: block; border-radius: 6px; }
+    .backQrLabel {
+        font-size: 13px; font-weight: 600; color: var(--blue);
+        display: flex; align-items: center; gap: 6px;
+        margin-bottom: 18px;
+    }
+
+    /* Bottom info */
+    .backBottomInfo {
+        display: flex; justify-content: space-between; align-items: flex-end;
+        padding-top: 14px; border-top: 1px solid var(--border);
+    }
+    .backSig { font-size: 12px; color: var(--gray); }
+    .backSigLine {
+        font-size: 26px; font-family: cursive; color: var(--text);
+        margin-bottom: 2px; line-height: 1;
+    }
+
+    .backDateLabel { font-size: 12px; font-weight: 700; color: var(--blue); margin-bottom: 4px; }
+    .backDateVal   { font-size: 14px; font-weight: 700; color: var(--text); }
+
+    /* ══ FEATURES ROW ══ */
+    .featuresRow {
+        display: flex; justify-content: center; gap: 16px; flex-wrap: wrap;
+        margin-top: 10px;
+    }
+    .featureBox {
+        background: white; border-radius: 16px; padding: 18px 14px;
+        text-align: center; min-width: 110px; flex: 1; max-width: 140px;
+        box-shadow: 0 4px 14px rgba(0,0,0,0.07);
+        transition: all 0.2s;
+    }
+    .featureBox:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(26,63,212,0.12); }
+    .featureBox.clickable { cursor: pointer; }
+    .featureIcon { font-size: 32px; margin-bottom: 8px; }
+    .featureText { font-size: 12px; font-weight: 600; color: var(--text); line-height: 1.4; }
+
+    /* ══ PRINT BUTTON ══ */
+    .printBtn {
+        display: flex; align-items: center; justify-content: center; gap: 8px;
+        margin: 24px auto 0; padding: 14px 36px;
+        background: linear-gradient(135deg, var(--blue-mid), var(--blue-dark));
+        color: white; border: none; border-radius: 14px;
+        font-size: 15px; font-weight: 700; cursor: pointer;
+        font-family: 'Poppins', sans-serif; transition: all 0.2s;
+        box-shadow: 0 6px 20px rgba(26,63,212,0.30);
+    }
+    .printBtn:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(26,63,212,0.40); }
+
+    /* ══ MOBILE BOTTOM NAV ══ */
+    .bottomNav {
+        display: none;
+        position: fixed; bottom: 0; left: 0; right: 0;
+        background: white; border-top: 1px solid var(--border);
+        justify-content: space-around; padding: 10px 0 12px;
+        z-index: 999; box-shadow: 0 -4px 16px rgba(0,0,0,0.08);
+    }
+    .bottomNav button {
+        display: flex; flex-direction: column; align-items: center; gap: 3px;
+        font-size: 11px; font-weight: 600; color: var(--gray); cursor: pointer;
+        padding: 0 10px; background: none; border: none;
+        font-family: 'Poppins', sans-serif; transition: color 0.2s;
+    }
+    .bottomNav button.active { color: var(--blue); }
+    .bnIcon { font-size: 20px; }
+
+    /* ══ RESPONSIVE ══ */
+    @media (max-width: 700px) {
+        .pageWrap { padding: 16px 12px 80px; }
+        .id-front, .id-back { padding: 22px 18px; }
+        .frontLogoTitle { font-size: 32px; }
+        .frontLogoSub   { font-size: 10px; letter-spacing: 4px; }
+        .frontIdLabel   { font-size: 14px; top: 22px; right: 22px; }
+        .frontTopWave   { height: 80px; }
+        .frontContent   { flex-direction: column; gap: 18px; }
+        .frontPhoto     { width: 120px; height: 148px; margin: 0 auto; }
+        .frontStamp     { position: relative; right: auto; bottom: auto; margin: 16px auto 0; }
+        .frontWebsite   { font-size: 12px; left: 18px; bottom: 14px; }
+        .frontBottomWave { height: 70px; }
+
+        .backBluePanel  { width: 100%; height: 200px; border-radius: 0 0 100px 100px; top: 0; bottom: auto; }
+        .backContent    { flex-direction: column; }
+        .backLeft       { width: 100%; padding-top: 0; }
+        .backRight      { width: 100%; }
+        .backTopInfo    { flex-direction: column; gap: 12px; }
+        .backBottomInfo { flex-direction: column; gap: 12px; }
+        .bottomNav      { display: flex; }
+        .featuresRow    { gap: 10px; }
+        .featureBox     { min-width: 80px; padding: 14px 8px; }
+        .featureIcon    { font-size: 26px; }
+        .featureText    { font-size: 11px; }
+    }
+
+    @media (min-width: 701px) and (max-width: 960px) {
+        .frontLogoTitle { font-size: 38px; }
+        .frontPhoto     { width: 130px; height: 160px; }
+    }
+
+    /* ══════════════════════════
+       PRINT STYLES — Real PVC card
+       size on A4 landscape
+    ══════════════════════════ */
+    @page {
+        size: A4 landscape;
+        margin: 10mm;
+    }
+
+    @media print {
+        * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+
+        body {
+            background: white !important;
+            padding: 0; margin: 0;
+            font-family: 'Poppins', Arial, sans-serif;
+        }
+
+        /* Hide everything except print area */
+        .topHeader,
+        .sectionLabel,
+        .featuresRow,
+        .printBtn,
+        .bottomNav { display: none !important; }
+
+        .pageWrap {
+            padding: 0; margin: 0;
+            max-width: none;
+        }
+
+        /* Print container: two cards side-by-side on A4 landscape */
+        .printContainer {
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: center !important;
+            gap: 8mm !important;
+            width: 277mm;
+            margin: 0 auto;
+        }
+
+        .cardWrap {
+            box-shadow: none !important;
+            border: 0.5mm solid #ccc !important;
+            border-radius: 3.5mm !important;
+            overflow: hidden !important;
+            margin: 0 !important;
+            /* Real PVC card: 85.6mm × 54mm */
+            width: 85.6mm !important;
+            height: 54mm !important;
+            page-break-inside: avoid !important;
+            break-inside: avoid !important;
+        }
+
+        /* Scale front card content */
+        .id-front {
+            width: 85.6mm !important; height: 54mm !important;
+            padding: 5mm 6mm !important;
+            min-height: unset !important;
+        }
+        .frontTopWave   { height: 18mm !important; }
+        .frontBottomWave { height: 14mm !important; }
+        .frontLogoTitle { font-size: 14pt !important; letter-spacing: 2px !important; }
+        .frontLogoSub   { font-size: 5pt !important; letter-spacing: 3px !important; }
+        .frontIdLabel   { font-size: 8pt !important; top: 5mm !important; right: 6mm !important; }
+        .frontContent   { margin-top: 4mm !important; gap: 5mm !important; }
+        .frontPhoto     { width: 20mm !important; height: 26mm !important; border-radius: 2mm !important; border-width: 1.5px !important; }
+        .frontDetail    { gap: 4px !important; margin-bottom: 4px !important; }
+        .detailIcon     { width: 12px !important; height: 12px !important; font-size: 7pt !important; border-radius: 3px !important; }
+        .detailLabel    { font-size: 5pt !important; }
+        .detailVal      { font-size: 7pt !important; }
+        .frontStamp     { width: 18mm !important; height: 18mm !important; right: 6mm !important; bottom: 16mm !important; border-width: 1.5px !important; font-size: 4pt !important; }
+        .stampCheck     { font-size: 10pt !important; }
+        .frontWebsite   { font-size: 5.5pt !important; left: 6mm !important; bottom: 4mm !important; }
+
+        /* Scale back card content */
+        .id-back {
+            width: 85.6mm !important; height: 54mm !important;
+            padding: 5mm 6mm !important;
+            min-height: unset !important;
+        }
+        .backBluePanel  { width: 32% !important; border-top-right-radius: 20mm !important; border-bottom-right-radius: 20mm !important; }
+        .backContent    { gap: 4mm !important; }
+        .backLogoTitle  { font-size: 11pt !important; letter-spacing: 1px !important; }
+        .backLogoSub    { font-size: 4pt !important; letter-spacing: 3px !important; margin-bottom: 3mm !important; }
+        .backTermsTitle { font-size: 5pt !important; margin-bottom: 2mm !important; }
+        .backTermsList  { font-size: 4pt !important; line-height: 1.5 !important; padding-left: 8px !important; }
+        .backTopInfo    { gap: 6mm !important; margin-bottom: 3mm !important; padding-bottom: 2mm !important; }
+        .backInfoLabel  { font-size: 5pt !important; margin-bottom: 1px !important; }
+        .backInfoVal    { font-size: 5.5pt !important; gap: 2px !important; }
+        .backQrBox      { padding: 3px !important; border-radius: 3px !important; margin-bottom: 2mm !important; }
+        .backQrBox img  { width: 18mm !important; height: 18mm !important; }
+        .backQrLabel    { font-size: 5pt !important; margin-bottom: 2mm !important; }
+        .backBottomInfo { padding-top: 2mm !important; }
+        .backSig        { font-size: 4.5pt !important; }
+        .backSigLine    { font-size: 12pt !important; }
+        .backDateLabel  { font-size: 4.5pt !important; }
+        .backDateVal    { font-size: 5.5pt !important; }
+    }
+</style>
+</head>
+<body>
+
+    <!-- TOP HEADER -->
+    <div class="topHeader">
+        <button class="backBtn" onclick="history.back()">←</button>
+        <span class="topHeaderTitle">Staff ID Card</span>
+    </div>
+
+    <div class="pageWrap">
+        <div class="printContainer">
+
+            <!-- ══ FRONT ══ -->
+            <div class="sectionLabel">🪪 ID CARD FRONT</div>
+            <div class="cardWrap">
+                <div class="id-front">
+                    <div class="frontTopWave"></div>
+                    <div class="frontBottomWave"></div>
+
+                    <div class="frontLogo">
+                        <div class="frontLogoTitle">VINSUU</div>
+                        <div class="frontLogoSub">SERVICES</div>
+                    </div>
+
+                    <div class="frontIdLabel">ID CARD</div>
+
+                    <div class="frontContent">
+                        <div class="frontPhoto">
+                            <img id="staffImage" src="https://i.pravatar.cc/400" alt="Staff Photo">
+                        </div>
+
+                        <div class="frontDetails">
+                            <div class="frontDetail">
+                                <div class="detailIcon">🪪</div>
+                                <div>
+                                    <div class="detailLabel">Staff ID</div>
+                                    <div class="detailVal" id="staffId">VSU1234</div>
+                                </div>
+                            </div>
+                            <div class="frontDetail">
+                                <div class="detailIcon">👤</div>
+                                <div>
+                                    <div class="detailLabel">Staff Name</div>
+                                    <div class="detailVal" id="staffName">Rohit Sharma</div>
+                                </div>
+                            </div>
+                            <div class="frontDetail">
+                                <div class="detailIcon">🛠</div>
+                                <div>
+                                    <div class="detailLabel">Service Name</div>
+                                    <div class="detailVal" id="staffService">Plumber for Everyone</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="frontStamp">
+                        <div>VINSUU</div>
+                        <div class="stampCheck">✔</div>
+                        <div>APPROVED</div>
+                    </div>
+
+                    <div class="frontWebsite">🌐 www.vinsuu.com</div>
+                </div>
+            </div>
+
+            <!-- ══ BACK ══ -->
+            <div class="sectionLabel" style="margin-top:10px;">🔖 ID CARD BACK</div>
+            <div class="cardWrap">
+                <div class="id-back">
+                    <div class="backBluePanel"></div>
+
+                    <div class="backContent">
+                        <!-- Left -->
+                        <div class="backLeft">
+                            <div class="backLogoTitle">VINSUU</div>
+                            <div class="backLogoSub">SERVICES</div>
+                            <div class="backTermsTitle">Terms &amp; Conditions</div>
+                            <ul class="backTermsList">
+                                <li>This ID card is valid only for authorized personnel.</li>
+                                <li>It must be worn at all times while on duty.</li>
+                                <li>If found, please return to nearest VINSUU office.</li>
+                            </ul>
+                        </div>
+
+                        <!-- Right -->
+                        <div class="backRight">
+                            <div class="backTopInfo">
+                                <div class="backInfoItem">
+                                    <div class="backInfoLabel">Emergency Contact</div>
+                                    <div class="backInfoVal">📞 +91 98765 43210</div>
+                                </div>
+                                <div class="backInfoItem">
+                                    <div class="backInfoLabel">Email</div>
+                                    <div class="backInfoVal">✉️ support@vinsuu.com</div>
+                                </div>
+                            </div>
+
+                            <div class="backQrBox">
+                                <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=VINSUU-VERIFIED" alt="QR Code">
+                            </div>
+                            <div class="backQrLabel">📱 Scan QR for Verification</div>
+
+                            <div class="backBottomInfo">
+                                <div class="backSig">
+                                    <div class="backSigLine">✍</div>
+                                    Authorized Signatory
+                                </div>
+                                <div class="backDate">
+                                    <div class="backDateLabel">Issue Date</div>
+                                    <div class="backDateVal" id="issueDate">01 May 2026</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div><!-- /printContainer -->
+
+        <!-- ══ FEATURES ══ -->
+        <div class="featuresRow">
+            <div class="featureBox">
+                <div class="featureIcon">🛡️</div>
+                <div class="featureText">Professional Design</div>
+            </div>
+            <div class="featureBox">
+                <div class="featureIcon">🪪</div>
+                <div class="featureText">Easy Identification</div>
+            </div>
+            <div class="featureBox">
+                <div class="featureIcon">🔒</div>
+                <div class="featureText">Secure &amp; Trusted</div>
+            </div>
+            <div class="featureBox clickable" onclick="downloadIdCard()">
+                <div class="featureIcon">🖨️</div>
+                <div class="featureText">Print Ready</div>
+            </div>
+        </div>
+
+        <!-- Print button -->
+        <button class="printBtn" onclick="downloadIdCard()">🖨️ Download / Print ID Card</button>
+
+    </div><!-- /pageWrap -->
+
+    <!-- MOBILE BOTTOM NAV -->
+    <div class="bottomNav">
+        <button onclick="location.href='index.html'"><span class="bnIcon">🏠</span>Home</button>
+        <button onclick="location.href='category.html'"><span class="bnIcon">📋</span>Category</button>
+        <button class="active" onclick="location.href='staff.html'"><span class="bnIcon">👤</span>Staff</button>
+        <button onclick="location.href='profile.html'"><span class="bnIcon">😊</span>Profile</button>
+    </div>
+
+<script>
+    const user = JSON.parse(localStorage.getItem("staffUser") || "{}");
+    console.log("ID CARD USER:", user);
+
+    // ── STAFF NAME ──
+    document.getElementById("staffName").innerText = user.name || "Staff Name";
+
+    // ── STAFF ID ──
+    let staffId = user.id || user.staff_id || localStorage.getItem("staffId") || "";
+    console.log("FULL USER DATA:", user);
+    console.log("STAFF ID VALUE:", staffId);
+    document.getElementById("staffId").innerText = staffId ? "VSU" + String(staffId) : "VSU";
+
+    // ── SERVICE NAME ──
+    let services = [];
+    if (Array.isArray(user.service_names))            services = user.service_names;
+    else if (typeof user.service_names === "string")  services = user.service_names.replace(/[{}]/g,"").split(",").map(s=>s.trim()).filter(Boolean);
+    else if (user.service_name)                       services = [user.service_name];
+    document.getElementById("staffService").innerText = services.join(", ") || "Service";
+
+    // ── PROFILE IMAGE ──
+    let latestUser   = JSON.parse(localStorage.getItem("staffUser") || "{}");
+    let profileImage = latestUser.profile_image || user.profile_image || user.photo || user.image || "";
+    console.log("LATEST PROFILE IMAGE:", profileImage);
+    if (profileImage) {
+        if      (profileImage.startsWith("http"))  document.getElementById("staffImage").src = profileImage + "?t=" + Date.now();
+        else if (profileImage.startsWith("data:")) document.getElementById("staffImage").src = profileImage;
+        else                                       document.getElementById("staffImage").src = "http://localhost:5000" + profileImage + "?t=" + Date.now();
+    }
+
+    // ── ISSUE DATE ──
+    const today = new Date();
+    const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+    document.getElementById("issueDate").innerText = `01 ${months[today.getMonth()]} ${today.getFullYear()}`;
+
+    // ── PRINT ──
+    function downloadIdCard() { window.print(); }
+</script>
+</body>
+</html>

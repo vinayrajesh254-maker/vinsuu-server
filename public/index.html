@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vinsuu - Home</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+    <style>
+      
+    </style>
+
+    <script>
+      
+    </script>
+</head>
+
+<body>
+
+    <!-- SIDE MENU OVERLAY -->
+    <div class="sideOverlay" id="sideOverlay" onclick="closeMenu()"></div>
+
+    <!-- SIDE MENU -->
+    <div class="sideMenu" id="sideMenu">
+        <a href="index.html" onclick="closeMenu()">🏠 Home</a>
+        <a href="#" onclick="closeMenu()">📱 App Download</a>
+        <a href="about.html" onclick="closeMenu()">ℹ️ About Us</a>
+        <a href="#footerContact" onclick="closeMenu()">☎️ Contact Us</a>
+    </div>
+
+    <!-- ========================== DESKTOP ========================== -->
+
+    <!-- TOP BAR -->
+    <div class="topBar">
+        
+        <div class="right">
+            
+            <span class="divider">|</span>
+            <a href="#">📱 Download App</a>
+            <div class="social">
+                <a href="#">f</a>
+                <a href="#">I</a>
+                
+            </div>
+        </div>
+    </div>
+
+    <!-- HEADER -->
+    <div class="header">
+        <a href="index.html" class="logo" id="logoBox">
+            <div class="logo-icon">🏠</div>VINSUU
+        </a>
+        <nav class="nav">
+            <a href="index.html" class="active">Home</a>
+            <a href="service-list.html">Services </a>
+            <a href="category.html">Categories</a>
+            <a href="about.html">About Us</a>
+            <a href="#footerContact">Contact Us</a>
+        </nav>
+        <div class="header-search" style="position:relative;">
+            <input type="text" id="serviceSearch" placeholder="Search services..." oninput="searchServices()">
+
+            <button>🔍</button>
+
+            <div id="searchDropdown" style="
+    display:none;
+    position:absolute;
+    top:45px;
+    left:0;
+    width:100%;
+    background:#fff;
+    border:1px solid #ddd;
+    border-radius:10px;
+    max-height:250px;
+    overflow-y:auto;
+    z-index:999999;
+    box-shadow:0 4px 15px rgba(0,0,0,.15);
+">
+            </div>
+        </div>
+        <div class="header-actions">
+            <button class="btn-login" onclick="window.location.href='customer-login.html'">Login</button>
+            <button class="btn-join" onclick="goLogin()">Join Now</button>
+             <button class="btn-login" onclick="window.location.href='profile.html'">Profile</button>
+        </div>
+    </div>
+
+    <!-- LOCATION BAR -->
+    <div class="locationBar">
+        <div class="location-right">
+            <button onclick="useGPS()">📍 Use Current Location</button>
+        </div>
+        <div class="location-result locationResult">Location not set</div>
+    </div>
+
+    <!-- HERO -->
+    <div class="heroSection">
+        <div class="heroLeft">
+            <div class="heroTag">🛡️ Trusted Home Services</div>
+            <h1 class="heroTitle">Book Trusted<br><span>Home Services</span></h1>
+            <p class="heroSub">Electrician, Plumber, AC Repair and more<br>services near you.</p>
+            <div class="heroButtons">
+                <button class="heroBtnPrimary" onclick="window.location.href='category.html'">
+                    Book a Service <span class="arrow">→</span>
+                </button>
+                <button class="heroBtnSecondary" onclick="window.location.href='/staff.html'">Become a Partner 👥</button>
+            </div>
+            <div class="heroStats">
+                <div class="heroStat">
+                    <div class="statIcon">🔌</div>
+                    <div><strong>Verified</strong>Professionals</div>
+                </div>
+                <div class="heroStat">
+                    <div class="statIcon">⏱</div>
+                    <div><strong>On-Time</strong>Service</div>
+                </div>
+                <div class="heroStat">
+                    <div class="statIcon">😊</div>
+                    <div><strong>100%</strong>Satisfaction</div>
+                </div>
+            </div>
+        </div>
+        <div class="heroRight">
+            <div class="heroSlider" id="desktopSlider"></div>
+            <div class="sliderOverlay">
+                <div class="sliderText">
+                    <h2>Professional<br>Care You Can<br><span>Trust</span></h2>
+                    <p>Quality service at your doorstep</p>
+                    <button class="sliderBookBtn" onclick="window.location.href='category.html'">Book Now</button>
+                </div>
+            </div>
+            <button class="sliderNavBtn prev" onclick="prevSlide()">‹</button>
+            <button class="sliderNavBtn next" onclick="nextSlide()">›</button>
+            <div class="sliderDots" id="desktopDots"></div>
+        </div>
+    </div>
+
+    <!-- STAFF BOX -->
+    <div class="staffSection">
+        <div class="staffBox">
+            <div class="staffText">
+                <h3>Grow your business. Build your skills. Join Vinsuu.</h3>
+                <p>Register as a service professional and start getting customers today.</p>
+            </div>
+            <button onclick="goLogin()">Join Now →</button>
+        </div>
+    </div>
+
+    <!-- POPULAR SERVICES + CATEGORIES (always together in one wrapper) -->
+    <div class="servicesCatalogSection">
+
+        <div class="secHeader">
+            <h2>Popular Services</h2>
+            <a href="#">View All →</a>
+        </div>
+        <div id="popularContainer" class="popularGrid"></div>
+
+        <div class="sectionDivider"></div>
+
+        <div class="secHeader">
+            <h2>Categories</h2>
+            <a href="#">View All →</a>
+        </div>
+        <div id="categoryContainer" class="category-grid"></div>
+
+    </div>
+
+    <!-- WHY CHOOSE US -->
+    <div class="whySection">
+        <h2>Why <span>Choose Us</span></h2>
+        <div class="whyUnderline"></div>
+        <p class="whySubtitle">We are committed to providing the best service experience with trust, quality, and
+            convenience.</p>
+        <div class="desktopWhyCards">
+            <div class="whyCard">
+                <div class="wIcon">🛡️</div>
+                <h4>Trusted Professionals</h4>
+                <p>All our professionals are verified, skilled and background checked.</p>
+            </div>
+            <div class="whyCard">
+                <div class="wIcon">⭐</div>
+                <h4>Quality Service</h4>
+                <p>We ensure top-quality work with attention to every detail.</p>
+            </div>
+            <div class="whyCard">
+                <div class="wIcon">₹</div>
+                <h4>Affordable Pricing</h4>
+                <p>Best pricing in the market with no hidden charges at all.</p>
+            </div>
+            <div class="whyCard">
+                <div class="wIcon">⏱</div>
+                <h4>On-Time Service</h4>
+                <p>We value your time and ensure on-time service every time.</p>
+            </div>
+            <div class="whyCard">
+                <div class="wIcon">📞</div>
+                <h4>24/7 Support</h4>
+                <p>Our support team is available round the clock to assist you.</p>
+            </div>
+            <div class="whyCard">
+                <div class="wIcon">👍</div>
+                <h4>100% Satisfaction</h4>
+                <p>Your satisfaction is our priority. We won't rest until you're happy.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- STATS -->
+    <div class="statsSection">
+        <div class="statCard">
+            <h3>10K+</h3>
+            <p>Happy Customers</p>
+        </div>
+        <div class="statCard">
+            <h3>500+</h3>
+            <p>Verified Experts</p>
+        </div>
+        <div class="statCard">
+            <h3>50K+</h3>
+            <p>Services Done</p>
+        </div>
+        <div class="statCard">
+            <h3>4.8⭐</h3>
+            <p>Customer Rating</p>
+        </div>
+    </div>
+
+    <!-- ========================== MOBILE ========================== -->
+
+    <!-- MOBILE HEADER -->
+    <div class="mobileHeader">
+        <div onclick="toggleMenu(event)" style="font-size:26px;cursor:pointer;color:var(--primary);">☰</div>
+        <div class="mobileLogo logoBox">
+            <div class="logo-icon">🏠</div>VINSUU
+        </div>
+        <div class="mobileHeaderRight">
+            <div class="mobileLocation">📍 Surat, Gujarat</div>
+            <button class="notifBtn">🔔<span class="notifDot"></span></button>
+        </div>
+    </div>
+
+    <!-- MOBILE SEARCH -->
+    <div class="mobileSearch">
+        <div class="mobileSearchBar" style="position:relative;">
+
+    <span>🔍</span>
+
+    <input
+        type="text"
+        id="mobileServiceSearch"
+        placeholder="Search for services..."
+        oninput="searchMobileServices()">
+
+    <button class="filterBtn">⚙</button>
+
+    <div id="mobileSearchDropdown" style="
+        display:none;
+        position:absolute;
+        top:45px;
+        left:0;
+        width:100%;
+        background:#fff;
+        border:1px solid #ddd;
+        border-radius:10px;
+        max-height:250px;
+        overflow-y:auto;
+        z-index:999999;
+        box-shadow:0 4px 15px rgba(0,0,0,.15);
+    "></div>
+
+</div>
+    </div>
+
+    <!-- MOBILE HERO BANNER -->
+    <div class="mobileBanner" id="mobileBanner">
+        <div class="mobileBannerContent">
+            <div class="mobileBannerTag">🛡️ Trusted Home Services</div>
+            <h2>Book Trusted<br><span>Home Services</span></h2>
+            <p>Electrician, Plumber, AC Repair<br>and more services near you.</p>
+            <div class="mobileBannerBtns">
+                <button class="mbbPrimary" onclick="window.location.href='category.html'">Book a Service →</button>
+                <button class="mbbSecondary"onclick="window.location.href='/staff.html'"> Become a Partner 👥</button>
+            </div>
+            <div class="bannerRating">
+                <span class="star">⭐</span>
+                <span>4.8 Customer Rating</span>
+            </div>
+        </div>
+        <div class="mobileBannerDots" id="mobileDots"></div>
+    </div>
+
+    <!-- TRUST BADGES -->
+    <div class="trustBadges">
+        <div class="trustBadgeRow">
+            <div class="trustBadge">
+                <div class="tIcon">🛡️</div><span>Verified</span>
+                <p>Professionals</p>
+            </div>
+            <div class="trustDivider"></div>
+            <div class="trustBadge">
+                <div class="tIcon">⏱</div><span>On-Time</span>
+                <p>Service</p>
+            </div>
+            <div class="trustDivider"></div>
+            <div class="trustBadge">
+                <div class="tIcon">😊</div><span>100%</span>
+                <p>Satisfaction</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- MOBILE: POPULAR SERVICES + CATEGORIES (always together) -->
+    <div class="mobileServicesCatalog">
+
+        <div class="mobileSecHeader">
+            <h3>Popular Services</h3>
+            <a href="#">View All</a>
+        </div>
+        <div id="mobilePopularContainer" class="mobilePopularScroll"></div>
+
+        <div class="mobileSectionDivider"></div>
+
+        <div class="mobileSecHeader">
+            <h3>Categories</h3>
+            <a href="#">View All</a>
+        </div>
+        <div id="mobileCategoryContainer" class="mobileCatGrid"></div>
+
+    </div>
+
+    <!-- WHY CHOOSE US (Mobile) -->
+    <div class="mobileWhySection">
+        <h2>Why <span>Choose</span> Us</h2>
+        <div class="mobileWhyUnderline"></div>
+        <div class="mobileWhyList">
+            <div class="mobileWhyItem">
+                <div class="mwIcon">🛡️</div>
+                <div class="mwText">
+                    <h4>Trusted Professionals</h4>
+                    <p>All our professionals are verified, skilled and background checked.</p>
+                </div><span class="mwArrow">›</span>
+            </div>
+            <div class="mobileWhyItem">
+                <div class="mwIcon">⭐</div>
+                <div class="mwText">
+                    <h4>Quality Service</h4>
+                    <p>We ensure top-quality work with attention to every detail.</p>
+                </div><span class="mwArrow">›</span>
+            </div>
+            <div class="mobileWhyItem">
+                <div class="mwIcon">₹</div>
+                <div class="mwText">
+                    <h4>Affordable Pricing</h4>
+                    <p>Best pricing in the market with no hidden charges at all.</p>
+                </div><span class="mwArrow">›</span>
+            </div>
+            <div class="mobileWhyItem">
+                <div class="mwIcon">⏱</div>
+                <div class="mwText">
+                    <h4>On-Time Service</h4>
+                    <p>We value your time and ensure on-time service every time.</p>
+                </div><span class="mwArrow">›</span>
+            </div>
+            <div class="mobileWhyItem">
+                <div class="mwIcon">📞</div>
+                <div class="mwText">
+                    <h4>24/7 Support</h4>
+                    <p>Our support team is available round the clock to assist you.</p>
+                </div><span class="mwArrow">›</span>
+            </div>
+            <div class="mobileWhyItem">
+                <div class="mwIcon">👍</div>
+                <div class="mwText">
+                    <h4>100% Satisfaction</h4>
+                    <p>Your satisfaction is our priority. We won't rest until you're happy.</p>
+                </div><span class="mwArrow">›</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- MOBILE STATS BAR -->
+    <div class="mobileStatsBar">
+        <div class="mobileStatsRow">
+            <div class="mobileStatItem">
+                <div class="msIcon">👥</div>
+                <h4>10K+</h4>
+                <p>Happy Customers</p>
+            </div>
+            <div class="mobileStatItem">
+                <div class="msIcon">✅</div>
+                <h4>500+</h4>
+                <p>Verified Experts</p>
+            </div>
+            <div class="mobileStatItem">
+                <div class="msIcon">📋</div>
+                <h4>50K+</h4>
+                <p>Services Completed</p>
+            </div>
+            <div class="mobileStatItem">
+                <div class="msIcon">⭐</div>
+                <h4>4.8</h4>
+                <p>Customer Rating</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================== FOOTER ========================== -->
+    <footer class="footer">
+        <div class="footer-container">
+
+            <div class="footer-left">
+                <div class="footerLogo">
+                    <div class="footerLogoIcon">🏠</div>VINSUU
+                </div>
+                <p>Your trusted partner for all home services. Professional, reliable, and affordable solutions at your
+                    doorstep.</p>
+                <div class="footerFeatures">
+                    <div><span class="fIcon">✔</span><span>Trusted Professionals</span></div>
+                    <div><span class="fIcon">⏱</span><span>On-Time Service</span></div>
+                    <div><span class="fIcon">👍</span><span>100% Satisfaction</span></div>
+                </div>
+                <div class="footerSocials">
+                    <a href="#">🌐</a>
+                    <a href="#">📘</a>
+                    <a href="#">🐦</a>
+                    <a href="#">💼</a>
+                </div>
+            </div>
+
+            <div class="footer-contact" id="footerContact">
+                <h3>Contact Us</h3>
+
+                <div class="input-box">
+                    <span><i class="fa-solid fa-user"></i></span>
+                    <input type="text" id="name" placeholder="Name">
+                </div>
+
+                <div class="input-box">
+                    <span>📞</span>
+                    <input type="text" id="mobile" placeholder="Mobile Number">
+                </div>
+
+                <div class="input-box">
+                    <span>📧</span>
+                    <input type="email" id="email" placeholder="Email Address">
+                </div>
+
+                <div class="input-box">
+                    <span>📍</span>
+                    <input type="text" id="pin" placeholder="Pin code">
+                </div>
+
+                <div class="input-box">
+                    <span>💬</span>
+                    <textarea id="message" placeholder="Type your message..."></textarea>
+                </div>
+
+                <button class="footerSubmitBtn" onclick="sendMessage()">Send Message ➤</button>
+            </div>
+            <div class="footer-links">
+                <h3>Company</h3>
+                <a href="about.html">About Us</a>
+                <a href="terms.html">Terms &amp; Conditions</a>
+                <a href="privacy.html">Privacy Policy</a>
+                <a href="refund.html">Refund &amp; Cancellation</a>
+             <a href="#footerContact">Contact Us</a>
+                <a href="service-list.html">Service list</a>
+            </div>
+
+        </div>
+
+        <div class="footer-bottom">
+            <div class="footer-bottom-badges">
+                <div class="footer-bottom-badge"><span>🔒</span><span>Secure Payments</span></div>
+                <div class="footer-bottom-badge"><span>💰</span><span>Best Price</span></div>
+                <div class="footer-bottom-badge"><span>🎧</span><span>24/7 Support</span></div>
+            </div>
+            <div class="footer-copyright">© 2026 Vinsuu. All rights reserved.</div>
+        </div>
+    </footer>
+
+    <!-- BOTTOM NAV (Mobile) -->
+    <div class="bottomNav">
+        <button class="active" onclick="location.href='index.html'">
+            <span class="bnIcon">🏠</span>Home
+        </button>
+        <button onclick="location.href='category.html'">
+            <span class="bnIcon">📋</span>Category
+        </button>
+        <button onclick="location.href='staff.html'">
+            <span class="bnIcon">👤</span>Staff
+        </button>
+        <button onclick="location.href='profile.html'">
+            <span class="bnIcon">😊</span>Profile
+        </button>
+    </div>
+
+</body>
+<script src="script.js"></script>
+</html>

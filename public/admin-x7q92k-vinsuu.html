@@ -1,0 +1,1474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+<script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
+<script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<title>Vinsuu Admin Panel</title>
+
+<style>
+/* ══════════════════════════════════════════
+   CSS VARIABLES
+══════════════════════════════════════════ */
+:root {
+    --primary: #1a3fd4;
+    --primary-dark: #1430b0;
+    --primary-mid: #2b52e0;
+    --primary-light: #e8eeff;
+    --sidebar-bg: #0f2460;
+    --sidebar-hover: #1a3580;
+    --sidebar-active: #1a3fd4;
+    --sidebar-width: 220px;
+    --header-h: 64px;
+    --text: #1a1a2e;
+    --gray: #6b7280;
+    --border: #e5e7eb;
+    --light-bg: #f5f7ff;
+    --green: #16a34a;
+    --red: #ef4444;
+    --orange: #f59e0b;
+    --purple: #7c3aed;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+    font-family: 'Poppins', sans-serif;
+    background: #eef2ff;
+    color: var(--text);
+    min-height: 100vh;
+}
+
+/* ══════════════════════════════════════════
+   LAYOUT
+══════════════════════════════════════════ */
+.adminLayout {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* ══ SIDEBAR ══ */
+.sidebar {
+    width: var(--sidebar-width);
+    background: var(--sidebar-bg);
+    min-height: 100vh;
+    position: fixed;
+    left: 0; top: 0; bottom: 0;
+    z-index: 300;
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.3s cubic-bezier(0.16,1,0.3,1);
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+.sidebar::-webkit-scrollbar { width: 4px; }
+.sidebar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 4px; }
+
+/* Sidebar logo */
+.sidebarLogo {
+    display: flex; align-items: center; gap: 10px;
+    padding: 20px 18px 16px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    flex-shrink: 0;
+}
+.sidebarLogoIcon { font-size: 26px; }
+.sidebarLogoText { font-size: 15px; font-weight: 800; color: white; letter-spacing: 1px; }
+
+/* Sidebar nav items */
+.sidebarNav { flex: 1; padding: 10px 0; }
+.sidebarItem {
+    display: flex; align-items: center; gap: 12px;
+    padding: 12px 18px; cursor: pointer;
+    color: rgba(255,255,255,0.65); font-size: 13.5px; font-weight: 500;
+    border-left: 3px solid transparent;
+    transition: all 0.2s; position: relative;
+    border: none; background: none; width: 100%; text-align: left;
+    font-family: 'Poppins', sans-serif;
+}
+.sidebarItem:hover { background: var(--sidebar-hover); color: white; border-left-color: rgba(255,255,255,0.3); }
+.sidebarItem.active { background: var(--primary); color: white; border-left-color: white; font-weight: 600; }
+.sidebarItem.active:hover { background: var(--primary-mid); }
+.sidebarItemIcon { font-size: 16px; flex-shrink: 0; width: 20px; text-align: center; }
+
+/* Dropdown group */
+
+.sidebarGroupBtn {
+    display: flex; align-items: center; gap: 12px; justify-content: space-between;
+    padding: 12px 18px; cursor: pointer;
+    color: rgba(255,255,255,0.65); font-size: 13.5px; font-weight: 500;
+    transition: all 0.2s; border: none; background: none; width: 100%;
+    font-family: 'Poppins', sans-serif;
+}
+.sidebarGroupBtn:hover { background: var(--sidebar-hover); color: white; }
+.sidebarGroupBtn.open { color: white; background: var(--sidebar-hover); }
+.sidebarGroupLeft { display: flex; align-items: center; gap: 12px; }
+.sidebarGroupChevron { font-size: 11px; transition: transform 0.25s; color: rgba(255,255,255,0.45); }
+.sidebarGroupChevron.rotated { transform: rotate(180deg); }
+
+.sidebarSubMenu {
+    display: none; background: rgba(0,0,0,0.15); padding: 4px 0;
+}
+.sidebarSubMenu.open { display: block; }
+.sidebarSubItem {
+    display: block; padding: 10px 18px 10px 50px;
+    color: rgba(255,255,255,0.55); font-size: 12.5px; font-weight: 400;
+    cursor: pointer; transition: all 0.2s; border: none; background: none;
+    width: 100%; text-align: left; font-family: 'Poppins', sans-serif;
+}
+.sidebarSubItem:hover { color: white; background: rgba(255,255,255,0.05); }
+
+/* Sidebar user badge at bottom */
+.sidebarUser {
+    display: flex; align-items: center; gap: 10px;
+    padding: 16px 18px;
+    border-top: 1px solid rgba(255,255,255,0.08);
+    cursor: pointer; transition: background 0.2s;
+    flex-shrink: 0;
+}
+.sidebarUser:hover { background: var(--sidebar-hover); }
+.sidebarUserAvatar {
+    width: 36px; height: 36px; border-radius: 50%;
+    background: rgba(255,255,255,0.15);
+    border: 1.5px solid rgba(255,255,255,0.3);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; font-weight: 700; color: white; flex-shrink: 0;
+}
+.sidebarUserName { font-size: 13px; font-weight: 600; color: white; line-height: 1.2; }
+.sidebarUserRole { font-size: 11px; color: rgba(255,255,255,0.5); }
+.sidebarUserChevron { font-size: 11px; color: rgba(255,255,255,0.4); margin-left: auto; }
+
+/* Overlay for mobile */
+.sidebarOverlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,0.5); z-index: 299;
+}
+.sidebarOverlay.show { display: block; }
+
+/* ══ HEADER ══ */
+.header {
+    position: fixed; top: 0;
+    left: var(--sidebar-width); right: 0;
+    height: var(--header-h); z-index: 200;
+    background: white; border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 24px;
+    box-shadow: 0 1px 8px rgba(0,0,0,0.06);
+}
+.headerLeft { display: flex; align-items: center; gap: 14px; }
+.hamburgerBtn {
+    display: none; background: none; border: none;
+    font-size: 22px; cursor: pointer; color: var(--text);
+    padding: 6px;
+}
+.headerPageTitle { font-size: 16px; font-weight: 700; color: var(--text); }
+
+.headerRight { display: flex; align-items: center; gap: 16px; }
+
+/* Notification bell */
+.notifBell {
+    position: relative; font-size: 20px; cursor: pointer;
+    background: none; border: none;
+    width: 38px; height: 38px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    transition: background 0.2s;
+}
+.notifBell:hover { background: var(--light-bg); }
+.notifBadge {
+    position: absolute; top: 2px; right: 2px;
+    background: var(--red); color: white;
+    font-size: 9px; font-weight: 700;
+    min-width: 16px; height: 16px; border-radius: 99px;
+    display: flex; align-items: center; justify-content: center;
+    padding: 0 4px;
+}
+.notifDropdown {
+    display: none; position: absolute; top: 46px; right: 0;
+    background: white; width: 280px;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.12); border-radius: 16px;
+    padding: 16px; z-index: 999; border: 1px solid var(--border);
+}
+.notifDropdown.show { display: block; }
+.notifDropdown h4 { font-size: 14px; margin-bottom: 10px; }
+
+/* Admin badge in header */
+.headerAdminBadge {
+    display: flex; align-items: center; gap: 10px; cursor: pointer;
+    padding: 6px 12px; border-radius: 12px; transition: background 0.2s;
+}
+.headerAdminBadge:hover { background: var(--light-bg); }
+.headerAdminAvatar {
+    width: 36px; height: 36px; border-radius: 50%;
+    background: var(--primary-light);
+    border: 2px solid rgba(26,63,212,0.2);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 15px; font-weight: 700; color: var(--primary);
+}
+.headerAdminName { font-size: 13px; font-weight: 600; color: var(--text); line-height: 1.2; }
+.headerAdminRole { font-size: 11px; color: var(--gray); }
+.headerAdminChevron { font-size: 12px; color: var(--gray); }
+
+/* Header dropdown */
+.headerDropdown {
+    display: none; flex-direction: column;
+    position: absolute; top: calc(var(--header-h) + 4px); right: 16px;
+    background: white; min-width: 200px;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.12); border-radius: 16px;
+    overflow: hidden; z-index: 999; border: 1px solid var(--border);
+}
+.headerDropdown.show { display: flex; }
+.headerDropdown a, .headerDropdown button {
+    padding: 13px 18px; text-decoration: none; color: var(--text);
+    font-size: 13.5px; font-weight: 500; border: none; background: white;
+    text-align: left; cursor: pointer; font-family: 'Poppins', sans-serif;
+    display: flex; align-items: center; gap: 10px;
+    border-bottom: 1px solid var(--border); transition: background 0.15s;
+}
+.headerDropdown a:last-child, .headerDropdown button:last-child { border-bottom: none; }
+.headerDropdown a:hover, .headerDropdown button:hover { background: var(--light-bg); }
+
+/* ══ MAIN AREA ══ */
+.mainArea {
+    margin-left: var(--sidebar-width);
+    margin-top: var(--header-h);
+    min-height: calc(100vh - var(--header-h));
+    padding: 24px;
+    background: #eef2ff;
+    flex: 1;
+}
+
+/* Section */
+.section { display: none; }
+.section.active { display: block; }
+
+/* ══════════════════════════════════════════
+   DASHBOARD
+══════════════════════════════════════════ */
+.dashTitle { font-size: 24px; font-weight: 800; color: var(--text); margin-bottom: 4px; }
+.dashSub   { font-size: 13px; color: var(--gray); margin-bottom: 20px; }
+
+/* Toolbar */
+.dashToolbar {
+    display: flex; align-items: center; gap: 10px;
+    flex-wrap: wrap; margin-bottom: 22px;
+    background: white; padding: 14px 18px;
+    border-radius: 14px; box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+.dateInput {
+    padding: 8px 12px; border: 1.5px solid var(--border);
+    border-radius: 10px; font-size: 13px;
+    font-family: 'Poppins', sans-serif; color: var(--text);
+    outline: none; background: var(--light-bg); cursor: pointer;
+    transition: border-color 0.2s;
+}
+.dateInput:focus { border-color: var(--primary); background: white; }
+.viewSelect {
+    padding: 8px 32px 8px 12px; border: 1.5px solid var(--border);
+    border-radius: 10px; font-size: 13px;
+    font-family: 'Poppins', sans-serif; color: var(--text);
+    outline: none; background: var(--light-bg); cursor: pointer;
+    appearance: none; -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%236b7280'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat; background-position: right 8px center; background-size: 18px;
+}
+.quickBtn {
+    padding: 8px 16px; border: 1.5px solid var(--border);
+    border-radius: 10px; font-size: 13px; font-weight: 600;
+    cursor: pointer; font-family: 'Poppins', sans-serif;
+    background: white; color: var(--text); transition: all 0.2s;
+}
+.quickBtn:hover, .quickBtn.active { background: var(--primary); color: white; border-color: var(--primary); }
+.addNewBtn {
+    display: flex; align-items: center; gap: 6px;
+    padding: 9px 18px; background: var(--primary); color: white;
+    border: none; border-radius: 10px; font-size: 13px; font-weight: 700;
+    cursor: pointer; font-family: 'Poppins', sans-serif; transition: all 0.2s;
+    margin-left: auto; box-shadow: 0 4px 12px rgba(26,63,212,0.25);
+}
+.addNewBtn:hover { background: var(--primary-dark); transform: translateY(-1px); }
+
+/* Stat cards */
+.dashStats {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 14px; margin-bottom: 22px;
+}
+.dashCard {
+    background: white; border-radius: 16px;
+    padding: 18px 16px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+    border: 1.5px solid transparent;
+    transition: all 0.2s;
+}
+.dashCard:hover { border-color: rgba(26,63,212,0.12); transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.08); }
+.dashCardIcon {
+    width: 44px; height: 44px; border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px; margin-bottom: 12px;
+}
+.dashCardIcon.blue   { background: #eff6ff; }
+.dashCardIcon.green  { background: #f0fdf4; }
+.dashCardIcon.purple { background: #faf5ff; }
+.dashCardIcon.orange { background: #fff7ed; }
+.dashCardIcon.teal   { background: #f0fdfa; }
+.dashCardLabel { font-size: 12px; color: var(--gray); font-weight: 500; margin-bottom: 6px; }
+.dashCardVal   { font-size: 26px; font-weight: 800; color: var(--text); margin-bottom: 6px; line-height: 1; }
+.dashCardTrend { font-size: 11.5px; font-weight: 600; display: flex; align-items: center; gap: 3px; }
+.dashCardTrend.up   { color: var(--green); }
+.dashCardTrend.down { color: var(--red); }
+
+/* Growth + Peak row */
+.dashMidRow {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 14px; margin-bottom: 22px;
+}
+.dashMidCard {
+    background: white; border-radius: 16px; padding: 18px 20px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+    display: flex; align-items: center; gap: 16px;
+}
+.dashMidIcon {
+    width: 48px; height: 48px; border-radius: 14px;
+    display: flex; align-items: center; justify-content: center; font-size: 22px;
+    background: var(--primary-light); flex-shrink: 0;
+}
+.dashMidLabel { font-size: 12px; color: var(--gray); font-weight: 500; margin-bottom: 4px; }
+.dashMidVal   { font-size: 20px; font-weight: 800; color: var(--green); }
+.dashMidSub   { font-size: 11px; color: var(--gray); margin-top: 2px; }
+
+/* Charts grid */
+.dashCharts {
+    display: grid; grid-template-columns: 2fr 1fr;
+    gap: 14px; margin-bottom: 22px;
+}
+.dashChartBox {
+    background: white; border-radius: 16px; padding: 20px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+}
+.dashChartTitle { font-size: 15px; font-weight: 700; color: var(--text); margin-bottom: 16px; }
+
+.dashBottomGrid {
+    display: grid; grid-template-columns: 1fr 1fr 1fr 1fr;
+    gap: 14px; margin-bottom: 22px;
+}
+.dashBottomBox {
+    background: white; border-radius: 16px; padding: 20px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+}
+.dashBottomTitle { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 14px; }
+.dashBottomBox ul { list-style: none; padding: 0; }
+.dashBottomBox li {
+    padding: 8px 0; border-bottom: 1px solid var(--border);
+    font-size: 13px; color: var(--gray);
+}
+.dashBottomBox li:last-child { border-bottom: none; }
+
+/* Footer */
+.dashFooter {
+    text-align: center; padding: 16px 0 8px;
+    font-size: 12px; color: var(--gray);
+}
+
+/* ══════════════════════════════════════════
+   CONTENT SECTIONS
+══════════════════════════════════════════ */
+.sectionHeader { margin-bottom: 20px; }
+.sectionTitle  { font-size: 20px; font-weight: 800; color: var(--text); margin-bottom: 4px; }
+.sectionSub    { font-size: 13px; color: var(--gray); }
+
+.box {
+    background: white; border-radius: 16px; padding: 20px 22px;
+    margin-bottom: 18px; box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+    border: 1.5px solid transparent;
+}
+.box h3 { font-size: 15px; font-weight: 700; color: var(--text); margin-bottom: 14px; }
+
+.row {
+    display: flex; gap: 12px; align-items: center;
+    margin-bottom: 14px; flex-wrap: wrap;
+}
+
+/* ── Inputs ── */
+input[type="text"],
+input[type="number"],
+input[type="email"],
+input[type="date"],
+input[type="file"],
+select, textarea {
+    padding: 10px 14px; border: 1.5px solid var(--border);
+    border-radius: 10px; font-size: 13.5px;
+    font-family: 'Poppins', sans-serif; color: var(--text);
+    outline: none; background: var(--light-bg);
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+input:focus, select:focus, textarea:focus {
+    border-color: var(--primary); background: white;
+    box-shadow: 0 0 0 3px rgba(26,63,212,0.10);
+}
+input[readonly] { color: var(--gray); cursor: default; }
+
+/* ── Buttons ── */
+button {
+    padding: 9px 18px; border: none;
+    border-radius: 10px; font-size: 13.5px; font-weight: 600;
+    cursor: pointer; font-family: 'Poppins', sans-serif;
+    background: var(--primary); color: white; transition: all 0.2s;
+}
+button:hover { background: var(--primary-dark); transform: translateY(-1px); }
+button:active { transform: scale(0.98); }
+
+/* ── Tables ── */
+table { width: 100%; border-collapse: collapse; background: white; }
+th, td { border-bottom: 1px solid var(--border); padding: 11px 14px; text-align: left; font-size: 13px; }
+th { background: var(--light-bg); font-weight: 700; color: var(--primary); font-size: 12.5px; text-transform: uppercase; letter-spacing: 0.4px; }
+tr:hover td { background: #fafbff; }
+tr:last-child td { border-bottom: none; }
+
+/* ── Status dots ── */
+.statusDot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; animation: blink 1.2s infinite; }
+.statusDot.green  { background: var(--green); }
+.statusDot.red    { background: var(--red); }
+.statusDot.orange { background: var(--orange); }
+@keyframes blink { 0%,100%{opacity:1;} 50%{opacity:0.3;} }
+
+/* ── Service tab buttons ── */
+.serviceTabBtn {
+    background: var(--light-bg); color: var(--gray);
+    border: 1.5px solid var(--border); padding: 8px 16px;
+    border-radius: 10px; cursor: pointer; font-size: 13px; font-weight: 600;
+    font-family: 'Poppins', sans-serif; transition: all 0.2s;
+}
+.serviceTabBtn.activeTab { border-color: transparent; }
+.serviceTabBtn.activeTab.pending       { background: var(--orange); color: white; }
+.serviceTabBtn.activeTab.accepted      { background: var(--primary); color: white; }
+.serviceTabBtn.activeTab.confirmation  { background: var(--purple); color: white; }
+.serviceTabBtn.activeTab.completed     { background: var(--green); color: white; }
+.serviceTabBtn.activeTab.cancel        { background: var(--red); color: white; }
+.serviceTabBtn.activeTab.all           { background: var(--text); color: white; }
+.serviceTabBtn.activeTab.process       { background: var(--orange); color: white; }
+.serviceTabBtn:hover { border-color: var(--primary); color: var(--primary); }
+
+/* ── Done / Danger buttons ── */
+.doneBtn   { background: var(--green); color: white; padding: 6px 14px; border-radius: 8px; font-size: 12px; }
+.doneBtn:hover { background: #15803d; }
+.dangerBtn { background: var(--red); color: white; padding: 6px 14px; border-radius: 8px; font-size: 12px; }
+.dangerBtn:hover { background: #b91c1c; }
+
+/* ── QR Preview ── */
+#qrPreview {
+    width: 130px; height: 130px; object-fit: contain;
+    border: 1.5px solid var(--border); border-radius: 12px;
+    display: block; margin-bottom: 12px; background: var(--light-bg);
+    padding: 8px;
+}
+
+/* ── Details board ── */
+#detailsBoard {
+    border: 1.5px solid var(--border); border-radius: 12px;
+    padding: 12px; min-height: 80px; max-height: 180px;
+    overflow: auto; background: var(--light-bg); margin: 8px 0;
+    font-size: 13px;
+}
+#categoryListBox {
+    border: 1.5px solid var(--border); border-radius: 12px;
+    padding: 12px; min-height: 60px; max-height: 200px;
+    overflow: auto; background: var(--light-bg); margin: 10px 0;
+    font-size: 13px;
+}
+
+/* ── Image upload drop area ── */
+#dropArea {
+    border: 2px dashed var(--border); border-radius: 14px;
+    padding: 32px; text-align: center; cursor: pointer;
+    background: var(--light-bg); transition: all 0.2s;
+    font-size: 13.5px; color: var(--gray); margin: 12px 0;
+}
+#dropArea:hover { border-color: var(--primary); background: var(--primary-light); }
+
+/* Content section boxes */
+
+
+/* ══════════════════════════════════════════
+   RESPONSIVE
+══════════════════════════════════════════ */
+@media (max-width: 1200px) {
+    .dashStats       { grid-template-columns: repeat(3, 1fr); }
+    .dashBottomGrid  { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 960px) {
+    .dashStats       { grid-template-columns: repeat(2, 1fr); }
+    .dashCharts      { grid-template-columns: 1fr; }
+    .dashBottomGrid  { grid-template-columns: 1fr 1fr; }
+    .dashMidRow      { grid-template-columns: 1fr; }
+}
+@media (max-width: 768px) {
+    :root { --sidebar-width: 0px; }
+    .sidebar { transform: translateX(-220px); width: 220px; }
+    .sidebar.open { transform: translateX(0); }
+    .header { left: 0; }
+    .mainArea { margin-left: 0; }
+    .hamburgerBtn { display: flex; }
+    .dashStats { grid-template-columns: 1fr 1fr; }
+    .dashBottomGrid { grid-template-columns: 1fr; }
+    .dashToolbar { flex-direction: column; align-items: stretch; }
+    .addNewBtn { margin-left: 0; width: 100%; justify-content: center; }
+    .row { flex-direction: column; align-items: stretch; }
+    table { font-size: 12px; }
+    th, td { padding: 8px 10px; }
+    .headerAdminName, .headerAdminRole { display: none; }
+    .dashCharts { grid-template-columns: 1fr; }
+}
+@media (max-width: 480px) {
+    .dashStats { grid-template-columns: 1fr; }
+    .dashMidRow { grid-template-columns: 1fr; }
+    .mainArea { padding: 14px 12px; }
+}
+</style>
+
+<script>
+// ── SECURITY CHECK ──
+fetch("/api/admin-auth/check")
+    .then(res => res.json())
+    .then(data => { if (!data.loggedIn) window.location.href = "/admin-login.html"; })
+    .catch(() => { window.location.href = "/admin-login.html"; });
+
+const API = "http://localhost:5000/api";
+let TOKEN = localStorage.getItem("token");
+let headerMenuOpen = false;
+let sidebarOpen = false;
+let serviceCounter = 1;
+let detailsList = [];
+
+document.addEventListener("DOMContentLoaded", () => {
+    document.addEventListener("click", function(e) {
+        // close header dropdown
+        const hDrop = document.getElementById("headerDropdown");
+        if (hDrop && !hDrop.contains(e.target) && !e.target.closest(".headerAdminBadge")) {
+            hDrop.classList.remove("show");
+            headerMenuOpen = false;
+        }
+        // close notif dropdown
+        const nDrop = document.getElementById("notifDropdown");
+        if (nDrop && !nDrop.contains(e.target) && !e.target.closest(".notifBell")) {
+            nDrop.classList.remove("show");
+        }
+    });
+
+    const socket = io("http://localhost:5000");
+
+    socket.on("dashboard_update", (data) => {
+        if (!data || typeof data !== "object") return;
+        updateDashboardUI(data);
+        if (typeof loadDashboardCharts === "function") loadDashboardCharts(data);
+    });
+
+    socket.on("new_booking", () => {
+        const el = document.getElementById("notifCount");
+        if (el) el.innerText = Number(el.innerText || 0) + 1;
+        const sound = document.getElementById("notifSound");
+        if (sound) sound.play().catch(() => {});
+    });
+
+    socket.on("admin_notification", (data) => {
+        alert("🔔 " + data.message);
+        loadWalletRequests();
+    });
+
+    showSection("dashboard");
+    loadDashboard();
+    loadCategories();
+    setServiceId();
+    loadServiceList();
+    loadStaffList();
+    loadCustomerList();
+    loadPaymentList();
+    loadPaymentDetails();
+    loadWalletRequests();
+    loadUnitRates();
+    loadAccountDetails();
+    loadMessages();
+    loadServiceUpdates();
+    loadSavedQR();
+});
+
+// ── SIDEBAR TOGGLE ──
+function toggleSidebar() {
+    const sidebar  = document.getElementById("sidebar");
+    const overlay  = document.getElementById("sidebarOverlay");
+    sidebarOpen    = !sidebarOpen;
+    sidebar.classList.toggle("open", sidebarOpen);
+    overlay.classList.toggle("show", sidebarOpen);
+}
+function closeSidebar() {
+    document.getElementById("sidebar").classList.remove("open");
+    document.getElementById("sidebarOverlay").classList.remove("show");
+    sidebarOpen = false;
+}
+
+// ── HEADER DROPDOWN ──
+function toggleHeaderMenu() {
+    headerMenuOpen = !headerMenuOpen;
+    document.getElementById("headerDropdown").classList.toggle("show", headerMenuOpen);
+}
+
+// ── NOTIF DROPDOWN ──
+function toggleNotifDropdown() {
+    document.getElementById("notifDropdown").classList.toggle("show");
+}
+
+// ── SIDEBAR GROUP DROPDOWNS ──
+function toggleSidebarGroup(groupId, chevronId) {
+    const menu    = document.getElementById(groupId);
+    const chevron = document.getElementById(chevronId);
+    const isOpen  = menu.classList.toggle("open");
+    if (chevron) chevron.classList.toggle("rotated", isOpen);
+}
+
+// ── SECTION SWITCH ──
+function showSection(id) {
+    document.querySelectorAll(".section").forEach(s => s.style.display = "none");
+    const el = document.getElementById(id);
+    if (el) el.style.display = "block";
+
+    // update sidebar active
+    document.querySelectorAll(".sidebarItem").forEach(b => b.classList.remove("active"));
+    const activeBtn = document.querySelector(`[data-section="${id}"]`);
+    if (activeBtn) activeBtn.classList.add("active");
+
+    // update header title
+    const titles = {
+        dashboard:"Dashboard", upload:"Upload", serviceList:"Service List",
+        staffList:"Staff List", customerList:"Customer List",
+        accountUpdate:"Account Update", paymentRequest:"Unit Payment Details",
+        paymentDetails:"Payment Details", walletPayment:"Wallet Payment Request",
+        imageUpload:"Image Upload", aboutUs:"About Us", terms:"Terms & Conditions",
+        privacy:"Privacy Policy", refund:"Refund / Cancellation",
+        staffTerms:"Terms (Staff)", customerTerms:"Terms (Customer)",
+        unit:"Unit Balance", message:"Messages", update:"Service Updates"
+    };
+    const titleEl = document.getElementById("headerPageTitle");
+    if (titleEl) titleEl.textContent = titles[id] || id;
+
+    // Load content editor for CMS sections
+    const map = { aboutUs:"About Us", terms:"Terms & Conditions", privacy:"Privacy Policy", refund:"Refund / Cancellation", staffTerms:"Terms for Staff", customerTerms:"Terms for Customer" };
+    if (map[id]) { loadContentPage(id, map[id]); loadContentData(id); }
+
+    closeSidebar();
+}
+
+// ── DASHBOARD ──
+async function loadDashboard() {
+    try {
+        const res  = await fetch(API + "/admin/dashboard");
+        if (!res.ok) return;
+        let d;
+        try { d = await res.json(); } catch { return; }
+        if (!d || typeof d !== "object") return;
+        updateDashboardUI(d);
+        if (typeof loadDashboardCharts === "function") loadDashboardCharts(d);
+        loadRecentBookings();
+        loadTopStaff();
+    } catch (e) { console.log("Dashboard crash:", e); }
+}
+
+function updateDashboardUI(d) {
+    setVal("dashCustomer", d.totalCustomers);
+    setVal("dashStaff",    d.totalStaff);
+    setVal("dashService",  d.totalServices);
+    setVal("dashPending",  d.pending);
+    setVal("dashComplete", d.completed);
+    const growthEl = document.getElementById("growth");
+    if (growthEl) {
+        const g = Number(d.growth || 0);
+        growthEl.innerHTML = g >= 0 ? `↑ ${g}%` : `↓ ${Math.abs(g)}%`;
+        growthEl.className = "dashMidVal " + (g >= 0 ? "up" : "down");
+        growthEl.style.color = g >= 0 ? "var(--green)" : "var(--red)";
+    }
+    setVal("peakDay", d.peakDay || "-");
+}
+function setVal(id, val) { const el = document.getElementById(id); if (el) el.innerText = val || 0; }
+
+// ── CATEGORY ──
+async function uploadCategory() {
+    const name = document.getElementById("categoryName").value.trim();
+    const file = document.getElementById("categoryImage").files[0];
+    if (!name || !file) { alert("Enter name and select image"); return; }
+    const fd = new FormData(); fd.append("name", name); fd.append("image", file);
+    try {
+        const res  = await fetch(API + "/admin/add-category", { method: "POST", body: fd });
+        const data = await res.json();
+        if (data.success) { alert("Category uploaded"); document.getElementById("categoryName").value = ""; document.getElementById("categoryImage").value = ""; await loadCategories(); await viewCategoryList(); }
+        else alert("Upload failed");
+    } catch { alert("Server error"); }
+}
+async function loadCategories() {
+    try {
+        const res  = await fetch(API + "/admin/categories");
+        const data = await res.json();
+        const dd   = document.getElementById("categoryDropdown");
+        dd.innerHTML = "<option value=''>Select Category</option>";
+        data.forEach(cat => { const o = document.createElement("option"); o.value = cat.id; o.innerText = cat.name; dd.appendChild(o); });
+    } catch {}
+}
+async function viewCategoryList() {
+    try {
+        const res  = await fetch(API + "/admin/categories");
+        const data = await res.json();
+        const box  = document.getElementById("categoryListBox");
+        box.innerHTML = "";
+        if (!data || !data.length) { box.innerHTML = "<p>No categories found</p>"; return; }
+        data.forEach(cat => {
+            const div = document.createElement("div");
+            div.style.cssText = "display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;padding:8px 12px;background:var(--light-bg);border-radius:10px;border:1px solid var(--border);";
+            div.innerHTML = `<div style="display:flex;align-items:center;gap:10px;"><img src="${cat.image.startsWith('http') ? cat.image : 'http://localhost:5000' + cat.image}" style="width:36px;height:36px;object-fit:cover;border-radius:8px;"><span style="font-size:13px;font-weight:500;">${cat.name}</span></div><div style="display:flex;gap:10px;"><span style="color:var(--primary);cursor:pointer;font-size:13px;font-weight:600;" onclick="editCategory(${cat.id},'${cat.name}')">Edit</span><span style="color:var(--red);cursor:pointer;font-size:13px;font-weight:600;" onclick="deleteCategory(${cat.id})">Delete</span></div>`;
+            box.appendChild(div);
+        });
+    } catch {}
+}
+async function deleteCategory(id) { if (!confirm("Delete category?")) return; await fetch(API + "/admin/category/" + id, { method: "DELETE" }); await loadCategories(); await viewCategoryList(); }
+async function editCategory(id, oldName) {
+    const newName = prompt("Edit category name:", oldName); if (!newName) return;
+    const imageInput = document.createElement("input"); imageInput.type = "file"; imageInput.accept = "image/*";
+    imageInput.onchange = async function() {
+        const fd = new FormData(); fd.append("name", newName); fd.append("image", imageInput.files[0]);
+        const res = await fetch(API + "/admin/category/" + id, { method: "PUT", body: fd });
+        const d   = await res.json();
+        if (d.success) { alert("Category updated"); await loadCategories(); await viewCategoryList(); }
+    };
+    imageInput.click();
+}
+</script>
+</head>
+<body>
+
+<!-- SIDEBAR OVERLAY -->
+<div id="sidebarOverlay" class="sidebarOverlay" onclick="closeSidebar()"></div>
+
+<!-- SIDEBAR -->
+<div id="sidebar" class="sidebar">
+    <div class="sidebarLogo">
+        <span class="sidebarLogoIcon">🏠</span>
+        <span class="sidebarLogoText">VINSUU ADMIN</span>
+    </div>
+
+    <nav class="sidebarNav">
+        <button class="sidebarItem active" data-section="dashboard" onclick="showSection('dashboard')">
+            <span class="sidebarItemIcon">📊</span> Dashboard
+        </button>
+        <button class="sidebarItem" data-section="upload" onclick="showSection('upload')">
+            <span class="sidebarItemIcon">⬆</span> Upload
+        </button>
+        <button class="sidebarItem" data-section="serviceList" onclick="showSection('serviceList')">
+            <span class="sidebarItemIcon">📋</span> Service List
+        </button>
+        <button class="sidebarItem" data-section="staffList" onclick="showSection('staffList')">
+            <span class="sidebarItemIcon">👤</span> Staff List
+        </button>
+        <button class="sidebarItem" data-section="customerList" onclick="showSection('customerList')">
+            <span class="sidebarItemIcon">😊</span> Customer List
+        </button>
+
+        <!-- Payment Management -->
+        <div class="sidebarGroup">
+            <button class="sidebarGroupBtn" onclick="toggleSidebarGroup('paymentMenu','paymentChevron')">
+                <span class="sidebarGroupLeft"><span class="sidebarItemIcon">💳</span> Payment Management</span>
+                <span class="sidebarGroupChevron" id="paymentChevron">▼</span>
+            </button>
+            <div id="paymentMenu" class="sidebarSubMenu">
+                <button class="sidebarSubItem" onclick="showSection('accountUpdate')">Account Update</button>
+                <button class="sidebarSubItem" onclick="showSection('paymentRequest')">Unit Payment Details</button>
+                <button class="sidebarSubItem" onclick="showSection('paymentDetails')">Payment Details</button>
+                <button class="sidebarSubItem" onclick="showSection('walletPayment')">Wallet Payment Request</button>
+            </div>
+        </div>
+
+        <!-- Setting -->
+        <div class="sidebarGroup">
+            <button class="sidebarGroupBtn" onclick="toggleSidebarGroup('settingMenu','settingChevron')">
+                <span class="sidebarGroupLeft"><span class="sidebarItemIcon">⚙️</span> Setting</span>
+                <span class="sidebarGroupChevron" id="settingChevron">▼</span>
+            </button>
+            <div id="settingMenu" class="sidebarSubMenu">
+                <button class="sidebarSubItem" onclick="showSection('imageUpload')">Image Upload</button>
+            </div>
+        </div>
+
+        <!-- Content Management -->
+        <div class="sidebarGroup">
+            <button class="sidebarGroupBtn" onclick="toggleSidebarGroup('contentMenu','contentChevron')">
+                <span class="sidebarGroupLeft"><span class="sidebarItemIcon">📝</span> Content Management</span>
+                <span class="sidebarGroupChevron" id="contentChevron">▼</span>
+            </button>
+            <div id="contentMenu" class="sidebarSubMenu">
+                <button class="sidebarSubItem" onclick="showSection('aboutUs')">About Us</button>
+                <button class="sidebarSubItem" onclick="showSection('terms')">Terms & Conditions</button>
+                <button class="sidebarSubItem" onclick="showSection('privacy')">Privacy Policy</button>
+                <button class="sidebarSubItem" onclick="showSection('refund')">Refund / Cancellation</button>
+                <button class="sidebarSubItem" onclick="showSection('staffTerms')">Terms (Staff)</button>
+                <button class="sidebarSubItem" onclick="showSection('customerTerms')">Terms (Customer)</button>
+            </div>
+        </div>
+
+        <button class="sidebarItem" data-section="unit" onclick="showSection('unit')">
+            <span class="sidebarItemIcon">⭐</span> Unit Balance
+        </button>
+        <button class="sidebarItem" data-section="message" onclick="showSection('message')">
+            <span class="sidebarItemIcon">✉️</span> Message
+        </button>
+        <button class="sidebarItem" data-section="update" onclick="showSection('update')">
+            <span class="sidebarItemIcon">🔄</span> Update
+        </button>
+    </nav>
+
+    <div class="sidebarUser">
+        <div class="sidebarUserAvatar">A</div>
+        <div>
+            <div class="sidebarUserName">Admin User</div>
+            <div class="sidebarUserRole">admin@vinsuu.com</div>
+        </div>
+        <span class="sidebarUserChevron">▾</span>
+    </div>
+</div>
+
+<!-- HEADER -->
+<div class="header">
+    <div class="headerLeft">
+        <button class="hamburgerBtn" onclick="toggleSidebar()">☰</button>
+        <span id="headerPageTitle" class="headerPageTitle">Dashboard</span>
+    </div>
+    <div class="headerRight" style="position:relative;">
+        <div style="position:relative;">
+            <button class="notifBell" onclick="toggleNotifDropdown()">
+                🔔 <span id="notifCount" class="notifBadge">0</span>
+            </button>
+            <div id="notifDropdown" class="notifDropdown">
+                <h4>New Bookings</h4>
+                <div id="notifList"></div>
+            </div>
+        </div>
+        <div class="headerAdminBadge" onclick="toggleHeaderMenu()">
+            <div class="headerAdminAvatar">A</div>
+            <div>
+                <div class="headerAdminName">Admin User</div>
+                <div class="headerAdminRole">Super Admin</div>
+            </div>
+            <span class="headerAdminChevron">▾</span>
+        </div>
+        <div id="headerDropdown" class="headerDropdown">
+            <a href="#">🏠 Home</a>
+            <a href="#">📱 App Download</a>
+            <a href="#">ℹ️ About Us</a>
+            <a href="#">📞 Contact Us</a>
+        </div>
+    </div>
+</div>
+
+<!-- MAIN -->
+<div class="mainArea">
+
+    <!-- ══ DASHBOARD ══ -->
+    <div id="dashboard" class="section">
+        <div class="dashTitle">Dashboard</div>
+        <div class="dashSub">Welcome back! Here's what's happening with your platform today.</div>
+
+        <!-- Toolbar -->
+        <div class="dashToolbar">
+            <input type="date" id="fromDate" class="dateInput" onchange="filterDashboardRange()">
+            <input type="date" id="toDate"   class="dateInput" onchange="filterDashboardRange()">
+            <select id="viewType" class="viewSelect" onchange="changeViewType()">
+                <option value="daily">Daily</option>
+                <option value="monthly">Monthly</option>
+                <option value="yearly">Yearly</option>
+            </select>
+            <button class="quickBtn" onclick="setQuickRange(7)">7D</button>
+            <button class="quickBtn" onclick="setQuickRange(30)">30D</button>
+            <button class="addNewBtn" onclick="">+ Add New</button>
+        </div>
+
+        <!-- Stat cards -->
+        <div class="dashStats">
+            <div class="dashCard">
+                <div class="dashCardIcon blue">👥</div>
+                <div class="dashCardLabel">Total Staff</div>
+                <div class="dashCardVal" id="dashStaff">0</div>
+                <div class="dashCardTrend up">↑ 12% vs last 30 days</div>
+            </div>
+            <div class="dashCard">
+                <div class="dashCardIcon green">😊</div>
+                <div class="dashCardLabel">Total Customers</div>
+                <div class="dashCardVal" id="dashCustomer">0</div>
+                <div class="dashCardTrend up">↑ 8% vs last 30 days</div>
+            </div>
+            <div class="dashCard">
+                <div class="dashCardIcon purple">🛒</div>
+                <div class="dashCardLabel">Total Services</div>
+                <div class="dashCardVal" id="dashService">0</div>
+                <div class="dashCardTrend up">↑ 18% vs last 30 days</div>
+            </div>
+            <div class="dashCard">
+                <div class="dashCardIcon orange">⏳</div>
+                <div class="dashCardLabel">Pending</div>
+                <div class="dashCardVal" id="dashPending">0</div>
+                <div class="dashCardTrend down">↓ 20% vs last 30 days</div>
+            </div>
+            <div class="dashCard">
+                <div class="dashCardIcon teal">✅</div>
+                <div class="dashCardLabel">Completed</div>
+                <div class="dashCardVal" id="dashComplete">0</div>
+                <div class="dashCardTrend up">↑ 14% vs last 30 days</div>
+            </div>
+        </div>
+
+        <!-- Growth + Peak -->
+        <div class="dashMidRow">
+            <div class="dashMidCard">
+                <div class="dashMidIcon">📈</div>
+                <div>
+                    <div class="dashMidLabel">Growth</div>
+                    <div class="dashMidVal" id="growth" style="color:var(--green);">0%</div>
+                    <div class="dashMidSub">vs last 30 days</div>
+                </div>
+            </div>
+            <div class="dashMidCard">
+                <div class="dashMidIcon">📅</div>
+                <div>
+                    <div class="dashMidLabel">Peak Day</div>
+                    <div class="dashMidVal" id="peakDay" style="color:var(--orange);">-</div>
+                    <div class="dashMidSub">vs last 30 days</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts -->
+        <div class="dashCharts">
+            <div class="dashChartBox">
+                <div class="dashChartTitle">Overview (Visits)</div>
+                <canvas id="lineChart"></canvas>
+            </div>
+            <div class="dashChartBox">
+                <div class="dashChartTitle">Services</div>
+                <canvas id="pieChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Bottom -->
+        <div class="dashBottomGrid">
+            <div class="dashBottomBox">
+                <div class="dashBottomTitle">Recent Bookings</div>
+                <ul id="recentBookings"></ul>
+            </div>
+            <div class="dashBottomBox">
+                <div class="dashBottomTitle">Top Staff</div>
+                <ul id="topStaff"></ul>
+            </div>
+            <div class="dashBottomBox">
+                <div class="dashBottomTitle">Revenue</div>
+                <canvas id="revenueChart"></canvas>
+            </div>
+            <div class="dashBottomBox">
+                <div class="dashBottomTitle">Profit vs Expense</div>
+                <canvas id="profitChart"></canvas>
+            </div>
+        </div>
+
+        <div class="dashFooter">© 2026 Vinsuu. All rights reserved.</div>
+    </div>
+
+    <!-- ══ UPLOAD ══ -->
+    <div id="upload" class="section">
+        <div class="sectionHeader"><div class="sectionTitle">Upload</div></div>
+        <div class="box">
+            <h3>Category Upload</h3>
+            <div class="row">
+                <input id="categoryName" placeholder="Category Name">
+                <input type="file" id="categoryImage">
+            </div>
+            <div style="display:flex;gap:10px;flex-wrap:wrap;">
+                <button onclick="uploadCategory()">Upload Category</button>
+                <button onclick="viewCategoryList()" style="background:var(--light-bg);color:var(--primary);border:1.5px solid var(--border);">View Category List</button>
+            </div>
+            <div id="categoryListBox"></div>
+        </div>
+        <div class="box">
+            <h3>Service Upload</h3>
+            <div class="row"><label>Service ID</label><input id="serviceId" readonly></div>
+            <div class="row">
+                <label>Service Name</label>
+                <input id="serviceName" placeholder="Service Name">
+                <input type="file" id="serviceImage" accept="image/*">
+            </div>
+            <div class="row">
+                <label>Service Type</label>
+                <select id="serviceType" onchange="handleServiceType()">
+                    <option value="">Select Type</option>
+                    <option value="price">Price</option>
+                    <option value="unit">Unit Balance</option>
+                </select>
+                <label>Price</label>
+                <select id="priceSelect" onchange="handlePriceSelect()">
+                    <option value="">Select Price</option>
+                    <option value="99">₹ 99</option>
+                    <option value="199">₹ 199</option>
+                    <option value="299">₹ 299</option>
+                    <option value="399">₹ 399</option>
+                    <option value="499">₹ 499</option>
+                    <option value="549">₹ 549</option>
+                </select>
+            </div>
+            <div class="row"><label>Preview</label><input id="pricePreview" readonly placeholder="₹ --- onward/visit"></div>
+            <div class="row">
+                <label>Unit Balance</label>
+                <select id="unitBalance"><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option></select>
+                <label>Category</label>
+                <select id="categoryDropdown"></select>
+            </div>
+            <div class="row">
+                <label>Details</label>
+                <input id="detailInput" placeholder="Enter detail">
+                <button onclick="addDetail()">Add</button>
+            </div>
+            <div id="detailsBoard"></div>
+            <button onclick="uploadService()" style="margin-top:10px;">Upload Service</button>
+        </div>
+    </div>
+
+    <!-- ══ SERVICE LIST ══ -->
+    <div id="serviceList" class="section">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+            <div class="sectionTitle">Service List</div>
+            <div style="font-size:13.5px;font-weight:600;color:var(--gray);">Total: <span id="totalServiceCount" style="color:var(--primary);">0</span></div>
+        </div>
+        <div class="box" id="serviceListPanel">
+            <div class="row" style="margin-bottom:16px;">
+                <div><label style="font-size:12px;font-weight:600;display:block;margin-bottom:4px;">Category</label><select id="filterCategory" onchange="filterServiceList()"></select></div>
+                <div><label style="font-size:12px;font-weight:600;display:block;margin-bottom:4px;">Service ID</label><input id="searchServiceId" placeholder="Search" onkeyup="filterServiceList()"></div>
+                <div><label style="font-size:12px;font-weight:600;display:block;margin-bottom:4px;">Service Name</label><input id="searchServiceName" placeholder="Search" onkeyup="filterServiceList()"></div>
+            </div>
+            <div style="overflow-x:auto;">
+            <table>
+                <thead><tr><th>Sr No.</th><th>Image</th><th>Service ID</th><th>Service Name</th><th>Edit</th><th>Remove</th><th>Popular</th></tr></thead>
+                <tbody id="serviceListBody"></tbody>
+            </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- ══ STAFF LIST ══ -->
+    <div id="staffList" class="section">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+            <div class="sectionTitle">Staff List <span id="totalStaffCount" style="font-size:14px;color:var(--gray);"></span></div>
+        </div>
+        <div class="box" id="staffListPanel">
+            <div class="row">
+                <input id="searchStaffId"   placeholder="Search Staff ID"   onkeyup="filterStaff()">
+                <input id="searchStaffName" placeholder="Search Staff Name" onkeyup="filterStaff()">
+                <input id="searchStaffPin"  placeholder="Search Pin Code"   onkeyup="filterStaff()">
+            </div>
+            <div style="overflow-x:auto;">
+            <table>
+                <thead><tr><th>Sr No</th><th>ID No.</th><th>Staff Name</th><th>Service Name</th><th>Location</th><th>Pin Code</th><th>View</th><th>Remove</th></tr></thead>
+                <tbody id="staffListBody"></tbody>
+            </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- ══ CUSTOMER LIST ══ -->
+    <div id="customerList" class="section">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+            <div class="sectionTitle">Customer List <span id="totalCustomerCount" style="font-size:14px;color:var(--gray);"></span></div>
+        </div>
+        <div class="box" id="customerListPanel">
+            <div class="row">
+                <input id="searchCustomerId"   placeholder="Search Customer ID"   onkeyup="filterCustomer()">
+                <input id="searchCustomerName" placeholder="Search Customer Name" onkeyup="filterCustomer()">
+                <input id="searchCustomerPin"  placeholder="Search Pin Code"      onkeyup="filterCustomer()">
+            </div>
+            <div style="overflow-x:auto;">
+            <table>
+                <thead><tr><th>Sr No</th><th>ID No.</th><th>Customer Name</th><th>Mob. No</th><th>Location</th><th>Pin Code</th><th>View</th><th>Remove</th></tr></thead>
+                <tbody id="customerListBody"></tbody>
+            </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- ══ ACCOUNT UPDATE ══ -->
+    <div id="accountUpdate" class="section">
+        <div class="sectionHeader"><div class="sectionTitle">Account Update</div></div>
+        <div class="box">
+            <div class="row"><label>Account Holder Name</label><input id="accName"></div>
+            <div class="row"><label>Account Number</label><input id="accNumber"></div>
+            <div class="row"><label>IFSC Code</label><input id="accIFSC"></div>
+            <div class="row"><label>Branch Name</label><input id="accBranch"></div>
+            <div class="row"><label>UPI ID</label><input id="accUPI"></div>
+            <button onclick="saveAccountDetails()">Save Account</button>
+            <div style="margin-top:20px;">
+                <img id="qrPreview" src="" alt="QR Code">
+                <input type="file" id="qrFile" accept="image/*" style="margin-bottom:10px;">
+                <div style="display:flex;gap:10px;flex-wrap:wrap;">
+                    <button onclick="uploadQRCode()">Upload QR</button>
+                    <button onclick="editQRCode()" style="background:var(--light-bg);color:var(--primary);border:1.5px solid var(--border);">Edit QR</button>
+                    <button onclick="saveQRCode()" style="background:var(--green);">Save QR</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ══ UNIT PAYMENT DETAILS ══ -->
+    <div id="paymentRequest" class="section">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+            <div class="sectionTitle">Unit Payment Details</div>
+            <span id="totalPaymentCount" style="font-size:13px;color:var(--gray);"></span>
+        </div>
+        <div class="box">
+            <div class="row">
+                <input id="searchPaymentStaff" placeholder="Search Staff Name" onkeyup="filterPayment()">
+                <input id="searchPaymentPin"   placeholder="Search Pin Code"   onkeyup="filterPayment()">
+                <input type="date" id="searchPaymentDate" onchange="filterPayment()">
+                <button onclick="togglePaymentHistory()">Payment History</button>
+            </div>
+            <div style="overflow-x:auto;">
+            <table>
+                <thead><tr><th>Sr No</th><th>Date</th><th>ID No.</th><th>Staff Name</th><th>Service Name</th><th>Pin Code</th><th>Purchased Unit</th><th>Unit Amount (₹)</th><th>Remaining Unit</th><th>View</th></tr></thead>
+                <tbody id="paymentListBody"></tbody>
+            </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- ══ PAYMENT DETAILS ══ -->
+    <div id="paymentDetails" class="section">
+        <div class="sectionHeader"><div class="sectionTitle">Payment Details</div></div>
+        <div class="box" style="overflow-x:auto;">
+            <table style="min-width:1200px;">
+                <thead><tr><th>Status</th><th>Sr No</th><th>Date</th><th>Staff ID</th><th>Staff Name</th><th>Service Charges</th><th>Material Charges</th><th>Total Amount</th><th>For Staff</th><th>For Vinsuu</th><th>Payment Type</th><th>Pending Fee</th><th>Wallet Amount</th><th>View</th><th>Start / Stop</th></tr></thead>
+                <tbody id="paymentDetailsBody"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- ══ WALLET PAYMENT REQUEST ══ -->
+    <div id="walletPayment" class="section">
+        <div class="sectionHeader"><div class="sectionTitle">Wallet Payment Request</div></div>
+        <div class="box" style="overflow-x:auto;">
+            <table style="min-width:1100px;">
+                <thead><tr><th>Status</th><th>Sr No</th><th>Date</th><th>Staff ID</th><th>Staff Name</th><th>Wallet Amount</th><th>Withdraw Amount</th><th>Deposit</th><th>Status</th><th>View</th></tr></thead>
+                <tbody id="walletPaymentBody"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- ══ IMAGE UPLOAD ══ -->
+    <div id="imageUpload" class="section" style="display:none;">
+        <div class="sectionHeader"><div class="sectionTitle">Image Upload</div></div>
+        <div class="box">
+            <div class="row">
+                <label>Image Category</label>
+                <select id="imageCategory"><option value="logo">Logo</option><option value="slide">Slide</option><option value="banner">Banner</option><option value="ads">Ads</option><option value="homepage">Homepage</option></select>
+            </div>
+            <input type="text" id="imageLink" placeholder="Enter redirect link (https://...)" style="width:300px;margin-bottom:12px;">
+            <div id="dropArea">Drag & Drop Images Here or Click to Upload<input type="file" id="imageFiles" multiple accept="image/*" style="display:none;"></div>
+            <div id="previewBox" style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px;"></div>
+            <button onclick="uploadMultipleImages()" style="margin-top:12px;">Upload</button>
+        </div>
+        <div class="box">
+            <h3>Uploaded Images</h3>
+            <button onclick="loadImages()">Refresh</button>
+            <div id="imageList" style="margin-top:12px;"></div>
+        </div>
+    </div>
+
+    <!-- ══ CONTENT MANAGEMENT ══ -->
+    <div id="aboutUs"       class="section contentBox"></div>
+    <div id="terms"         class="section contentBox"></div>
+    <div id="privacy"       class="section contentBox"></div>
+    <div id="refund"        class="section contentBox"></div>
+    <div id="staffTerms"    class="section contentBox"></div>
+    <div id="customerTerms" class="section contentBox"></div>
+
+    <!-- ══ UNIT BALANCE ══ -->
+    <div id="unit" class="section">
+        <div class="sectionHeader"><div class="sectionTitle">Unit Balance</div></div>
+        <div class="box">
+            <h3>Create Unit Balance</h3>
+            <div class="row">
+                <input id="unitInput"   type="number" placeholder="Unit (e.g. 1)">
+                <input id="amountInput" type="number" placeholder="₹ Amount (e.g. 50)">
+                <button onclick="addUnit()">Save</button>
+            </div>
+            <h3 style="margin-top:16px;">Saved Unit Rates</h3>
+            <div style="overflow-x:auto;">
+            <table>
+                <thead><tr><th>Unit Balance</th><th>Purchase Power (₹)</th><th>Edit</th><th>Remove</th></tr></thead>
+                <tbody id="unitRateBody"></tbody>
+            </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- ══ MESSAGE ══ -->
+    <div id="message" class="section">
+        <div class="sectionHeader"><div class="sectionTitle">Messages & Contact</div></div>
+        <div class="box">
+            <div class="row">
+                <label>Phone</label>
+                <input id="contactPhone">
+                <button onclick="savePhone()">Save Phone</button>
+            </div>
+            <div style="overflow-x:auto;">
+            <table>
+                <thead><tr><th>Sr No</th><th>Date</th><th>Name</th><th>Mob</th><th>Email</th><th>Pin Code</th><th>View</th></tr></thead>
+                <tbody id="messageListBody"></tbody>
+            </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- ══ SERVICE UPDATES ══ -->
+    <div id="update" class="section">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+            <div class="sectionTitle">Service Updates</div>
+        </div>
+        <div class="box" id="updatePanel">
+            <div class="row">
+                <input id="searchServicePin"        placeholder="Search Pin Code"   onkeyup="filterService()">
+                <input id="searchServiceCustomerId" placeholder="Search Customer ID" onkeyup="filterService()">
+                <input id="searchServiceStaffId"    placeholder="Search Staff ID"   onkeyup="filterService()">
+            </div>
+            <div class="row" style="flex-wrap:wrap;gap:8px;">
+                <button class="serviceTabBtn activeTab pending"  onclick="showServiceTab('pending', this)">Pending</button>
+                <button class="serviceTabBtn" onclick="showServiceTab('accepted', this)">Accepted</button>
+                <button class="serviceTabBtn" onclick="showServiceTab('confirmation', this)">Confirmation</button>
+                <button class="serviceTabBtn" onclick="showServiceTab('process', this)">Process</button>
+                <button class="serviceTabBtn" onclick="showServiceTab('completed', this)">Completed</button>
+                <button class="serviceTabBtn" onclick="showServiceTab('all', this)">Total</button>
+                <button class="serviceTabBtn" onclick="showServiceTab('cancel', this)">Cancel</button>
+            </div>
+            <div style="overflow-x:auto;">
+            <table>
+                <thead><tr><th>Sr No</th><th>Request Date</th><th>Customer ID</th><th>Customer Name</th><th>Staff ID</th><th>Staff Name</th><th>Mob. No</th><th>Location</th><th>Pin Code</th><th>View</th><th>Remove</th></tr></thead>
+                <tbody id="serviceUpdateBody"></tbody>
+            </table>
+            </div>
+        </div>
+    </div>
+
+</div><!-- /mainArea -->
+
+<!-- ══════════════ ALL BACKEND SCRIPTS ══════════════ -->
+<script>
+let lineChart, pieChart, revenueChart, profitChart;
+
+function loadDashboardCharts(d) {
+    const visits = d.visits || [], labels = d.labels || [];
+    if (lineChart)    lineChart.destroy();
+    if (pieChart)     pieChart.destroy();
+    if (revenueChart) revenueChart.destroy();
+    if (profitChart)  profitChart.destroy();
+    lineChart = new Chart(document.getElementById("lineChart"), { type:"line", data:{ labels, datasets:[{ label:"Visits", data:visits, borderColor:"#2b52e0", backgroundColor:"rgba(43,82,224,0.08)", fill:true, tension:0.4, pointRadius:4, pointBackgroundColor:"#2b52e0" }] }, options:{ plugins:{ legend:{ labels:{ font:{ family:"Poppins" } } } } } });
+    pieChart  = new Chart(document.getElementById("pieChart"),  { type:"doughnut", data:{ labels:d.serviceLabels||[], datasets:[{ data:d.serviceCounts||[], backgroundColor:["#2b52e0","#16a34a","#f59e0b","#ef4444"] }] } });
+    revenueChart = new Chart(document.getElementById("revenueChart"), { type:"bar", data:{ labels:d.revenueLabels||[], datasets:[{ label:"Revenue ₹", data:d.revenueData||[], backgroundColor:"#16a34a", borderRadius:6 }] } });
+    profitChart  = new Chart(document.getElementById("profitChart"),  { type:"bar", data:{ labels:d.revenueLabels||[], datasets:[{ label:"Profit ₹", data:d.profitData||[], backgroundColor:"#2b52e0", borderRadius:6 },{ label:"Expense ₹", data:d.expenseData||[], backgroundColor:"#ef4444", borderRadius:6 }] } });
+}
+
+async function loadRecentBookings() {
+    const res = await fetch(API + "/admin/service-requests");
+    const data = await res.json();
+    const list = document.getElementById("recentBookings");
+    list.innerHTML = "";
+    data.slice(0,5).forEach(b => { list.innerHTML += `<li>${b.service_name} — <b>${b.status}</b></li>`; });
+}
+async function loadTopStaff() {
+    const res = await fetch(API + "/admin/staff");
+    const data = await res.json();
+    const list = document.getElementById("topStaff");
+    list.innerHTML = "";
+    data.slice(0,5).forEach(s => { list.innerHTML += `<li>${s.name}</li>`; });
+}
+function filterDashboardRange() {
+    const from = document.getElementById("fromDate").value, to = document.getElementById("toDate").value;
+    if (!from || !to) return;
+    fetch(`${API}/admin/dashboard?from=${from}&to=${to}`).then(r=>r.json()).then(d => { updateDashboardUI(d); loadDashboardCharts(d); });
+}
+function setQuickRange(days) {
+    const to = new Date(), from = new Date();
+    from.setDate(to.getDate() - days);
+    document.getElementById("fromDate").value = from.toISOString().split("T")[0];
+    document.getElementById("toDate").value   = to.toISOString().split("T")[0];
+    filterDashboardRange();
+}
+function changeViewType() {
+    const type = document.getElementById("viewType").value;
+    const from = document.getElementById("fromDate").value, to = document.getElementById("toDate").value;
+    fetch(`${API}/admin/dashboard?from=${from}&to=${to}&type=${type}`).then(r=>r.json()).then(d => { updateDashboardUI(d); loadDashboardCharts(d); });
+}
+
+// SERVICE LIST
+async function setServiceId() {
+    try { const res = await fetch(API + "/admin/services"); const data = await res.json(); document.getElementById("serviceId").value = "SVC" + String(data.length + 1).padStart(4,"0"); } catch {}
+}
+async function uploadService() {
+    const name = document.getElementById("serviceName").value;
+    const imageFile = document.getElementById("serviceImage").files[0];
+    const category_id = document.getElementById("categoryDropdown").value;
+    const unit_cost = document.getElementById("unitBalance").value;
+    const service_type = document.getElementById("serviceType").value;
+    const price = document.getElementById("priceSelect").value;
+    if (!name || !imageFile || !category_id) { alert("Fill all fields"); return; }
+    if (!service_type) { alert("Select service type"); return; }
+    if (service_type === "price" && !price) { alert("Select price"); return; }
+    const fd = new FormData();
+    fd.append("name", name); fd.append("image", imageFile); fd.append("category_id", category_id); fd.append("unit_cost", unit_cost); fd.append("details", JSON.stringify(detailsList)); fd.append("service_type", service_type); fd.append("price", price);
+    try {
+        const res = await fetch(API + "/admin/add-service", { method:"POST", body:fd });
+        const data = await res.json();
+        if (data.success) { alert("Service uploaded"); detailsList = []; renderDetails(); document.getElementById("serviceName").value = ""; document.getElementById("serviceImage").value = ""; document.getElementById("serviceType").value = ""; document.getElementById("priceSelect").value = ""; document.getElementById("pricePreview").value = ""; setServiceId(); loadServiceList(); }
+        else alert("Upload failed");
+    } catch {}
+}
+function addDetail() { const input = document.getElementById("detailInput"); const val = input.value.trim(); if (!val) return; detailsList.push(val); input.value = ""; renderDetails(); }
+function renderDetails() { const board = document.getElementById("detailsBoard"); board.innerHTML = ""; detailsList.forEach((d,i) => { board.innerHTML += `<div style="padding:6px;border-bottom:1px solid var(--border);font-size:13px;">${d} <span style="float:right;color:var(--red);cursor:pointer;" onclick="removeDetail(${i})">✕</span></div>`; }); }
+function removeDetail(i) { detailsList.splice(i,1); renderDetails(); }
+let allServices = [];
+async function loadServiceList() { const res = await fetch(API + "/admin/services"); allServices = await res.json(); renderServiceList(allServices); loadCategoryFilter(allServices); }
+function renderServiceList(data) {
+    const body = document.getElementById("serviceListBody"); body.innerHTML = "";
+    document.getElementById("totalServiceCount").innerText = data.length;
+    data.forEach((s,i) => { const tr = document.createElement("tr"); tr.innerHTML = `<td>${i+1}</td><td><img src="${s.image.startsWith('http') ? s.image : 'http://localhost:5000' + s.image}" width="44" style="border-radius:8px;"></td><td>SVC${String(s.id).padStart(4,'0')}</td><td>${s.name}</td><td><button onclick="editService(${s.id})" style="background:var(--primary-light);color:var(--primary);border:1.5px solid rgba(26,63,212,0.2);">Edit</button></td><td><button onclick="deleteService(${s.id})" style="background:#fee2e2;color:var(--red);border:1.5px solid #fecaca;">✕</button></td><td><button onclick="togglePopular(${s.id}, this)" style="padding:6px 14px;border-radius:20px;color:white;background:${s.is_popular ? 'var(--green)' : 'var(--red)'};">${s.is_popular ? 'ON' : 'OFF'}</button></td>`; body.appendChild(tr); });
+}
+async function editService(id) { const name = prompt("New service name:"); if (!name) return; await fetch(API + "/admin/service/" + id, { method:"PUT", headers:{"Content-Type":"application/json","Authorization":"Bearer "+TOKEN}, body:JSON.stringify({ name }) }); loadServiceList(); }
+async function deleteService(id) { if (!confirm("Delete this service?")) return; const res = await fetch(API + "/admin/service/" + id, { method:"DELETE" }); const data = await res.json(); if (data.success) { alert("Deleted"); loadServiceList(); } else alert("Delete failed"); }
+async function togglePopular(id, btn) { const isOn = btn.innerText==="ON"; const res = await fetch(API + "/admin/toggle-popular/" + id, { method:"PUT" }); const data = await res.json(); if (data.success) { btn.innerText = isOn ? "OFF" : "ON"; btn.style.background = isOn ? "var(--red)" : "var(--green)"; } }
+function loadCategoryFilter(services) { const dd = document.getElementById("filterCategory"); const unique = [...new Map(services.map(s=>[s.category_id,s])).values()]; dd.innerHTML = `<option value="">All</option>`; unique.forEach(s => { dd.innerHTML += `<option value="${s.category_id}">${s.category_name}</option>`; }); }
+function filterServiceList() { const cat = document.getElementById("filterCategory").value; const id = document.getElementById("searchServiceId").value.toLowerCase(); const name = document.getElementById("searchServiceName").value.toLowerCase(); renderServiceList(allServices.filter(s => (!cat || s.category_id == cat) && String(s.id).includes(id) && s.name.toLowerCase().includes(name))); }
+function handleServiceType() { const type = document.getElementById("serviceType").value; const ps = document.getElementById("priceSelect"); if (type==="unit") { ps.value=""; ps.disabled=true; document.getElementById("pricePreview").value="Based on unit balance"; } else { ps.disabled=false; } }
+function handlePriceSelect() { const p = document.getElementById("priceSelect").value; if (p) document.getElementById("pricePreview").value = `₹ ${p} onward/visit`; }
+
+// STAFF LIST
+let staffData = [];
+async function loadStaffList() { const res = await fetch(API + "/admin/staff"); staffData = await res.json(); renderStaffList(staffData); }
+function renderStaffList(data) { const body = document.getElementById("staffListBody"); body.innerHTML = ""; document.getElementById("totalStaffCount").innerText = `(${data.length})`; data.forEach((s,i) => { const tr = document.createElement("tr"); tr.innerHTML = `<td>${i+1}</td><td>${s.id}</td><td>${s.name||''}</td><td>${s.service_name||'-'}</td><td>${s.location||'-'}</td><td>${Array.isArray(s.pincodes)?s.pincodes.join(", "):(s.pin_code||'-')}</td><td><button onclick="viewStaff(${s.id})">View</button></td><td><button onclick="removeStaff(${s.id})" style="background:#fee2e2;color:var(--red);border:1.5px solid #fecaca;">✕</button></td>`; body.appendChild(tr); }); }
+function filterStaff() { const id=document.getElementById("searchStaffId").value.toLowerCase(), name=document.getElementById("searchStaffName").value.toLowerCase(), pin=document.getElementById("searchStaffPin").value.toLowerCase(); renderStaffList(staffData.filter(s => (s.id+"").includes(id) && (s.name||"").toLowerCase().includes(name) && (Array.isArray(s.pincodes)?s.pincodes.join(",").includes(pin):(s.pin_code||"").includes(pin)))); }
+async function viewStaff(id) {
+    try {
+        const res = await fetch(API + "/admin/staff/" + id); const s = await res.json(); if (!s) return alert("Staff not found");
+        let services = []; if (Array.isArray(s.service_names)) services = s.service_names; else if (typeof s.service_names==="string") services = s.service_names.replace(/[{}]/g,"").split(",").map(x=>x.trim());
+        const pinDisplay = Array.isArray(s.pincodes) ? s.pincodes.join(", ") : (s.pin_code||'');
+        const w = window.open("","_blank");
+        w.document.write(`<html><head><title>Staff Profile</title><style>body{font-family:Arial;padding:20px}img{max-width:150px;margin:10px 0;border-radius:8px}.box{border:1px solid #ccc;padding:15px;margin-bottom:10px}</style></head><body><h2>Staff Profile</h2><div class="box"><p><b>ID:</b> ${s.id}</p><p><b>Name:</b> ${s.name||''}</p><p><b>Mobile:</b> ${s.mobile||''}</p><p><b>Email:</b> ${s.email||''}</p><p><b>Qualification:</b> ${s.qualification||''}</p></div><div class="box"><p><b>Services:</b> ${services.join(", ")}</p><p><b>Experience:</b> ${s.experience||'-'}</p><p><b>Address:</b> ${s.address||'-'}</p><p><b>Pincode:</b> ${pinDisplay}</p></div><div class="box"><p><b>ID Proof:</b> ${s.id_proof||''} — ${s.id_proof_no||''}</p></div><div class="box"><h3>Images</h3>${s.profile_image?`<div><b>Profile:</b><br><img src="${s.profile_image}"></div>`:""} ${s.id_image?`<div><b>ID Proof:</b><br><img src="${s.id_image}"></div>`:""}</div><div class="box"><h3>Change History</h3><table border="1" width="100%"><tr><th>Date</th><th>Time</th><th>Old</th><th>New</th></tr><tbody id="changeHistory"></tbody></table></div><button onclick="window.print()">Print / Save PDF</button></body></html>`);
+        fetch(API + "/admin/staff-changes/" + id).then(r=>r.json()).then(data => { const tbody = w.document.getElementById("changeHistory"); data.forEach(c => { const d = new Date(c.changed_at); tbody.innerHTML += `<tr><td>${d.toLocaleDateString()}</td><td>${d.toLocaleTimeString()}</td><td>${c.old_value}</td><td>${c.field}: ${c.new_value}</td></tr>`; }); });
+    } catch { alert("Error loading profile"); }
+}
+async function removeStaff(id) { if (!confirm("Remove staff?")) return; await fetch(API + "/admin/remove-staff/" + id, { method:"DELETE", headers:{"Authorization":"Bearer "+TOKEN} }); loadStaffList(); }
+
+// CUSTOMER LIST
+let customerData = [];
+async function loadCustomerList() { const res = await fetch(API + "/admin/customers"); customerData = await res.json(); renderCustomerList(customerData); }
+function renderCustomerList(data) { const body = document.getElementById("customerListBody"); body.innerHTML = ""; document.getElementById("totalCustomerCount").innerText = `(${data.length})`; data.forEach((c,i) => { const tr = document.createElement("tr"); tr.innerHTML = `<td>${i+1}</td><td>${c.id}</td><td>${c.name||''}</td><td>${c.mobile||''}</td><td>${c.location||'-'}</td><td>${c.pin_code||'-'}</td><td><button onclick="viewCustomer(${c.id})">View</button></td><td><button onclick="removeCustomer(${c.id})" style="background:#fee2e2;color:var(--red);border:1.5px solid #fecaca;">✕</button></td>`; body.appendChild(tr); }); }
+function filterCustomer() { const id=document.getElementById("searchCustomerId").value.toLowerCase(), name=document.getElementById("searchCustomerName").value.toLowerCase(), pin=document.getElementById("searchCustomerPin").value.toLowerCase(); renderCustomerList(customerData.filter(c => (c.id+"").includes(id) && (c.name||"").toLowerCase().includes(name) && (c.pin_code||"").includes(pin))); }
+function viewCustomer(id) { const c = customerData.find(x=>x.id==id); if (!c) return; const w = window.open("","_blank"); w.document.write(`<h2>Customer Details</h2><p>ID: ${c.id}</p><p>Name: ${c.name||''}</p><p>Mobile: ${c.mobile||''}</p><p>Location: ${c.location||''}</p><p>Pin: ${c.pin_code||''}</p><button onclick="window.print()">Print</button>`); }
+async function removeCustomer(id) { if (!confirm("Remove customer?")) return; await fetch(API + "/admin/remove-customer/" + id, { method:"DELETE", headers:{"Authorization":"Bearer "+TOKEN} }); loadCustomerList(); }
+
+// PAYMENT
+let paymentDataMain = [];
+async function loadPaymentList() { const res = await fetch(API + "/admin/payments"); paymentDataMain = await res.json(); renderPaymentList(paymentDataMain); }
+function renderPaymentList(data) {
+    const body = document.getElementById("paymentListBody"); body.innerHTML = ""; let total = 0;
+    data.forEach((p,i) => { total += (p.amount||0); body.innerHTML += `<tr><td>${i+1}</td><td>${new Date(p.created_at).toLocaleDateString()}</td><td>${p.staff_id}</td><td>${p.staff_name}</td><td>${p.service_name||'-'}</td><td>${p.pin_code||'-'}</td><td>${p.purchased_unit||0}</td><td>₹ ${p.amount||0}</td><td>${p.remaining_unit||0}</td><td><button onclick="viewPayment(${p.id})">View</button></td></tr>`; });
+    document.getElementById("totalPaymentCount").innerText = `(Total: ₹${total})`;
+}
+function filterPayment() { const name=document.getElementById("searchPaymentStaff").value.toLowerCase(), pin=document.getElementById("searchPaymentPin").value.toLowerCase(), date=document.getElementById("searchPaymentDate").value; renderPaymentList(paymentDataMain.filter(p => (p.staff_name||"").toLowerCase().includes(name) && (p.pin_code||"").includes(pin) && (!date || new Date(p.created_at).toISOString().split("T")[0]===date))); }
+function viewPayment(id) { const p = paymentDataMain.find(x=>x.id==id); if (!p) return; const w=window.open("","_blank"); w.document.write(`<h2>Payment Details</h2><p>Staff ID: ${p.staff_id}</p><p>Name: ${p.staff_name||''}</p><p>Amount: ₹${p.amount||0}</p><p>Date: ${new Date(p.created_at).toLocaleString()}</p><button onclick="window.print()">Print</button>`); }
+function togglePaymentHistory() { const box = document.getElementById("paymentHistoryBox"); if (box) box.style.display = box.style.display==="none" ? "block" : "none"; }
+async function loadPaymentDetails() {
+    try { const res = await fetch(API + "/admin/payment-history"); const data = await res.json(); const body = document.getElementById("paymentDetailsBody"); body.innerHTML = "";
+    data.forEach((p,i) => { const statusOk = !!p.payment_type && p.service_status !== "stopped"; body.innerHTML += `<tr><td><span class="statusDot ${statusOk?'green':'red'}"></span></td><td>${i+1}</td><td>${new Date(p.created_at).toLocaleDateString()}</td><td>${p.staff_id}</td><td>${p.staff_name}</td><td>${p.service_charges||0}</td><td>${p.material_charges||0}</td><td>${p.total_amount||0}</td><td>${p.staff_amount||0}</td><td>${p.vinsuu_amount||0}</td><td>${p.payment_type||'-'}</td><td>${p.pending_fee||0}</td><td>${Number(p.wallet_amount||0).toFixed(2)}</td><td><button onclick="viewInvoice(${p.request_id})">Invoice</button></td><td><button style="background:var(--red);color:white;margin-right:4px;">OFF</button><button style="background:var(--green);color:white;">ON</button></td></tr>`; }); } catch {}
+}
+function viewInvoice(id) { window.open("/invoice.html?id=" + id, "_blank"); }
+function uploadQRCode() { const file = document.getElementById("qrFile").files[0]; if (!file) return alert("Select QR image"); const reader = new FileReader(); reader.onload = e => { document.getElementById("qrPreview").src = e.target.result; }; reader.readAsDataURL(file); }
+function editQRCode() { document.getElementById("qrFile").click(); }
+async function saveQRCode() { const file = document.getElementById("qrFile").files[0]; if (!file) return alert("Select QR Code"); const fd = new FormData(); fd.append("qr", file); const res = await fetch(API + "/admin/upload-qr", { method:"POST", body:fd }); const data = await res.json(); if (data.success) { alert("QR Code Saved"); loadSavedQR(); } }
+async function loadSavedQR() { try { const res = await fetch(API + "/admin/get-qr"); const data = await res.json(); if (data.success) document.getElementById("qrPreview").src = data.path + "?t=" + Date.now(); } catch {} }
+async function loadWalletRequests() {
+    try { const res = await fetch(API + "/admin/wallet-requests"); const data = await res.json(); const body = document.getElementById("walletPaymentBody"); body.innerHTML = "";
+    data.forEach((w,i) => { body.innerHTML += `<tr><td>🟡</td><td>${i+1}</td><td>${new Date(w.created_at).toLocaleDateString()}</td><td>${w.staff_id}</td><td>${w.staff_name}</td><td>₹ ${Number(w.wallet_balance).toFixed(2)}</td><td>₹ ${Number(w.withdraw_amount).toFixed(2)}</td><td><input type="number" class="depositInput" placeholder="Enter amount" style="width:100px;margin-right:6px;"><button onclick="processDeposit(this, ${w.staff_id}, ${w.id})">DONE</button></td><td>${w.status==="completed"?`<span style="color:var(--green);">🟢 completed</span>`:`<span style="color:var(--orange);">🟡 pending</span>`}</td><td><button onclick="viewWallet(${w.staff_id})">View</button></td></tr>`; }); } catch {}
+}
+async function processDeposit(btn, staffId, requestId) {
+    const row = btn.closest("tr"); const depositAmount = Number(row.querySelector(".depositInput").value);
+    if (!depositAmount || depositAmount<=0) return alert("Enter valid amount");
+    try { const res = await fetch(API + "/admin/wallet-deduct", { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({ staff_id:Number(staffId), amount:depositAmount, request_id:requestId }) }); const data = JSON.parse(await res.text()); if (!data.success) return alert("Failed"); row.children[5].innerText = "₹ " + Number(data.wallet).toFixed(2); row.children[8].innerHTML = `<span style="color:var(--green);">🟢 completed</span>`; btn.innerText = "DONE"; btn.disabled = true; alert("Payment Completed"); loadPaymentDetails(); } catch { alert("Server error"); }
+}
+function viewWallet(staffId) { window.open("account-details.html?staff_id=" + staffId, "_blank"); }
+
+// IMAGE UPLOAD
+document.addEventListener("DOMContentLoaded", () => {
+    const dropArea = document.getElementById("dropArea"), fileInput = document.getElementById("imageFiles"), previewBox = document.getElementById("previewBox");
+    if (!dropArea || !fileInput) return;
+    dropArea.onclick = () => fileInput.click();
+    fileInput.addEventListener("change", previewImages);
+    dropArea.addEventListener("dragover", e => { e.preventDefault(); dropArea.style.background = "var(--primary-light)"; });
+    dropArea.addEventListener("dragleave", () => { dropArea.style.background = "var(--light-bg)"; });
+    dropArea.addEventListener("drop", e => { e.preventDefault(); fileInput.files = e.dataTransfer.files; previewImages(); });
+    function previewImages() { previewBox.innerHTML = ""; [...fileInput.files].forEach(file => { const img = document.createElement("img"); img.src = URL.createObjectURL(file); img.style.cssText = "width:90px;height:70px;object-fit:cover;border-radius:8px;border:1.5px solid var(--border);"; previewBox.appendChild(img); }); }
+});
+async function uploadMultipleImages() { const files = document.getElementById("imageFiles").files; const type = document.getElementById("imageCategory").value; const link = document.getElementById("imageLink").value; if (!files.length) return alert("Select images"); const fd = new FormData(); [...files].forEach(f => fd.append("images", f)); fd.append("type", type); fd.append("link", link); const res = await fetch(API + "/admin/upload-multiple", { method:"POST", body:fd }); const data = await res.json(); if (data.success) { alert("Uploaded"); document.getElementById("previewBox").innerHTML = ""; loadImages(); } }
+async function loadImages() { const type = document.getElementById("imageCategory").value; const res = await fetch(API + "/admin/images/" + type); const data = await res.json(); const box = document.getElementById("imageList"); box.innerHTML = ""; data.forEach(img => { box.innerHTML += `<div style="width:180px;margin:8px;border:1.5px solid var(--border);padding:10px;border-radius:12px;display:inline-block;vertical-align:top;"><a href="${img.link||'#'}" target="_blank"><img src="http://localhost:5000${img.path}" style="width:100%;height:100px;object-fit:cover;border-radius:8px;"></a><p style="font-size:11px;word-break:break-all;margin:6px 0;">${img.link||"No link"}</p><button onclick="deleteImage(${img.id})" style="background:#fee2e2;color:var(--red);border:1.5px solid #fecaca;width:100%;">Delete</button></div>`; }); }
+async function deleteImage(id) { await fetch(API + "/admin/image/" + id, { method:"DELETE" }); loadImages(); }
+
+// CONTENT MANAGEMENT
+function loadContentPage(sectionId, title) {
+    const box = document.getElementById(sectionId);
+    box.innerHTML = `<div class="sectionHeader"><div class="sectionTitle">Edit ${title}</div></div><div class="box"><label style="font-size:12px;font-weight:700;display:block;margin-bottom:4px;">Title</label><input id="${sectionId}_title" value="${title}" style="width:100%;margin-bottom:14px;"><label style="font-size:12px;font-weight:700;display:block;margin-bottom:6px;">Content</label><div id="${sectionId}_editor" style="height:260px;border-radius:10px;"></div><br><button onclick="saveContent('${sectionId}')">Save Changes</button></div>`;
+    window[sectionId + "_quill"] = new Quill(`#${sectionId}_editor`, { theme:"snow", modules:{ toolbar:[[{ header:[1,2,3,false] }],['bold','italic','underline'],[{ color:[] },{ background:[] }],[{ list:'ordered' },{ list:'bullet' }],[{ align:[] }],['clean']] } });
+}
+async function saveContent(type) { const title = document.getElementById(type+"_title").value; const content = window[type+"_quill"].root.innerHTML; await fetch(API + "/admin/content", { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({ type, title, content }) }); alert("Saved successfully"); }
+async function loadContentData(type) { const res = await fetch(API + "/admin/content/" + type); const data = await res.json(); document.getElementById(type+"_title").value = data.title || ""; if (window[type+"_quill"]) window[type+"_quill"].root.innerHTML = data.content || ""; }
+
+// UNIT RATES
+let unitData = [];
+async function addUnit() { const unit=document.getElementById("unitInput").value, amount=document.getElementById("amountInput").value; if (!unit||!amount) return alert("Enter unit and amount"); const res = await fetch(API + "/admin/unit/add", { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({ unit:Number(unit), amount:Number(amount) }) }); const data = await res.json(); if (data.error) return alert(data.error); document.getElementById("unitInput").value = ""; document.getElementById("amountInput").value = ""; loadUnitRates(); }
+async function loadUnitRates() {
+    const body = document.getElementById("unitRateBody"); body.innerHTML = "";
+    try { const res = await fetch(API + "/staff/unit/all"); const data = await res.json(); if (!Array.isArray(data)) { body.innerHTML = "<tr><td colspan='4'>Error loading data</td></tr>"; return; } if (!data.length) { body.innerHTML = "<tr><td colspan='4'>No data</td></tr>"; return; } data.forEach(u => { body.innerHTML += `<tr><td>${u.unit} ⭐</td><td>₹ ${u.amount}</td><td><button onclick="editUnit(${u.id},${u.unit},${u.amount})">Edit</button></td><td><button onclick="deleteUnit(${u.id})" style="background:#fee2e2;color:var(--red);border:1.5px solid #fecaca;">Delete</button></td></tr>`; }); } catch {}
+}
+async function editUnit(id,oldUnit,oldAmount) { const unit=prompt("Edit Unit:",oldUnit), amount=prompt("Edit Amount:",oldAmount); if (!unit||!amount) return; await fetch(API + "/admin/unit/update/" + id, { method:"PUT", headers:{"Content-Type":"application/json"}, body:JSON.stringify({ unit:Number(unit), amount:Number(amount) }) }); loadUnitRates(); }
+async function deleteUnit(id) { if (!confirm("Delete this unit?")) return; await fetch(API + "/admin/unit/delete/" + id, { method:"DELETE" }); loadUnitRates(); }
+
+// ACCOUNT DETAILS
+async function loadAccountDetails() { const res = await fetch(API + "/admin/account-details"); const acc = await res.json(); ["accName","accNumber","accIFSC","accBranch","accUPI"].forEach(k => { const el=document.getElementById(k); if (el) el.value = acc[k.replace("acc","").toLowerCase()] || ""; }); }
+async function saveAccountDetails() { const data = { name:document.getElementById("accName").value, number:document.getElementById("accNumber").value, ifsc:document.getElementById("accIFSC").value, branch:document.getElementById("accBranch").value, upi:document.getElementById("accUPI").value }; await fetch(API + "/admin/account-details", { method:"POST", headers:{"Content-Type":"application/json","Authorization":"Bearer "+TOKEN}, body:JSON.stringify(data) }); alert("Account details saved"); }
+
+// MESSAGES
+async function loadMessages() { try { const res = await fetch(API + "/admin/messages"); const data = await res.json(); const tbody = document.getElementById("messageListBody"); if (!tbody) return; tbody.innerHTML = ""; if (!data||!data.length) { tbody.innerHTML = "<tr><td colspan='7'>No messages</td></tr>"; return; } data.forEach((m,i) => { tbody.innerHTML += `<tr><td>${i+1}</td><td>${new Date(m.created_at).toLocaleDateString()}</td><td>${m.name||'-'}</td><td>${m.mobile||'-'}</td><td>${m.email||'-'}</td><td>${m.pin_code||'-'}</td><td><button onclick="viewMessage(${m.id})">View</button></td></tr>`; }); } catch {} }
+function viewMessage(id) { fetch(API + "/admin/messages").then(r=>r.json()).then(data => { const m = data.find(x=>x.id===id); if (!m) return; alert(`Name: ${m.name}\nMobile: ${m.mobile||'-'}\nEmail: ${m.email||'-'}\nPin Code: ${m.pin_code||'-'}\n\nMessage:\n${m.message}`); }); }
+async function savePhone() { const phone = document.getElementById("contactPhone").value; await fetch(API + "/admin/contact-phone", { method:"POST", headers:{"Content-Type":"application/json","Authorization":"Bearer "+TOKEN}, body:JSON.stringify({ phone }) }); alert("Contact phone updated"); }
+
+// SERVICE UPDATES
+let serviceRequests = [], currentTab = "pending";
+async function loadServiceUpdates() {
+    try { const res = await fetch(API + "/admin/service-requests"); if (!res.ok) { serviceRequests=[]; return; } let text = await res.text(); try { serviceRequests = JSON.parse(text); } catch { serviceRequests=[]; return; } serviceRequests.sort((a,b)=>new Date(b.created_at)-new Date(a.created_at)); renderServiceUpdates(); updateServiceCounts(); } catch {}
+}
+function showServiceTab(tab, btn) { currentTab=tab; document.querySelectorAll(".serviceTabBtn").forEach(b => b.classList.remove("activeTab","pending","accepted","confirmation","completed","cancel","all","process")); if (btn) btn.classList.add("activeTab", tab); filterService(); }
+function renderServiceUpdates() {
+    const body = document.getElementById("serviceUpdateBody"); body.innerHTML = "";
+    let filtered = currentTab === "all" ? serviceRequests : serviceRequests.filter(s => currentTab==="process" ? (s.status==="process"||s.status==="confirmation") : s.status===currentTab);
+    filtered.forEach((s,i) => { body.innerHTML += `<tr><td>${i+1}</td><td>${new Date(s.created_at).toLocaleDateString()}</td><td>${s.customer_id||''}</td><td>${s.customer_name||''}</td>${s.status!=="pending"?`<td>${s.staff_id||''}</td><td>${s.staff_name||''}</td>`:`<td></td><td></td>`}<td>${s.mobile||''}</td><td>${s.location||''}</td><td>${s.pin_code||''}</td><td><button onclick="viewService(${s.id})">View</button></td><td><button style="background:#fee2e2;color:var(--red);border:1.5px solid #fecaca;">✕</button></td></tr>`; });
+}
+function filterService() { const pin=document.getElementById("searchServicePin").value.toLowerCase(), cid=document.getElementById("searchServiceCustomerId").value.toLowerCase(), sid=document.getElementById("searchServiceStaffId").value.toLowerCase(); let filtered = currentTab==="all" ? serviceRequests : serviceRequests.filter(s=>s.status===currentTab); filtered = filtered.filter(s => (!pin||(s.pin_code||"").toString().includes(pin)) && (!cid||(s.customer_id||"").toString().includes(cid)) && (!sid||((s.staff_id&&s.staff_id.toString().includes(sid))||currentTab==="pending"))); const body=document.getElementById("serviceUpdateBody"); body.innerHTML=""; filtered.forEach((s,i)=>{ body.innerHTML+=`<tr><td>${i+1}</td><td>${new Date(s.created_at).toLocaleDateString()}</td><td>${s.customer_id||''}</td><td>${s.customer_name||''}</td>${s.status!=="pending"?`<td>${s.staff_id||''}</td><td>${s.staff_name||''}</td>`:`<td></td><td></td>`}<td>${s.mobile||''}</td><td>${s.location||''}</td><td>${s.pin_code||''}</td><td><button onclick="viewService(${s.id})">View</button></td><td><button style="background:#fee2e2;color:var(--red);border:1.5px solid #fecaca;">✕</button></td></tr>`; }); }
+function timeAgo(date) { const s=Math.floor((new Date()-new Date(date))/1000); if(s<60)return"Just now"; if(s<3600)return Math.floor(s/60)+" min ago"; if(s<86400)return Math.floor(s/3600)+" hr ago"; return Math.floor(s/86400)+" days ago"; }
+function viewService(id) {
+    const s = serviceRequests.find(x=>x.id==id); if (!s) return;
+    const w = window.open("","_blank");
+    w.document.write(`<html><head><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Service Details</title><style>body{font-family:Arial;margin:0;padding:15px;background:#f5f5f5;}.card{background:#fff;border-radius:15px;padding:15px;max-width:700px;margin:auto;box-shadow:0 2px 10px rgba(0,0,0,0.1);position:relative;}.time{position:absolute;right:15px;top:10px;font-size:12px;color:#666;}h2{margin-top:0;font-size:20px;}.row{margin:8px 0;font-size:14px;}.label{font-weight:bold;}hr{margin:15px 0;}button{padding:10px;border:none;border-radius:8px;background:#2b52e0;color:white;cursor:pointer;width:100%;}</style></head><body><div class="card"><div class="time">${timeAgo(s.created_at)}</div><h2>Service Details</h2><div class="row"><span class="label">Service No:</span> ${s.id}</div><div class="row"><span class="label">Service Name:</span> ${s.service_name||s.name||"-"}</div><div class="row"><span class="label">Price:</span> ${s.price||s.service_price||"-"}</div><div class="row"><span class="label">Location:</span> ${s.location||'-'}</div><div class="row"><span class="label">Pin Code:</span> ${s.pin_code||s.pincode||"-"}</div><div class="row"><span class="label">Details:</span> ${s.details||'-'}</div>${s.status==="cancel"?`<hr><div style="padding:10px;background:#fee2e2;border-radius:8px;"><h3 style="color:#b91c1c;">Cancellation Details</h3><div class="row"><span class="label">Cancelled By:</span> ${s.cancelled_by||"-"}</div><div class="row"><span class="label">Remark:</span> ${s.cancel_remark||"-"}</div></div>`:""}${s.status!=="pending"?`<hr><h3>Staff Details</h3><div class="row"><span class="label">Staff ID:</span> ${s.staff_id}</div><div class="row"><span class="label">Staff Name:</span> ${s.staff_name}</div><div class="row"><span class="label">Mobile:</span> ${s.staff_mobile||'-'}</div>`:""} ${s.status==="completed"?`<hr><div class="row"><span class="label">Payment:</span> Paid</div><button onclick="window.open('/invoice.html?id=${s.id}')">View Invoice</button>`:"</div>"}</body></html>`);
+}
+function updateServiceCounts() { const counts={pending:0,accepted:0,confirmation:0,completed:0,cancel:0,all:serviceRequests.length}; serviceRequests.forEach(s => { if (counts[s.status]!==undefined) counts[s.status]++; }); document.querySelectorAll(".serviceTabBtn").forEach(btn => { const tab=btn.innerText.replace(/\s*\(\d+\)/,"").toLowerCase(); let key=tab==="total"?"all":tab; if (counts[key]!==undefined) btn.innerHTML = `${tab.charAt(0).toUpperCase()+tab.slice(1)} (${counts[key]})`; }); }
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+<audio id="notifSound" src="https://www.soundjay.com/buttons/sounds/button-3.mp3"></audio>
+</body>
+</html>
