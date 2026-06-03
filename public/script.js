@@ -249,7 +249,7 @@ console.log("RESULT COUNT:", filtered.length);
 
                 const desktopHTML = data.map(s => `
                     <div class="popularCard">
-                       <img src="${window.location.origin}${s.image}" alt="${s.name}">
+                       <img src="${s.image?.startsWith("http")? s.image: window.location.origin + s.image}" alt="${s.name}">
                         <h4>${s.name}</h4>
                         <div class="rating">⭐ 4.8</div>
                         <div class="price">Starting ₹${s.price || 199}</div>
@@ -259,7 +259,7 @@ console.log("RESULT COUNT:", filtered.length);
 
                 const mobileHTML = data.map(s => `
                     <div class="mobilePopularItem">
-                        <img src="${window.location.origin}${s.image}" alt="${s.name}">
+                        <img src="${ s.image?.startsWith("http")? s.image: window.location.origin + s.image}" alt="${s.name}">
                         <h4>${s.name}</h4>
                         <div class="mRating">⭐ 4.8</div>
                         <div class="mPrice">₹${s.price || 199}</div>
@@ -288,14 +288,15 @@ console.log("RESULT COUNT:", filtered.length);
 
                 const desktopHTML = categories.map(cat => `
                     <div class="category-box" onclick="openCategory(${cat.id})">
-                       <img src="${window.location.origin}${cat.image}" alt="${cat.name}">
+                       <img src="${ cat.image?.startsWith("http")? cat.image: window.location.origin + cat.image}" alt="${cat.name}">
                         <h4>${cat.name}</h4>
                     </div>
                 `).join('');
 
                 const mobileHTML = categories.map(cat => `
                     <div class="mobileCatBox" onclick="openCategory(${cat.id})">
-                       <img src="${window.location.origin}${cat.image}" alt="${cat.name}">
+                      <img src="${ cat.image?.startsWith("http") ? cat.image : window.location.origin + cat.image
+}" alt="${cat.name}">
                         <h4>${cat.name}</h4>
                     </div>
                 `).join('');

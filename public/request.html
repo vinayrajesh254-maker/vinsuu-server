@@ -498,15 +498,17 @@
 
         // Image
         document.getElementById("serviceImageBox").innerHTML = `
-            <img src="${serviceData.image.startsWith('http')? serviceData.image: window.location.origin + serviceData.image}">
-                 style="width:120px;height:120px;object-fit:contain;border-radius:16px;margin-bottom:0;">`;
+    <img src="${serviceData.image.startsWith('http')? serviceData.image: window.location.origin + serviceData.image}"
+    style="width:120px;height:120px;object-fit:contain;border-radius:16px;margin-bottom:0;">`;
 
         document.getElementById("categoryName").value = serviceData.name;
-        document.getElementById("heading").value      = serviceData.name;
+        document.getElementById("heading").value = "";
+document.getElementById("heading").placeholder =
+    "Service Heading";
 
-        let details = [];
-        try { details = JSON.parse(serviceData.details); } catch {}
-        document.getElementById("details").value = details.join(", ");
+        document.getElementById("details").value = "";
+document.getElementById("details").placeholder =
+    "Describe your service requirements...";
 
         // Price
         const priceBox = document.getElementById("servicePriceBox");
