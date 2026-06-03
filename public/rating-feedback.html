@@ -577,7 +577,7 @@
     </div><!-- /pageWrap -->
 
 <script>
-const API   = "http://localhost:5000/api";
+const API = window.location.origin + "/api";
 const token = localStorage.getItem("staffToken");
 
 let selectedRating       = 0;

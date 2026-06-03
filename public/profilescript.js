@@ -1,4 +1,4 @@
-const API = "http://localhost:5000/api";
+const API = window.location.origin + "/api";
 let token = localStorage.getItem("customerToken");
 let isTyping = false;
 let sectionState = {};
@@ -20,7 +20,7 @@ async function loadProfile() {
         <div class="profileTopRow">
             <div class="profileTopLeft">
                 <div class="profileAvatar">
-                    ${user.image ? `<img src="http://localhost:5000${user.image}?t=${Date.now()}">` : "📞"}
+                    ${user.image ? `<img src="${window.location.origin}${user.image}?t=${Date.now()}">` : "📞"}
                 </div>
                 <div>
                     <div class="profileName">
@@ -69,7 +69,7 @@ async function fillFullProfile() {
     document.getElementById("full_mobile").value  = user.mobile  || "";
     document.getElementById("full_email").value   = user.email   || "";
     document.getElementById("full_address").value = user.address || "";
-    document.getElementById("full_image").src = user.image ? "http://localhost:5000" + user.image : "https://via.placeholder.com/120";
+    document.getElementById("full_image").src = user.image? window.location.origin + user.image: "https://via.placeholder.com/120";
     disableFull();
 }
 async function toggleEditFull() {
@@ -364,7 +364,7 @@ async function submitReview(id) {
 }
 async function loadStaffRating(staffId, reqId) {
     try {
-        const res  = await fetch("http://localhost:5000/api/staff/rating/" + staffId);
+        const res = await fetch(API + "/staff/rating/" + staffId);
         if (!res.ok) return;
         const data = await res.json();
         const avg  = Number(data.avg || 0), count = Number(data.count || 0);

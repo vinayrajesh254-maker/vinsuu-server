@@ -597,7 +597,7 @@
     </style>
 
     <script>
-        const API = "http://localhost:5000/api";
+        const API = window.location.origin + "/api";
         let categoryId = null;
         let categoryName = "Services";
 
@@ -660,7 +660,7 @@
      src="${
         cat.image?.startsWith('http')
         ? cat.image
-        : 'http://localhost:5000' + (cat.image || '')
+        : window.location.origin + (cat.image || '')
      }"
      alt="${cat.name}"
      onerror="this.src='https://cdn-icons-png.flaticon.com/512/1246/1246640.png'">
@@ -727,7 +727,7 @@
      src="${
         service.image?.startsWith('http')
         ? service.image
-        : 'http://localhost:5000' + service.image
+        : window.location.origin + service.image
      }"
      alt="${service.name}"
                              onerror="this.src='https://via.placeholder.com/300x150?text=Service'">

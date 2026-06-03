@@ -1,4 +1,4 @@
-     const API = "http://localhost:5000/api";
+     const API = window.location.origin + "/api";
         let token = localStorage.getItem("staffToken");
         let lastRequestCount = 0;
         let openedFormId = null;
@@ -19,7 +19,7 @@
 
         function connectSocket() {
             try {
-                socket = io("http://localhost:5000");
+                socket = io(window.location.origin);
                 console.log("Socket connected");
                 socket.on("new_request", () => { loadRequests(); });
             } catch (err) { console.log("Socket error:", err); }
@@ -46,7 +46,7 @@
                         ? user.profile_image
                         : user.profile_image.startsWith('data:')
                             ? user.profile_image
-                            : 'http://localhost:5000' + user.profile_image
+                            : window.location.origin + user.profile_image
                     }?t=${Date.now()}">`
                     : firstLetter
                 }

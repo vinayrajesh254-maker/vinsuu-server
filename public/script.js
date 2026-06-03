@@ -1,5 +1,5 @@
   let allServices = [];
-        const API = "http://localhost:5000/api";
+        const API = window.location.origin + "/api";
 
         document.addEventListener("DOMContentLoaded", () => {
             loadLogo();
@@ -140,7 +140,7 @@ console.log("RESULT COUNT:", filtered.length);
                 const data = await res.json();
                 document.querySelectorAll(".logoBox").forEach(box => {
                     if (data.length) {
-                        box.innerHTML = `<img src="http://localhost:5000${data[0].path}" style="height:36px;object-fit:contain;">`;
+                       box.innerHTML = `<img src="${window.location.origin}${data[0].path}" style="height:36px;object-fit:contain;">`;
                     } else {
                         box.innerHTML = `<div class="logo-icon">🏠</div> VINSUU`;
                     }
@@ -228,7 +228,7 @@ console.log("RESULT COUNT:", filtered.length);
             try {
                 const res = await fetch(API + "/admin/images/homepage");
                 const data = await res.json();
-                if (data.length) document.querySelectorAll(".whyImg").forEach(el => el.src = "http://localhost:5000" + data[0].path);
+                if (data.length) document.querySelectorAll(".whyImg").forEach(el => el.src = window.location.origin + data[0].path);
             } catch { }
         }
 
@@ -249,7 +249,7 @@ console.log("RESULT COUNT:", filtered.length);
 
                 const desktopHTML = data.map(s => `
                     <div class="popularCard">
-                        <img src="http://localhost:5000${s.image}" alt="${s.name}">
+                       <img src="${window.location.origin}${s.image}" alt="${s.name}">
                         <h4>${s.name}</h4>
                         <div class="rating">⭐ 4.8</div>
                         <div class="price">Starting ₹${s.price || 199}</div>
@@ -259,7 +259,7 @@ console.log("RESULT COUNT:", filtered.length);
 
                 const mobileHTML = data.map(s => `
                     <div class="mobilePopularItem">
-                        <img src="http://localhost:5000${s.image}" alt="${s.name}">
+                        <img src="${window.location.origin}${s.image}" alt="${s.name}">
                         <h4>${s.name}</h4>
                         <div class="mRating">⭐ 4.8</div>
                         <div class="mPrice">₹${s.price || 199}</div>
@@ -288,14 +288,14 @@ console.log("RESULT COUNT:", filtered.length);
 
                 const desktopHTML = categories.map(cat => `
                     <div class="category-box" onclick="openCategory(${cat.id})">
-                        <img src="http://localhost:5000${cat.image}" alt="${cat.name}">
+                       <img src="${window.location.origin}${cat.image}" alt="${cat.name}">
                         <h4>${cat.name}</h4>
                     </div>
                 `).join('');
 
                 const mobileHTML = categories.map(cat => `
                     <div class="mobileCatBox" onclick="openCategory(${cat.id})">
-                        <img src="http://localhost:5000${cat.image}" alt="${cat.name}">
+                       <img src="${window.location.origin}${cat.image}" alt="${cat.name}">
                         <h4>${cat.name}</h4>
                     </div>
                 `).join('');
@@ -387,7 +387,7 @@ console.log("RESULT COUNT:", filtered.length);
                     return;
                 }
 
-                const res = await fetch("http://localhost:5000/api/admin/contact", {
+                const res = await fetch(API + "/admin/contact", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json"

@@ -1170,9 +1170,9 @@
 
     <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
     <script>
-        const API = "http://localhost:5000/api";
+        const API = window.location.origin + "/api";
         const token = localStorage.getItem("staffToken");
-        const socket = io("http://localhost:5000");
+        const socket = io();
 
         const staffId = JSON.parse(atob(token.split(".")[1])).id;
         socket.emit("joinStaffRoom", staffId);
@@ -1335,7 +1335,7 @@
 
             const qrEl = document.getElementById("withdrawQR");
             if (data.qr) {
-                qrEl.src = "http://localhost:5000" + data.qr;
+                qrEl.src = window.location.origin + data.qr;
                 qrEl.style.display = "block";
             }
         }
@@ -1471,7 +1471,7 @@
                 payload.name.charAt(0).toUpperCase();
         } else {
             // fallback → fetch from API
-            fetch("http://localhost:5000/api/staff/profile", {
+            fetch(API + "/staff/profile", {
                 headers: { Authorization: "Bearer " + token }
             })
             .then(res => res.json())

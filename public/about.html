@@ -98,14 +98,18 @@ h1{
 </div>
 
 <script>
-const API = "http://localhost:5000/api";
+const API = window.location.origin + "/api";
 
 async function load(){
-    const res = await fetch(API + "/admin/content/aboutUs");
-    const data = await res.json();
+    try{
+        const res = await fetch(API + "/admin/content/aboutUs");
+        const data = await res.json();
 
-    document.getElementById("title").innerText = data.title || "About Us";
-    document.getElementById("content").innerHTML = data.content || "";
+        document.getElementById("title").innerText = data.title || "About Us";
+        document.getElementById("content").innerHTML = data.content || "";
+    }catch(err){
+        console.error("About Us load error:", err);
+    }
 }
 
 load();

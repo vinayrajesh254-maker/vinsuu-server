@@ -45,13 +45,13 @@ h1{
 
 <div class="container">
     <div class="box">
-        <h1 id="title">Loading...</h1>
+        <h1 id="title">Privacy Policy</h1>
         <div id="content" class="content"></div>
     </div>
 </div>
 
 <script>
-    const API = "http://localhost:5000/api";
+    window.location.origin + "/api"
 async function load(){
     const res = await fetch(API + "/admin/content/privacy");
     const data = await res.json();

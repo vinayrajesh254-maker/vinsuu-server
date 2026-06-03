@@ -953,8 +953,10 @@
         const params = new URLSearchParams(window.location.search);
         const isViewMode = params.get("mode") === "view";
 
-        const STAFF_API = "http://localhost:5000/api/staff";
-        const ADMIN_API = "http://localhost:5000/api/admin";
+        const API = window.location.origin + "/api";
+
+const STAFF_API = API + "/staff";
+const ADMIN_API = API + "/admin";
 
         let idImageBase64 = null;
         let profileImageBase64 = null;
@@ -1079,9 +1081,7 @@
 
                     try {
 
-                        const res = await fetch(
-                            `http://localhost:5000/api/geocode?lat=${lat}&lng=${lng}`
-                        );
+                        const res = await fetch(`${API}/geocode?lat=${lat}&lng=${lng}`);
 
                         const data = await res.json();
 
@@ -1172,7 +1172,7 @@
 
         async function sendOTP(mobile) {
             if (mobile.length !== 10) return alert("Enter valid mobile number");
-            const res = await fetch("http://localhost:5000/api/otp/send", {
+            const res = await fetch(API + "/otp/send", {
                 method: "POST", headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ mobile })
             });
@@ -1189,7 +1189,7 @@
             const otp = document.getElementById("otpInput").value;
             const sessionId = otpSessionId || localStorage.getItem("staffOtpSessionId");
             if (!sessionId) { alert("OTP session expired. Please resend OTP."); return; }
-            const res = await fetch("http://localhost:5000/api/otp/verify", {
+            const res = await fetch(API + "/otp/verify", {
                 method: "POST", headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ sessionId, otp })
             });
@@ -1258,7 +1258,7 @@
             const token = localStorage.getItem("staffToken");
             let user = {};
             try {
-                const res = await fetch("http://localhost:5000/api/staff/profile", { headers: { "Authorization": "Bearer " + token } });
+                const res = await fetch(STAFF_API + "/profile", { headers: { "Authorization": "Bearer " + token } });
                 console.log("PROFILE API DATA:", user);
                 if (res.ok) { user = await res.json(); console.log("PROFILE API DATA:", user); }
             } catch (err) { console.log("Profile fetch error:", err); }
@@ -1278,7 +1278,7 @@
             try { if (typeof loc === "string") loc = JSON.parse(loc); } catch { }
             if (loc?.lat && loc?.lng) {
                 selectedLat = loc.lat; selectedLng = loc.lng;
-                fetch(`http://localhost:5000/api/geocode?lat=${loc.lat}&lng=${loc.lng}`)
+                fetch(`${API}/geocode?lat=${lat}&lng=${lng}`)
                     .then(r => r.json())
                     .then(data => {
                         let address = data.plus_code?.compound_code || data.results?.[0]?.formatted_address || "";
@@ -1311,19 +1311,19 @@
 
             if (user.id_image) {
                 let src = user.id_image;
-                if (!src.startsWith("http") && !src.startsWith("data:")) src = "http://localhost:5000" + src;
+                if (!src.startsWith("http") && !src.startsWith("data:")) src = window.location.origin + src;
                 document.getElementById("idImage").src = src;
                 document.getElementById("idPreview").style.display = "block";
             }
             if (user.profile_image) {
                 let src = user.profile_image;
-                if (!src.startsWith("http") && !src.startsWith("data:")) src = "http://localhost:5000" + src;
+                if (!src.startsWith("http") && !src.startsWith("data:")) src = window.location.origin + src;
                 document.getElementById("photoImage").src = src;
                 document.getElementById("photoPreview").style.display = "block";
             }
             if (user.camera_image && user.camera_image !== "null") {
                 let src = user.camera_image;
-                if (!src.startsWith("http") && !src.startsWith("data:")) src = "http://localhost:5000" + src;
+                if (!src.startsWith("http") && !src.startsWith("data:")) src = src = window.location.origin + src;
                 const camImg = document.getElementById("cameraImage");
                 const camPrev = document.getElementById("cameraPreview");
                 if (camImg && camPrev) { camImg.src = src; camPrev.style.display = "block"; }

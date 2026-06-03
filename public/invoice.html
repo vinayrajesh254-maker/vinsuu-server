@@ -1017,7 +1017,7 @@
         </button>
     </div>
     <script>
-        const API = "http://localhost:5000/api";
+        const API = window.location.origin + "/api";
 
         const params = new URLSearchParams(window.location.search);
         const id = params.get("id");

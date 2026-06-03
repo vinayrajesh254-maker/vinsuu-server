@@ -625,8 +625,8 @@
     if (profileImage) {
         if      (profileImage.startsWith("http"))  document.getElementById("staffImage").src = profileImage + "?t=" + Date.now();
         else if (profileImage.startsWith("data:")) document.getElementById("staffImage").src = profileImage;
-        else                                       document.getElementById("staffImage").src = "http://localhost:5000" + profileImage + "?t=" + Date.now();
-    }
+       else
+    document.getElementById("staffImage").src = window.location.origin + profileImage + "?t=" + Date.now();}
 
     // ── ISSUE DATE ──
     const today = new Date();

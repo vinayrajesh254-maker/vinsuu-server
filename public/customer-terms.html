@@ -71,7 +71,7 @@ h1{
 
 <div class="container">
     <div class="box">
-        <h1 id="title">Loading...</h1>
+        <h1 id="title">Terms & condition for Customer</h1>
         <div id="content" class="content"></div>
     </div>
 </div>
@@ -91,7 +91,7 @@ h1{
         </button>
     </div>
 <script>
-const API = "http://localhost:5000/api";
+const API = window.location.origin + "/api";
 
 async function load(){
     const res = await fetch(API + "/admin/content/customerTerms");
@@ -99,6 +99,7 @@ async function load(){
 
     document.getElementById("title").innerText = data.title || "Terms for Customer";
     document.getElementById("content").innerHTML = data.content || "";
+    
 }
 load();
 </script>

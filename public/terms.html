@@ -52,7 +52,7 @@ h1{
 </div>
 
 <script>
-const API = "http://localhost:5000/api";
+const API = window.location.origin + "/api";
 
 async function load(){
     const res = await fetch(API + "/admin/content/terms");

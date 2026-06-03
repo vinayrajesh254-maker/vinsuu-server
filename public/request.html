@@ -460,7 +460,7 @@
         </button>
     </div>
 <script>
-    const API = "http://localhost:5000/api";
+    const API = window.location.origin + "/api";
     let serviceId   = null;
     let serviceData = null;
     let selectedLat = null;
@@ -498,7 +498,7 @@
 
         // Image
         document.getElementById("serviceImageBox").innerHTML = `
-            <img src="${serviceData.image.startsWith('http') ? serviceData.image : 'http://localhost:5000' + serviceData.image}"
+            <img src="${serviceData.image.startsWith('http')? serviceData.image: window.location.origin + serviceData.image}">
                  style="width:120px;height:120px;object-fit:contain;border-radius:16px;margin-bottom:0;">`;
 
         document.getElementById("categoryName").value = serviceData.name;
@@ -670,7 +670,7 @@
         const mobile = document.getElementById("mobile").value;
         if (mobile.length !== 10) { alert("Enter valid mobile number"); return; }
         currentMobile = mobile;
-        const res  = await fetch("http://localhost:5000/api/otp/send", {
+        const res  = await fetch(API + "/otp/send", {
             method: "POST", headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ mobile })
         });
@@ -688,7 +688,7 @@
         document.querySelectorAll(".otpInput").forEach(i => otp += i.value);
         if (otp.length !== 6) { alert("Enter complete OTP"); return; }
         const sessionId = otpSessionId || localStorage.getItem("otpSessionId");
-        const res  = await fetch("http://localhost:5000/api/otp/verify", {
+        const res  = await fetch(API + "/otp/verify", {
             method: "POST", headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ sessionId, otp })
         });
@@ -711,7 +711,7 @@
 
     async function submitAfterOTP() {
         if (!selectedLat || !selectedLng) { alert("Please click 'Use Current Location'"); return; }
-        const token = localStorage.getItem("token");
+        const token = localStorage.getItem("customerToken");
 
         await fetch(API + "/customer/update-location", {
             method: "POST",

@@ -281,16 +281,16 @@
     </div>
 
 <script>
-const API = "http://localhost:5000/api";
+const API = window.location.origin + "/api";
 
 async function loadQR() {
     try {
-        const res  = await fetch("http://localhost:5000/api/admin/get-qr");
+        const res  = await fetch(API + "/admin/get-qr");
         const data = await res.json();
         if (data.success && data.path) {
             const img = document.getElementById("qrImage");
             const ph  = document.getElementById("qrPlaceholder");
-            img.src = data.path + "?t=" + Date.now();
+           img.src = window.location.origin + data.path + "?t=" + Date.now();
             img.style.display = "block";
             ph.style.display  = "none";
         }
@@ -340,6 +340,7 @@ window.onload = function () {
     startPayment();
 };
 </script>
+
  <!-- BOTTOM NAV (Mobile) -->
     <div class="bottomNav">
         <button class="active" onclick="location.href='index.html'">

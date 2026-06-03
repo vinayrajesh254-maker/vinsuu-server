@@ -666,8 +666,10 @@
         </button>
     </div>
 <script>
-const STAFF_API = "http://localhost:5000/api/staff";
-const OTP_API   = "http://localhost:5000/api/otp";
+const API = window.location.origin + "/api";
+
+const STAFF_API = API + "/staff";
+const OTP_API   = API + "/otp";
 
 let currentMobile = null;
 let otpSessionId = null;

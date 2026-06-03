@@ -534,7 +534,7 @@ fetch("/api/admin-auth/check")
     .then(data => { if (!data.loggedIn) window.location.href = "/admin-login.html"; })
     .catch(() => { window.location.href = "/admin-login.html"; });
 
-const API = "http://localhost:5000/api";
+const API = window.location.origin + "/api";
 let TOKEN = localStorage.getItem("token");
 let headerMenuOpen = false;
 let sidebarOpen = false;
@@ -556,7 +556,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
-    const socket = io("http://localhost:5000");
+    const socket = io(window.location.origin);
 
     socket.on("dashboard_update", (data) => {
         if (!data || typeof data !== "object") return;
@@ -722,7 +722,7 @@ async function viewCategoryList() {
         data.forEach(cat => {
             const div = document.createElement("div");
             div.style.cssText = "display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;padding:8px 12px;background:var(--light-bg);border-radius:10px;border:1px solid var(--border);";
-            div.innerHTML = `<div style="display:flex;align-items:center;gap:10px;"><img src="${cat.image.startsWith('http') ? cat.image : 'http://localhost:5000' + cat.image}" style="width:36px;height:36px;object-fit:cover;border-radius:8px;"><span style="font-size:13px;font-weight:500;">${cat.name}</span></div><div style="display:flex;gap:10px;"><span style="color:var(--primary);cursor:pointer;font-size:13px;font-weight:600;" onclick="editCategory(${cat.id},'${cat.name}')">Edit</span><span style="color:var(--red);cursor:pointer;font-size:13px;font-weight:600;" onclick="deleteCategory(${cat.id})">Delete</span></div>`;
+            div.innerHTML = `<div style="display:flex;align-items:center;gap:10px;"><img src="${cat.image.startsWith('http') ? cat.image : window.location.origin + cat.image}" style="width:36px;height:36px;object-fit:cover;border-radius:8px;"><span style="font-size:13px;font-weight:500;">${cat.name}</span></div><div style="display:flex;gap:10px;"><span style="color:var(--primary);cursor:pointer;font-size:13px;font-weight:600;" onclick="editCategory(${cat.id},'${cat.name}')">Edit</span><span style="color:var(--red);cursor:pointer;font-size:13px;font-weight:600;" onclick="deleteCategory(${cat.id})">Delete</span></div>`;
             box.appendChild(div);
         });
     } catch {}
@@ -1337,7 +1337,7 @@ async function loadServiceList() { const res = await fetch(API + "/admin/service
 function renderServiceList(data) {
     const body = document.getElementById("serviceListBody"); body.innerHTML = "";
     document.getElementById("totalServiceCount").innerText = data.length;
-    data.forEach((s,i) => { const tr = document.createElement("tr"); tr.innerHTML = `<td>${i+1}</td><td><img src="${s.image.startsWith('http') ? s.image : 'http://localhost:5000' + s.image}" width="44" style="border-radius:8px;"></td><td>SVC${String(s.id).padStart(4,'0')}</td><td>${s.name}</td><td><button onclick="editService(${s.id})" style="background:var(--primary-light);color:var(--primary);border:1.5px solid rgba(26,63,212,0.2);">Edit</button></td><td><button onclick="deleteService(${s.id})" style="background:#fee2e2;color:var(--red);border:1.5px solid #fecaca;">✕</button></td><td><button onclick="togglePopular(${s.id}, this)" style="padding:6px 14px;border-radius:20px;color:white;background:${s.is_popular ? 'var(--green)' : 'var(--red)'};">${s.is_popular ? 'ON' : 'OFF'}</button></td>`; body.appendChild(tr); });
+    data.forEach((s,i) => { const tr = document.createElement("tr"); tr.innerHTML = `<td>${i+1}</td><td><img src="${s.image.startsWith('http') ? s.image : window.location.origin + s.image}" width="44" style="border-radius:8px;"></td><td>SVC${String(s.id).padStart(4,'0')}</td><td>${s.name}</td><td><button onclick="editService(${s.id})" style="background:var(--primary-light);color:var(--primary);border:1.5px solid rgba(26,63,212,0.2);">Edit</button></td><td><button onclick="deleteService(${s.id})" style="background:#fee2e2;color:var(--red);border:1.5px solid #fecaca;">✕</button></td><td><button onclick="togglePopular(${s.id}, this)" style="padding:6px 14px;border-radius:20px;color:white;background:${s.is_popular ? 'var(--green)' : 'var(--red)'};">${s.is_popular ? 'ON' : 'OFF'}</button></td>`; body.appendChild(tr); });
 }
 async function editService(id) { const name = prompt("New service name:"); if (!name) return; await fetch(API + "/admin/service/" + id, { method:"PUT", headers:{"Content-Type":"application/json","Authorization":"Bearer "+TOKEN}, body:JSON.stringify({ name }) }); loadServiceList(); }
 async function deleteService(id) { if (!confirm("Delete this service?")) return; const res = await fetch(API + "/admin/service/" + id, { method:"DELETE" }); const data = await res.json(); if (data.success) { alert("Deleted"); loadServiceList(); } else alert("Delete failed"); }
@@ -1415,7 +1415,7 @@ document.addEventListener("DOMContentLoaded", () => {
     function previewImages() { previewBox.innerHTML = ""; [...fileInput.files].forEach(file => { const img = document.createElement("img"); img.src = URL.createObjectURL(file); img.style.cssText = "width:90px;height:70px;object-fit:cover;border-radius:8px;border:1.5px solid var(--border);"; previewBox.appendChild(img); }); }
 });
 async function uploadMultipleImages() { const files = document.getElementById("imageFiles").files; const type = document.getElementById("imageCategory").value; const link = document.getElementById("imageLink").value; if (!files.length) return alert("Select images"); const fd = new FormData(); [...files].forEach(f => fd.append("images", f)); fd.append("type", type); fd.append("link", link); const res = await fetch(API + "/admin/upload-multiple", { method:"POST", body:fd }); const data = await res.json(); if (data.success) { alert("Uploaded"); document.getElementById("previewBox").innerHTML = ""; loadImages(); } }
-async function loadImages() { const type = document.getElementById("imageCategory").value; const res = await fetch(API + "/admin/images/" + type); const data = await res.json(); const box = document.getElementById("imageList"); box.innerHTML = ""; data.forEach(img => { box.innerHTML += `<div style="width:180px;margin:8px;border:1.5px solid var(--border);padding:10px;border-radius:12px;display:inline-block;vertical-align:top;"><a href="${img.link||'#'}" target="_blank"><img src="http://localhost:5000${img.path}" style="width:100%;height:100px;object-fit:cover;border-radius:8px;"></a><p style="font-size:11px;word-break:break-all;margin:6px 0;">${img.link||"No link"}</p><button onclick="deleteImage(${img.id})" style="background:#fee2e2;color:var(--red);border:1.5px solid #fecaca;width:100%;">Delete</button></div>`; }); }
+async function loadImages() { const type = document.getElementById("imageCategory").value; const res = await fetch(API + "/admin/images/" + type); const data = await res.json(); const box = document.getElementById("imageList"); box.innerHTML = ""; data.forEach(img => { box.innerHTML += `<div style="width:180px;margin:8px;border:1.5px solid var(--border);padding:10px;border-radius:12px;display:inline-block;vertical-align:top;"><a href="${img.link||'#'}" target="_blank"><img src="${window.location.origin}${img.path}" style="width:100%;height:100px;object-fit:cover;border-radius:8px;"></a><p style="font-size:11px;word-break:break-all;margin:6px 0;">${img.link||"No link"}</p><button onclick="deleteImage(${img.id})" style="background:#fee2e2;color:var(--red);border:1.5px solid #fecaca;width:100%;">Delete</button></div>`; }); }
 async function deleteImage(id) { await fetch(API + "/admin/image/" + id, { method:"DELETE" }); loadImages(); }
 
 // CONTENT MANAGEMENT
