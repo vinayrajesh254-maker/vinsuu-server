@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Request a Service - Vinsuu</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
     <style>
         :root {
             --primary: #1a3fd4;
@@ -19,7 +21,11 @@
             --red: #ef4444;
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
 
         body {
             font-family: 'Poppins', sans-serif;
@@ -32,19 +38,40 @@
         .topHeader {
             background: linear-gradient(90deg, var(--primary-mid) 0%, var(--primary-dark) 100%);
             padding: 14px 20px;
-            display: flex; align-items: center; gap: 14px;
-            position: sticky; top: 0; z-index: 100;
-            box-shadow: 0 2px 12px rgba(26,63,212,0.25);
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 12px rgba(26, 63, 212, 0.25);
         }
+
         .backBtn {
-            background: rgba(255,255,255,0.15); border: none; color: white;
-            width: 34px; height: 34px; border-radius: 50%;
-            font-size: 18px; cursor: pointer;
-            display: flex; align-items: center; justify-content: center;
-            flex-shrink: 0; transition: background 0.2s;
+            background: rgba(255, 255, 255, 0.15);
+            border: none;
+            color: white;
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            font-size: 18px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            transition: background 0.2s;
         }
-        .backBtn:hover { background: rgba(255,255,255,0.25); }
-        .topHeaderTitle { font-size: 17px; font-weight: 700; color: white; }
+
+        .backBtn:hover {
+            background: rgba(255, 255, 255, 0.25);
+        }
+
+        .topHeaderTitle {
+            font-size: 17px;
+            font-weight: 700;
+            color: white;
+        }
 
         /* ══ PAGE WRAPPER ══ */
         .container {
@@ -55,218 +82,461 @@
 
         /* ══ SERVICE IMAGE HERO ══ */
         .serviceHero {
-            background: white; border-radius: 18px;
+            background: white;
+            border-radius: 18px;
             padding: 28px 20px 20px;
             margin-bottom: 20px;
             text-align: center;
-            box-shadow: 0 4px 18px rgba(0,0,0,0.06);
+            box-shadow: 0 4px 18px rgba(0, 0, 0, 0.06);
         }
+
         .serviceHero img {
-            width: 120px; height: 120px;
-            object-fit: contain; border-radius: 16px;
+            width: 120px;
+            height: 120px;
+            object-fit: contain;
+            border-radius: 16px;
             margin-bottom: 12px;
         }
+
         .serviceHeroText {
-            font-size: 13.5px; color: var(--primary);
+            font-size: 13.5px;
+            color: var(--primary);
             font-weight: 500;
         }
 
         /* ══ FORM CARD ══ */
         .formCard {
-            background: white; border-radius: 18px;
+            background: white;
+            border-radius: 18px;
             padding: 24px 22px;
-            box-shadow: 0 4px 18px rgba(0,0,0,0.06);
+            box-shadow: 0 4px 18px rgba(0, 0, 0, 0.06);
         }
 
         /* ══ FIELD ══ */
-        .fieldGroup { margin-bottom: 18px; }
+        .fieldGroup {
+            margin-bottom: 18px;
+        }
+
         .fieldLabel {
-            font-size: 12.5px; font-weight: 700;
-            color: var(--text); margin-bottom: 7px;
-            display: flex; align-items: center; gap: 4px;
-            text-transform: capitalize; letter-spacing: 0.1px;
+            font-size: 12.5px;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 7px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            text-transform: capitalize;
+            letter-spacing: 0.1px;
         }
-        .fieldLabel .req { color: var(--red); font-size: 13px; }
+
+        .fieldLabel .req {
+            color: var(--red);
+            font-size: 13px;
+        }
+
         .fieldLabel .detailsLink {
-            margin-left: auto; font-size: 13px; font-weight: 600;
-            color: var(--primary); cursor: pointer; display: flex; align-items: center; gap: 4px;
+            margin-left: auto;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--primary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 4px;
         }
-        .fieldLabel .detailsLink:hover { text-decoration: underline; }
+
+        .fieldLabel .detailsLink:hover {
+            text-decoration: underline;
+        }
 
         .inputWrap {
-            display: flex; align-items: center;
-            border: 1.5px solid var(--border); border-radius: 12px;
-            background: var(--light-bg); overflow: hidden;
+            display: flex;
+            align-items: center;
+            border: 1.5px solid var(--border);
+            border-radius: 12px;
+            background: var(--light-bg);
+            overflow: hidden;
             transition: border-color 0.2s, box-shadow 0.2s;
         }
+
         .inputWrap:focus-within {
             border-color: var(--primary);
             background: white;
-            box-shadow: 0 0 0 3px rgba(26,63,212,0.10);
+            box-shadow: 0 0 0 3px rgba(26, 63, 212, 0.10);
         }
+
         .inputWrap .iIcon {
-            padding: 0 13px; font-size: 16px; color: var(--gray);
-            flex-shrink: 0; pointer-events: none;
+            padding: 0 13px;
+            font-size: 16px;
+            color: var(--gray);
+            flex-shrink: 0;
+            pointer-events: none;
         }
+
         .inputWrap input,
         .inputWrap select,
         .inputWrap textarea {
-            flex: 1; border: none; outline: none; background: transparent;
+            flex: 1;
+            border: none;
+            outline: none;
+            background: transparent;
             padding: 12px 14px 12px 0;
-            font-size: 13.5px; font-family: 'Poppins', sans-serif;
+            font-size: 13.5px;
+            font-family: 'Poppins', sans-serif;
             color: var(--text);
         }
+
         .inputWrap input[readonly],
         .inputWrap input:disabled {
-            color: var(--gray); cursor: default;
+            color: var(--gray);
+            cursor: default;
         }
+
         .inputWrap input::placeholder,
-        .inputWrap textarea::placeholder { color: #adb5bd; }
-        .inputWrap select { cursor: pointer; }
+        .inputWrap textarea::placeholder {
+            color: #adb5bd;
+        }
+
+        .inputWrap select {
+            cursor: pointer;
+        }
 
         /* Select arrow */
         .selectWrap {
             position: relative;
         }
+
         .selectWrap .selectArrow {
-            position: absolute; right: 14px; top: 50%;
+            position: absolute;
+            right: 14px;
+            top: 50%;
             transform: translateY(-50%);
-            font-size: 13px; color: var(--gray); pointer-events: none;
+            font-size: 13px;
+            color: var(--gray);
+            pointer-events: none;
         }
-        .selectWrap select { padding-right: 36px; }
+
+        .selectWrap select {
+            padding-right: 36px;
+        }
 
         /* Textarea */
         .inputWrap textarea {
-            min-height: 90px; resize: vertical;
+            min-height: 90px;
+            resize: vertical;
             padding-top: 12px;
         }
 
         /* Two-col row */
         .formRow {
-            display: grid; grid-template-columns: 1fr 1fr;
-            gap: 16px; margin-bottom: 18px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 18px;
         }
 
         /* ══ LOCATION ROW ══ */
         .locationRow {
-            display: flex; align-items: center; gap: 8px;
-            margin-top: 10px; margin-bottom: 2px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 10px;
+            margin-bottom: 2px;
         }
+
         .locationCheckbox {
-            width: 18px; height: 18px;
-            accent-color: var(--primary); cursor: pointer; flex-shrink: 0;
+            width: 18px;
+            height: 18px;
+            accent-color: var(--primary);
+            cursor: pointer;
+            flex-shrink: 0;
         }
+
         .locationRowBtn {
-            display: flex; align-items: center; gap: 6px;
-            font-size: 13.5px; font-weight: 600; color: var(--primary);
-            cursor: pointer; background: none; border: none;
-            font-family: 'Poppins', sans-serif; transition: opacity 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13.5px;
+            font-weight: 600;
+            color: var(--primary);
+            cursor: pointer;
+            background: none;
+            border: none;
+            font-family: 'Poppins', sans-serif;
+            transition: opacity 0.2s;
         }
-        .locationRowBtn:hover { opacity: 0.75; }
+
+        .locationRowBtn:hover {
+            opacity: 0.75;
+        }
+
         #currentLocationText {
-            font-size: 12.5px; color: var(--gray); margin-top: 5px;
+            font-size: 12.5px;
+            color: var(--gray);
+            margin-top: 5px;
         }
 
         /* ══ SUBMIT BUTTON ══ */
         .submitBtn {
-            display: flex; align-items: center; justify-content: center; gap: 8px;
-            width: 100%; padding: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: 100%;
+            padding: 14px;
             background: linear-gradient(135deg, var(--primary-mid), var(--primary-dark));
-            color: white; border: none; border-radius: 14px;
-            font-size: 15px; font-weight: 700; cursor: pointer;
-            font-family: 'Poppins', sans-serif; transition: all 0.2s;
-            box-shadow: 0 6px 20px rgba(26,63,212,0.30); margin-top: 8px;
+            color: white;
+            border: none;
+            border-radius: 14px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            font-family: 'Poppins', sans-serif;
+            transition: all 0.2s;
+            box-shadow: 0 6px 20px rgba(26, 63, 212, 0.30);
+            margin-top: 8px;
         }
+
         .submitBtn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 10px 28px rgba(26,63,212,0.40);
+            box-shadow: 0 10px 28px rgba(26, 63, 212, 0.40);
         }
 
         /* ══ DETAILS MODAL ══ */
         #detailsModal {
-            display: none; position: fixed; inset: 0;
-            background: rgba(0,0,0,0.45); z-index: 999;
-            justify-content: center; align-items: center; padding: 16px;
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.45);
+            z-index: 999;
+            justify-content: center;
+            align-items: center;
+            padding: 16px;
         }
-        #detailsModal.open { display: flex; }
+
+        #detailsModal.open {
+            display: flex;
+        }
+
         #modalContent {
-            background: white; width: 100%; max-width: 380px;
-            border-radius: 20px; padding: 24px 22px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+            background: white;
+            width: 100%;
+            max-width: 380px;
+            border-radius: 20px;
+            padding: 24px 22px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
             position: relative;
-            animation: popIn 0.3s cubic-bezier(0.16,1,0.3,1) both;
+            animation: popIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) both;
         }
+
         @keyframes popIn {
-            from { opacity:0; transform:scale(0.92) translateY(14px); }
-            to   { opacity:1; transform:scale(1) translateY(0); }
+            from {
+                opacity: 0;
+                transform: scale(0.92) translateY(14px);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
         }
-        #modalContent h3 { font-size: 16px; font-weight: 700; margin-bottom: 14px; color: var(--text); }
+
+        #modalContent h3 {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 14px;
+            color: var(--text);
+        }
+
         #closeBtn {
-            position: absolute; top: 14px; right: 14px;
-            width: 28px; height: 28px; background: #fee2e2; color: var(--red);
-            border: none; border-radius: 50%; font-size: 16px; cursor: pointer;
-            display: flex; align-items: center; justify-content: center;
-            font-family: 'Poppins', sans-serif; font-weight: 700;
+            position: absolute;
+            top: 14px;
+            right: 14px;
+            width: 28px;
+            height: 28px;
+            background: #fee2e2;
+            color: var(--red);
+            border: none;
+            border-radius: 50%;
+            font-size: 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 700;
         }
-        #detailsList { list-style: none; padding: 0; }
+
+        #detailsList {
+            list-style: none;
+            padding: 0;
+        }
+
         #detailsList li {
-            font-size: 13.5px; color: var(--gray); padding: 8px 0;
-            border-bottom: 1px solid var(--border); display: flex; align-items: flex-start; gap: 8px;
+            font-size: 13.5px;
+            color: var(--gray);
+            padding: 8px 0;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
         }
-        #detailsList li:last-child { border-bottom: none; }
-        #detailsList li::before { content: '✓'; color: var(--primary); font-weight: 700; flex-shrink: 0; }
+
+        #detailsList li:last-child {
+            border-bottom: none;
+        }
+
+        #detailsList li::before {
+            content: '✓';
+            color: var(--primary);
+            font-weight: 700;
+            flex-shrink: 0;
+        }
 
         /* ══ OTP MODAL ══ */
         #otpModal {
-            display: none; position: fixed; inset: 0;
-            background: rgba(0,0,0,0.5); z-index: 999;
-            justify-content: center; align-items: center; padding: 16px;
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+            justify-content: center;
+            align-items: center;
+            padding: 16px;
         }
-        #otpModal.open { display: flex; }
+
+        #otpModal.open {
+            display: flex;
+        }
+
         .otpBox {
-            background: white; width: 100%; max-width: 360px;
-            border-radius: 20px; padding: 28px 24px; text-align: center;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.2);
-            animation: popIn 0.3s cubic-bezier(0.16,1,0.3,1) both;
+            background: white;
+            width: 100%;
+            max-width: 360px;
+            border-radius: 20px;
+            padding: 28px 24px;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+            animation: popIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) both;
         }
-        .otpBox h3 { font-size: 18px; font-weight: 700; margin-bottom: 6px; color: var(--text); }
-        .otpBox p  { font-size: 13px; color: var(--gray); margin-bottom: 22px; }
-        .otpInputsRow { display: flex; justify-content: center; gap: 10px; margin-bottom: 20px; }
+
+        .otpBox h3 {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 6px;
+            color: var(--text);
+        }
+
+        .otpBox p {
+            font-size: 13px;
+            color: var(--gray);
+            margin-bottom: 22px;
+        }
+
+        .otpInputsRow {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
         .otpInputsRow input {
-            width: 44px; height: 50px; text-align: center;
-            font-size: 20px; font-family: 'Poppins', sans-serif; font-weight: 700;
-            border: 1.5px solid var(--border); border-radius: 12px;
-            outline: none; color: var(--text); background: var(--light-bg);
+            width: 44px;
+            height: 50px;
+            text-align: center;
+            font-size: 20px;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 700;
+            border: 1.5px solid var(--border);
+            border-radius: 12px;
+            outline: none;
+            color: var(--text);
+            background: var(--light-bg);
             transition: border-color 0.2s;
         }
-        .otpInputsRow input:focus { border-color: var(--primary); background: white; box-shadow: 0 0 0 3px rgba(26,63,212,0.10); }
+
+        .otpInputsRow input:focus {
+            border-color: var(--primary);
+            background: white;
+            box-shadow: 0 0 0 3px rgba(26, 63, 212, 0.10);
+        }
+
         .otpVerifyBtn {
-            width: 100%; padding: 13px; background: var(--primary); color: white;
-            border: none; border-radius: 12px; font-size: 14px; font-weight: 700;
-            cursor: pointer; font-family: 'Poppins', sans-serif; transition: all 0.2s; margin-bottom: 12px;
+            width: 100%;
+            padding: 13px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            font-family: 'Poppins', sans-serif;
+            transition: all 0.2s;
+            margin-bottom: 12px;
         }
-        .otpVerifyBtn:hover { background: var(--primary-dark); transform: translateY(-1px); }
-        .otpResend { color: var(--primary); cursor: pointer; font-size: 13px; font-weight: 600; }
-        .otpResend:hover { text-decoration: underline; }
+
+        .otpVerifyBtn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+        }
+
+        .otpResend {
+            color: var(--primary);
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .otpResend:hover {
+            text-decoration: underline;
+        }
+
         .otpCancelBtn {
-            width: 100%; padding: 11px; background: #fee2e2; color: var(--red);
-            border: none; border-radius: 12px; font-size: 13.5px; font-weight: 600;
-            cursor: pointer; font-family: 'Poppins', sans-serif; margin-top: 8px; transition: all 0.2s;
+            width: 100%;
+            padding: 11px;
+            background: #fee2e2;
+            color: var(--red);
+            border: none;
+            border-radius: 12px;
+            font-size: 13.5px;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: 'Poppins', sans-serif;
+            margin-top: 8px;
+            transition: all 0.2s;
         }
-        .otpCancelBtn:hover { background: #fecaca; }
+
+        .otpCancelBtn:hover {
+            background: #fecaca;
+        }
 
         /* ══ RESPONSIVE ══ */
         @media (max-width: 600px) {
-            .container { padding: 16px 12px 50px; }
-            .formRow { grid-template-columns: 1fr; gap: 0; margin-bottom: 0; }
-            .formRow > .fieldGroup { margin-bottom: 18px; }
-            .serviceHero img { width: 100px; height: 100px; }
+            .container {
+                padding: 16px 12px 50px;
+            }
+
+            .formRow {
+                grid-template-columns: 1fr;
+                gap: 0;
+                margin-bottom: 0;
+            }
+
+            .formRow>.fieldGroup {
+                margin-bottom: 18px;
+            }
+
+            .serviceHero img {
+                width: 100px;
+                height: 100px;
+            }
         }
     </style>
 </head>
 
 <body>
- <!-- SIDE MENU OVERLAY -->
+    <!-- SIDE MENU OVERLAY -->
     <div class="sideOverlay" id="sideOverlay" onclick="closeMenu()"></div>
 
     <!-- SIDE MENU -->
@@ -288,7 +558,7 @@
             <a href="service-list.html">Services </a>
             <a href="category.html">Categories</a>
             <a href="about.html">About Us</a>
-      
+
         </nav>
     </div>
     <!-- TOP HEADER -->
@@ -367,7 +637,8 @@
                     <div class="fieldLabel">Pin Code <span class="req">*</span></div>
                     <div class="inputWrap">
                         <span class="iIcon">🏷</span>
-                        <input type="text" id="pincode" placeholder="6-digit PIN" maxlength="6" inputmode="numeric" oninput="findLocation()">
+                        <input type="text" id="pincode" placeholder="6-digit PIN" maxlength="6" inputmode="numeric"
+                            oninput="findLocation()">
                     </div>
                 </div>
                 <div class="fieldGroup">
@@ -405,7 +676,19 @@
                     <textarea id="details" placeholder="Describe your service requirements..."></textarea>
                 </div>
             </div>
-
+            <div class="fieldGroup" style="margin-top:-4px;">
+                <label
+                    style="display:flex;align-items:flex-start;gap:8px;font-size:13px;color:var(--text);cursor:pointer;">
+                    <input type="checkbox" id="termsChk" style="margin-top:2px;accent-color:var(--primary);">
+                    <span>
+                        I agree to the
+                        <a href="customer-terms.html" target="_blank"
+                            style="color:var(--primary);font-weight:600;text-decoration:none;">
+                            Terms & Conditions
+                        </a>
+                    </span>
+                </label>
+            </div>
             <!-- Submit -->
             <button class="submitBtn" onclick="submitRequest()">
                 ✈ Submit Request
@@ -444,7 +727,7 @@
         </div>
     </div>
 
-<!-- BOTTOM NAV (Mobile) -->
+    <!-- BOTTOM NAV (Mobile) -->
     <div class="bottomNav">
         <button class="active" onclick="location.href='index.html'">
             <span class="bnIcon">🏠</span>Home
@@ -459,300 +742,308 @@
             <span class="bnIcon">😊</span>Profile
         </button>
     </div>
-<script>
-    const API = window.location.origin + "/api";
-    let serviceId   = null;
-    let serviceData = null;
-    let selectedLat = null;
-    let selectedLng = null;
+    <script>
+        const API = window.location.origin + "/api";
+        let serviceId = null;
+        let serviceData = null;
+        let selectedLat = null;
+        let selectedLng = null;
 
-    document.addEventListener("DOMContentLoaded", async () => {
-        const params  = new URLSearchParams(window.location.search);
-        serviceId     = params.get("service_id") || params.get("service");
+        document.addEventListener("DOMContentLoaded", async () => {
+            const params = new URLSearchParams(window.location.search);
+            serviceId = params.get("service_id") || params.get("service");
 
-        if (!serviceId) { alert("Invalid service"); return; }
+            if (!serviceId) { alert("Invalid service"); return; }
 
-        const user = JSON.parse(localStorage.getItem("user") || "{}");
-        if (user.name)   document.getElementById("customerName").value = user.name;
-        if (user.mobile) document.getElementById("mobile").value = user.mobile;
+            const user = JSON.parse(localStorage.getItem("user") || "{}");
+            if (user.name) document.getElementById("customerName").value = user.name;
+            if (user.mobile) document.getElementById("mobile").value = user.mobile;
 
-        await loadService();
+            await loadService();
 
-        const savedLocation = JSON.parse(localStorage.getItem("userLocation") || "null");
-        if (savedLocation && savedLocation.address) {
-            document.getElementById("currentLocationText").innerText = "📍 " + savedLocation.address;
-            document.getElementById("address").value = savedLocation.address;
-        }
-    });
+            const savedLocation = JSON.parse(localStorage.getItem("userLocation") || "null");
+            if (savedLocation && savedLocation.address) {
+                document.getElementById("currentLocationText").innerText = "📍 " + savedLocation.address;
+                document.getElementById("address").value = savedLocation.address;
+            }
+        });
 
-    // ── LOAD SERVICE ──
-    async function loadService() {
-        const res      = await fetch(API + "/admin/services");
-        const services = await res.json();
+        // ── LOAD SERVICE ──
+        async function loadService() {
+            const res = await fetch(API + "/admin/services");
+            const services = await res.json();
 
-        console.log("URL SERVICE ID:", serviceId);
-        console.log("ALL SERVICES:", services);
+            console.log("URL SERVICE ID:", serviceId);
+            console.log("ALL SERVICES:", services);
 
-        serviceData = services.find(s => Number(s.id) === Number(serviceId));
-        if (!serviceData) { alert("Service not found"); return; }
+            serviceData = services.find(s => Number(s.id) === Number(serviceId));
+            if (!serviceData) { alert("Service not found"); return; }
 
-        // Image
-        document.getElementById("serviceImageBox").innerHTML = `
-    <img src="${serviceData.image.startsWith('http')? serviceData.image: window.location.origin + serviceData.image}"
+            // Image
+            document.getElementById("serviceImageBox").innerHTML = `
+    <img src="${serviceData.image.startsWith('http') ? serviceData.image : window.location.origin + serviceData.image}"
     style="width:120px;height:120px;object-fit:contain;border-radius:16px;margin-bottom:0;">`;
 
-        document.getElementById("categoryName").value = serviceData.name;
-        document.getElementById("heading").value = "";
-document.getElementById("heading").placeholder =
-    "Service Heading";
+            document.getElementById("categoryName").value = serviceData.name;
+            document.getElementById("heading").value = "";
+            document.getElementById("heading").placeholder =
+                "Service Heading";
 
-        document.getElementById("details").value = "";
-document.getElementById("details").placeholder =
-    "Describe your service requirements...";
+            document.getElementById("details").value = "";
+            document.getElementById("details").placeholder =
+                "Describe your service requirements...";
 
-        // Price
-        const priceBox = document.getElementById("servicePriceBox");
-        const type     = (serviceData.service_type || "").trim().toLowerCase();
-        if (type === "price" && serviceData.price) {
-            priceBox.value = `₹ ${serviceData.price} onward/visit`;
-        } else if (type === "unit") {
-            priceBox.value = `${serviceData.unit_cost || 0} Unit Balance`;
-        } else {
-            priceBox.value = "Price not available";
-        }
-    }
-
-    // ── DETAILS POPUP ──
-    function toggleDetails() {
-        const modal = document.getElementById("detailsModal");
-        const list  = document.getElementById("detailsList");
-        list.innerHTML = "";
-        let details = [];
-        try { details = JSON.parse(serviceData.details); } catch {}
-        if (details.length > 0) {
-            details.forEach(item => { list.innerHTML += `<li>${item}</li>`; });
-        } else { list.innerHTML = "<li>No details available</li>"; }
-        modal.classList.add("open");
-    }
-    function closeDetails() { document.getElementById("detailsModal").classList.remove("open"); }
-    window.addEventListener("click", e => {
-        if (e.target === document.getElementById("detailsModal")) closeDetails();
-    });
-
-    // ── COPY DETAILS ──
-    function copyDetails() {
-        navigator.clipboard.writeText(document.getElementById("details").value);
-        alert("Copied!");
-    }
-
-    // ── CURRENT LOCATION ──
-    async function useCurrentLocation() {
-        const locationEl   = document.getElementById("currentLocationText");
-        const addressInput = document.getElementById("address");
-        if (!navigator.geolocation) return alert("GPS not supported");
-        navigator.geolocation.getCurrentPosition(
-
-    async (pos) => {
-
-        const lat = pos.coords.latitude;
-        const lng = pos.coords.longitude;
-
-        selectedLat = lat;
-        selectedLng = lng;
-
-        console.log("LAT:", lat);
-        console.log("LNG:", lng);
-        console.log("GPS ACCURACY:", pos.coords.accuracy, "meters");
-
-        locationEl.innerText = "📍 Fetching location...";
-
-        try {
-
-            const res = await fetch(
-                `${API}/geocode?lat=${lat}&lng=${lng}`
-            );
-
-            const data = await res.json();
-
-            if (data.status === "OK" && data.results.length > 0) {
-
-                let bestResult =
-                    data.results.find(r =>
-                        r.types.includes("street_address") ||
-                        r.types.includes("premise") ||
-                        r.types.includes("subpremise")
-                    ) ||
-                    data.results.find(r =>
-                        r.types.includes("route") ||
-                        r.types.includes("neighborhood")
-                    ) ||
-                    data.results[0];
-
-                let address =
-                    data.plus_code?.compound_code ||
-                    bestResult?.formatted_address ||
-                    `${lat}, ${lng}`;
-
-                addressInput.value = address;
-
-                locationEl.innerHTML =
-                    `<span style="color:#16a34a;font-weight:600;">✔ Location updated</span>`;
-
-                document.getElementById("locationChk").checked = true;
-
+            // Price
+            const priceBox = document.getElementById("servicePriceBox");
+            const type = (serviceData.service_type || "").trim().toLowerCase();
+            if (type === "price" && serviceData.price) {
+                priceBox.value = `₹ ${serviceData.price} onward/visit`;
+            } else if (type === "unit") {
+                priceBox.value = `${serviceData.unit_cost || 0} Unit Balance`;
             } else {
+                priceBox.value = "Price not available";
+            }
+        }
 
-                locationEl.innerHTML =
-                    `<span style="color:#16a34a;font-weight:600;">✔ Location updated</span>`;
+        // ── DETAILS POPUP ──
+        function toggleDetails() {
+            const modal = document.getElementById("detailsModal");
+            const list = document.getElementById("detailsList");
+            list.innerHTML = "";
+            let details = [];
+            try { details = JSON.parse(serviceData.details); } catch { }
+            if (details.length > 0) {
+                details.forEach(item => { list.innerHTML += `<li>${item}</li>`; });
+            } else { list.innerHTML = "<li>No details available</li>"; }
+            modal.classList.add("open");
+        }
+        function closeDetails() { document.getElementById("detailsModal").classList.remove("open"); }
+        window.addEventListener("click", e => {
+            if (e.target === document.getElementById("detailsModal")) closeDetails();
+        });
 
+        // ── COPY DETAILS ──
+        function copyDetails() {
+            navigator.clipboard.writeText(document.getElementById("details").value);
+            alert("Copied!");
+        }
+
+        // ── CURRENT LOCATION ──
+        async function useCurrentLocation() {
+            const locationEl = document.getElementById("currentLocationText");
+            const addressInput = document.getElementById("address");
+            if (!navigator.geolocation) return alert("GPS not supported");
+            navigator.geolocation.getCurrentPosition(
+
+                async (pos) => {
+
+                    const lat = pos.coords.latitude;
+                    const lng = pos.coords.longitude;
+
+                    selectedLat = lat;
+                    selectedLng = lng;
+
+                    console.log("LAT:", lat);
+                    console.log("LNG:", lng);
+                    console.log("GPS ACCURACY:", pos.coords.accuracy, "meters");
+
+                    locationEl.innerText = "📍 Fetching location...";
+
+                    try {
+
+                        const res = await fetch(
+                            `${API}/geocode?lat=${lat}&lng=${lng}`
+                        );
+
+                        const data = await res.json();
+
+                        if (data.status === "OK" && data.results.length > 0) {
+
+                            let bestResult =
+                                data.results.find(r =>
+                                    r.types.includes("street_address") ||
+                                    r.types.includes("premise") ||
+                                    r.types.includes("subpremise")
+                                ) ||
+                                data.results.find(r =>
+                                    r.types.includes("route") ||
+                                    r.types.includes("neighborhood")
+                                ) ||
+                                data.results[0];
+
+                            let address =
+                                data.plus_code?.compound_code ||
+                                bestResult?.formatted_address ||
+                                `${lat}, ${lng}`;
+
+                            addressInput.value = address;
+
+                            locationEl.innerHTML =
+                                `<span style="color:#16a34a;font-weight:600;">✔ Location updated</span>`;
+
+                            document.getElementById("locationChk").checked = true;
+
+                        } else {
+
+                            locationEl.innerHTML =
+                                `<span style="color:#16a34a;font-weight:600;">✔ Location updated</span>`;
+
+                        }
+
+                    } catch (err) {
+
+                        console.error(err);
+
+                        locationEl.innerHTML =
+                            `<span style="color:#16a34a;font-weight:600;">✔ Location updated</span>`;
+
+                    }
+
+                },
+
+                () => {
+                    alert("Location permission denied");
+                },
+
+                {
+                    enableHighAccuracy: true,
+                    timeout: 15000,
+                    maximumAge: 0
+                }
+
+            );
+        }
+
+        // ── PINCODE ──
+        async function findLocation() {
+            const pincode = document.getElementById("pincode").value;
+            const locationInput = document.getElementById("location");
+            if (pincode.length !== 6) { locationInput.value = ""; return; }
+            locationInput.value = "Fetching...";
+            try {
+                const res = await fetch(`https://api.zippopotam.us/in/${pincode}`);
+                if (!res.ok) { locationInput.value = "Invalid Pincode"; return; }
+                const data = await res.json();
+                const place = data.places[0];
+                locationInput.value = `${place["place name"]}, ${place["state district"] || place["state"]}, ${place["state"]}`;
+            } catch { locationInput.value = "Location not found"; }
+        }
+
+        // ── OTP ──
+        function closeOTP() { document.getElementById("otpModal").classList.remove("open"); }
+        function clearOTPInputs() {
+            document.querySelectorAll(".otpInput").forEach(i => i.value = "");
+            document.querySelector(".otpInput")?.focus();
+        }
+
+        // Auto-advance OTP inputs
+        document.addEventListener("input", e => {
+            if (e.target.classList.contains("otpInput")) {
+                if (e.target.value.length === 1) e.target.nextElementSibling?.focus();
+            }
+        });
+        document.addEventListener("keydown", e => {
+            if (e.target.classList.contains("otpInput") && e.key === "Backspace" && !e.target.value) {
+                e.target.previousElementSibling?.focus();
+            }
+        });
+
+        let currentMobile = null;
+        let otpSessionId = null;
+
+        async function sendOTP() {
+            const mobile = document.getElementById("mobile").value;
+            if (mobile.length !== 10) { alert("Enter valid mobile number"); return; }
+            currentMobile = mobile;
+            const res = await fetch(API + "/otp/send", {
+                method: "POST", headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ mobile })
+            });
+            const data = await res.json();
+            if (res.ok) {
+                otpSessionId = data.sessionId;
+                localStorage.setItem("otpSessionId", data.sessionId);
+                document.getElementById("otpModal").classList.add("open");
+                clearOTPInputs();
+            } else { alert(data.error || "Failed to send OTP"); }
+        }
+
+        async function verifyOTP() {
+            let otp = "";
+            document.querySelectorAll(".otpInput").forEach(i => otp += i.value);
+            if (otp.length !== 6) { alert("Enter complete OTP"); return; }
+            const sessionId = otpSessionId || localStorage.getItem("otpSessionId");
+            const res = await fetch(API + "/otp/verify", {
+                method: "POST", headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ sessionId, otp })
+            });
+            const data = await res.json();
+            if (res.ok) { localStorage.removeItem("otpSessionId"); closeOTP(); submitAfterOTP(); }
+            else alert(data.error || "Invalid OTP");
+        }
+
+        document.addEventListener("click", async e => {
+            if (e.target.id === "resendText") { await sendOTP(); alert("OTP resent"); }
+        });
+
+        // ── SUBMIT ──
+        async function submitRequest() {
+            const token = localStorage.getItem("customerToken");
+            if (!document.getElementById("termsChk").checked) {
+                alert("Please agree to the Terms & Conditions");
+                return;
             }
 
-        } catch (err) {
-
-            console.error(err);
-
-            locationEl.innerHTML =
-                `<span style="color:#16a34a;font-weight:600;">✔ Location updated</span>`;
-
+            if (!selectedLat || !selectedLng) { alert("Please click 'Use Current Location' before submitting"); return; }
+            await sendOTP();
         }
 
-    },
+        async function submitAfterOTP() {
+            if (!selectedLat || !selectedLng) { alert("Please click 'Use Current Location'"); return; }
+            const token = localStorage.getItem("customerToken");
+            if (token) {
+                await fetch(API + "/customer/update-location", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json", "Authorization": "Bearer " + token },
+                    body: JSON.stringify({
+                        mobile: document.getElementById("mobile").value, location: document.getElementById("location").value, pin_code: document.getElementById("pincode").value
+                    })
+                });
+            }
 
-    () => {
-        alert("Location permission denied");
-    },
+            const body = {
+                service_id: serviceId,
+                name: document.getElementById("customerName").value,
+                mobile: document.getElementById("mobile").value,
+                email: document.getElementById("email").value.trim(),
+                heading: document.getElementById("heading").value,
+                details: document.getElementById("details").value,
+                address: document.getElementById("address").value,
+                pincode: document.getElementById("pincode").value,
+                location: document.getElementById("location").value,
+                latitude: selectedLat,
+                longitude: selectedLng
+            };
 
-    {
-        enableHighAccuracy: true,
-        timeout: 15000,
-        maximumAge: 0
-    }
+            const res = await fetch(API + "/customer/request-service", {
+                method: "POST",
+                headers: { "Content-Type": "application/json", "Authorization": "Bearer " + token },
+                body: JSON.stringify(body)
+            });
 
-);
-    }
-
-    // ── PINCODE ──
-    async function findLocation() {
-        const pincode       = document.getElementById("pincode").value;
-        const locationInput = document.getElementById("location");
-        if (pincode.length !== 6) { locationInput.value = ""; return; }
-        locationInput.value = "Fetching...";
-        try {
-            const res = await fetch(`https://api.zippopotam.us/in/${pincode}`);
-            if (!res.ok) { locationInput.value = "Invalid Pincode"; return; }
-            const data  = await res.json();
-            const place = data.places[0];
-            locationInput.value = `${place["place name"]}, ${place["state district"] || place["state"]}, ${place["state"]}`;
-        } catch { locationInput.value = "Location not found"; }
-    }
-
-    // ── OTP ──
-    function closeOTP() { document.getElementById("otpModal").classList.remove("open"); }
-    function clearOTPInputs() {
-        document.querySelectorAll(".otpInput").forEach(i => i.value = "");
-        document.querySelector(".otpInput")?.focus();
-    }
-
-    // Auto-advance OTP inputs
-    document.addEventListener("input", e => {
-        if (e.target.classList.contains("otpInput")) {
-            if (e.target.value.length === 1) e.target.nextElementSibling?.focus();
+            if (res.ok) {
+                localStorage.setItem("user", JSON.stringify({
+                    name: document.getElementById("customerName").value,
+                    mobile: document.getElementById("mobile").value,
+                    email: document.getElementById("email").value,
+                    address: document.getElementById("address").value
+                }));
+                alert("Service requested successfully");
+                window.location.href = "profile.html";
+            } else { alert("Error submitting request"); }
         }
-    });
-    document.addEventListener("keydown", e => {
-        if (e.target.classList.contains("otpInput") && e.key === "Backspace" && !e.target.value) {
-            e.target.previousElementSibling?.focus();
-        }
-    });
-
-    let currentMobile = null;
-    let otpSessionId  = null;
-
-    async function sendOTP() {
-        const mobile = document.getElementById("mobile").value;
-        if (mobile.length !== 10) { alert("Enter valid mobile number"); return; }
-        currentMobile = mobile;
-        const res  = await fetch(API + "/otp/send", {
-            method: "POST", headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ mobile })
-        });
-        const data = await res.json();
-        if (res.ok) {
-            otpSessionId = data.sessionId;
-            localStorage.setItem("otpSessionId", data.sessionId);
-            document.getElementById("otpModal").classList.add("open");
-            clearOTPInputs();
-        } else { alert(data.error || "Failed to send OTP"); }
-    }
-
-    async function verifyOTP() {
-        let otp = "";
-        document.querySelectorAll(".otpInput").forEach(i => otp += i.value);
-        if (otp.length !== 6) { alert("Enter complete OTP"); return; }
-        const sessionId = otpSessionId || localStorage.getItem("otpSessionId");
-        const res  = await fetch(API + "/otp/verify", {
-            method: "POST", headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ sessionId, otp })
-        });
-        const data = await res.json();
-        if (res.ok) { localStorage.removeItem("otpSessionId"); closeOTP(); submitAfterOTP(); }
-        else alert(data.error || "Invalid OTP");
-    }
-
-    document.addEventListener("click", async e => {
-        if (e.target.id === "resendText") { await sendOTP(); alert("OTP resent"); }
-    });
-
-    // ── SUBMIT ──
-    async function submitRequest() {
-        const token = localStorage.getItem("customerToken");
-        if (!token) { alert("Please login first"); window.location.href = "profile.html"; return; }
-        if (!selectedLat || !selectedLng) { alert("Please click 'Use Current Location' before submitting"); return; }
-        await sendOTP();
-    }
-
-    async function submitAfterOTP() {
-        if (!selectedLat || !selectedLng) { alert("Please click 'Use Current Location'"); return; }
-        const token = localStorage.getItem("customerToken");
-
-        await fetch(API + "/customer/update-location", {
-            method: "POST",
-            headers: { "Content-Type": "application/json", "Authorization": "Bearer " + token },
-            body: JSON.stringify({ mobile: document.getElementById("mobile").value, location: document.getElementById("location").value, pin_code: document.getElementById("pincode").value })
-        });
-
-        const body = {
-            service_id: serviceId,
-            name:       document.getElementById("customerName").value,
-            mobile:     document.getElementById("mobile").value,
-            email:      document.getElementById("email").value.trim(),
-            heading:    document.getElementById("heading").value,
-            details:    document.getElementById("details").value,
-            address:    document.getElementById("address").value,
-            pincode:    document.getElementById("pincode").value,
-            location:   document.getElementById("location").value,
-            latitude:   selectedLat,
-            longitude:  selectedLng
-        };
-
-        const res = await fetch(API + "/customer/request-service", {
-            method: "POST",
-            headers: { "Content-Type": "application/json", "Authorization": "Bearer " + token },
-            body: JSON.stringify(body)
-        });
-
-        if (res.ok) {
-            localStorage.setItem("user", JSON.stringify({
-                name:    document.getElementById("customerName").value,
-                mobile:  document.getElementById("mobile").value,
-                email:   document.getElementById("email").value,
-                address: document.getElementById("address").value
-            }));
-            alert("Service requested successfully");
-            window.location.href = "profile.html";
-        } else { alert("Error submitting request"); }
-    }
-</script>
-<script src="script.js"></script>
+    </script>
+    <script src="script.js"></script>
 </body>
+
 </html>

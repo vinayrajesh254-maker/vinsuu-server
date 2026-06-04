@@ -3,7 +3,45 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Service List - Vinsuu</title>
+<title>Home Services List | Plumber, Electrician, AC Repair & More - Vinsuu</title>
+<meta name="description"
+content="Explore all home services offered by Vinsuu in Silvassa including plumber, electrician, AC repair, cleaning, carpenter, appliance repair, painting and more.">
+
+<meta name="keywords"
+content="home services Silvassa, plumber Silvassa, electrician Silvassa, AC repair, cleaning services, carpenter, appliance repair, Vinsuu services">
+
+<meta name="robots"
+content="index,follow">
+
+<link rel="canonical"
+href="https://vinsuu.com/service-list.html">
+
+<meta property="og:title"
+content="Home Services List | Vinsuu">
+
+<meta property="og:description"
+content="Browse all available home services and book trusted professionals in Silvassa.">
+
+<meta property="og:url"
+content="https://vinsuu.com/service-list.html">
+
+<meta property="og:type"
+content="website">
+
+<meta property="og:image"
+content="https://vinsuu.com/logo.png">
+
+<meta name="twitter:card"
+content="summary_large_image">
+
+<meta name="twitter:title"
+content="Home Services List | Vinsuu">
+
+<meta name="twitter:description"
+content="Find trusted plumbers, electricians, AC technicians, cleaners and more.">
+
+<meta name="twitter:image"
+content="https://vinsuu.com/logo.png">
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
 <style>
@@ -26,10 +64,7 @@
         background: #eef2ff;
         color: var(--text);
         min-height: 100vh;
-        user-select: none;
-        -webkit-user-select: none;
-        -moz-user-select: none;
-        -ms-user-select: none;
+       
     }
 
     /* ══ TOP HEADER ══ */
@@ -214,6 +249,44 @@
         .serviceBadge { font-size: 11px; padding: 4px 10px; }
     }
 </style>
+<script type="application/ld+json">
+{
+  "@context":"https://schema.org",
+  "@type":"ItemList",
+  "name":"Vinsuu Home Services",
+  "url":"https://vinsuu.com/service-list.html",
+  "provider":{
+    "@type":"Organization",
+    "name":"Vinsuu",
+    "url":"https://vinsuu.com"
+  }
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context":"https://schema.org",
+  "@type":"Organization",
+  "name":"Vinsuu",
+  "url":"https://vinsuu.com",
+  "logo":"https://vinsuu.com/logo.png"
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context":"https://schema.org",
+  "@type":"LocalBusiness",
+  "name":"Vinsuu",
+  "url":"https://vinsuu.com",
+  "image":"https://vinsuu.com/logo.png",
+  "areaServed":"Silvassa",
+  "address":{
+    "@type":"PostalAddress",
+    "addressLocality":"Silvassa",
+    "addressCountry":"IN"
+  },
+  "priceRange":"₹₹"
+}
+</script>
 </head>
 
 <body oncontextmenu="return false;">
@@ -233,7 +306,7 @@
         <!-- Heading + Search -->
         <div class="pageTopRow">
             <div class="pageHeadText">
-                <div class="pageTitle">All Services</div>
+                <h1 class="pageTitle">All Services</h1>
                 <div class="pageSub">Browse and explore all available services</div>
             </div>
             <div class="searchBar">
@@ -266,13 +339,6 @@
 <script>
     const API = window.location.origin + "/api";
 
-    // No right-click, no copy
-    document.addEventListener("contextmenu", e => e.preventDefault());
-    document.addEventListener("copy",        e => e.preventDefault());
-    document.addEventListener("cut",         e => e.preventDefault());
-    document.addEventListener("keydown",     e => {
-        if ((e.ctrlKey || e.metaKey) && ["c","x","u","s","a"].includes(e.key.toLowerCase())) e.preventDefault();
-    });
 
     // Category icons map
     const iconMap = {

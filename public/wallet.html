@@ -961,9 +961,9 @@
                 🔔<span class="navNotifDot"></span>
             </div>
             <div class="navUser">
-    <div class="navAvatar" id="navAvatar">A</div>
-    <span id="navUserName">Loading...</span> ▾
-</div>
+                <div class="navAvatar" id="navAvatar">A</div>
+                <span id="navUserName">Loading...</span> ▾
+            </div>
         </div>
     </div>
 
@@ -1106,7 +1106,13 @@
             <div class="popInput">
                 <input id="withdrawMobile" type="tel" placeholder="Mob. No" disabled style="padding-left:14px;">
             </div>
+            <div class="popInput">
+                <input id="withdrawMobile" type="tel" placeholder="Mob. No" disabled style="padding-left:14px;">
+            </div>
 
+            <div style="margin:-2px 0 14px 2px;"><a href="account-details.html" style="font-size:12px;color:var(--primary); font-weight:600;
+              text-decoration:none;">+ Add your account details </a>
+            </div>
             <button class="popBtn popBtnPrimary" onclick="submitWithdraw()">
                 Withdraw Request
             </button>
@@ -1456,41 +1462,41 @@
         });
         // --- Staff name load----
         function loadStaffName() {
-    try {
-        const token = localStorage.getItem("staffToken");
+            try {
+                const token = localStorage.getItem("staffToken");
 
-        if (!token) return;
+                if (!token) return;
 
-        const payload = JSON.parse(atob(token.split(".")[1]));
+                const payload = JSON.parse(atob(token.split(".")[1]));
 
-        // OPTIONAL: if name stored in token
-        if (payload.name) {
-            document.getElementById("navUserName").innerText = payload.name;
+                // OPTIONAL: if name stored in token
+                if (payload.name) {
+                    document.getElementById("navUserName").innerText = payload.name;
 
-            document.getElementById("navAvatar").innerText =
-                payload.name.charAt(0).toUpperCase();
-        } else {
-            // fallback → fetch from API
-            fetch(API + "/staff/profile", {
-                headers: { Authorization: "Bearer " + token }
-            })
-            .then(res => res.json())
-            .then(data => {
-                const name = data.name || "User";
+                    document.getElementById("navAvatar").innerText =
+                        payload.name.charAt(0).toUpperCase();
+                } else {
+                    // fallback → fetch from API
+                    fetch(API + "/staff/profile", {
+                        headers: { Authorization: "Bearer " + token }
+                    })
+                        .then(res => res.json())
+                        .then(data => {
+                            const name = data.name || "User";
 
-                document.getElementById("navUserName").innerText = name;
-                document.getElementById("navAvatar").innerText =
-                    name.charAt(0).toUpperCase();
-            });
+                            document.getElementById("navUserName").innerText = name;
+                            document.getElementById("navAvatar").innerText =
+                                name.charAt(0).toUpperCase();
+                        });
+                }
+
+            } catch (err) {
+                console.log("Name load error:", err);
+            }
         }
-
-    } catch (err) {
-        console.log("Name load error:", err);
-    }
-}
-document.addEventListener("DOMContentLoaded", () => {
-    loadStaffName();
-});
+        document.addEventListener("DOMContentLoaded", () => {
+            loadStaffName();
+        });
     </script>
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 

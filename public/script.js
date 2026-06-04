@@ -1,6 +1,18 @@
   let allServices = [];
         const API = window.location.origin + "/api";
 
+        // CLOUDARY IMAGE SIZE OPTIMIZATION
+        function optimizeImage(url, width = 300) {
+    if (!url) return "";
+    if (url.includes("res.cloudinary.com")) {  return url.replace(
+            "/upload/",
+            `/upload/f_auto,q_auto,w_${width}/`
+        );
+    }
+
+    return url;
+}
+
         document.addEventListener("DOMContentLoaded", () => {
             loadLogo();
             loadSliderImages();
@@ -177,7 +189,7 @@ console.log("RESULT COUNT:", filtered.length);
             }
             if (desktopSlider) {
                 desktopSlider.innerHTML = images.map((img, i) =>
-                    `<a href="${img.link || '#'}" target="_blank"><img src="${img.path}" class="${i === 0 ? 'active' : ''}"></a>`
+                    `<a href="${img.link || '#'}" target="_blank"><img src="${optimizeImage(img.path, 800)}"class="${i === 0 ? 'active' : ''}"></a>`
                 ).join('');
             }
             if (desktopDots) {
@@ -187,7 +199,7 @@ console.log("RESULT COUNT:", filtered.length);
             }
             if (mobileBanner) {
                 mobileBanner.innerHTML = images.map((img, i) =>
-                    `<img src="${img.path}" class="${i === 0 ? 'active' : ''}">`
+                    `<img src="${optimizeImage(img.path, 800)}" class="${i === 0 ? 'active' : ''}">`
                 ).join('') + mobileBanner.innerHTML;
             }
             if (mobileDots) {
@@ -249,7 +261,7 @@ console.log("RESULT COUNT:", filtered.length);
 
                 const desktopHTML = data.map(s => `
                     <div class="popularCard">
-                       <img src="${s.image?.startsWith("http")? s.image: window.location.origin + s.image}" alt="${s.name}">
+                     <img src="${optimizeImage(s.image?.startsWith('http')? s.image: window.location.origin + s.image,300 )}"alt="${s.name}"loading="lazy"decoding="async">
                         <h4>${s.name}</h4>
                         <div class="rating">⭐ 4.8</div>
                         <div class="price">Starting ₹${s.price || 199}</div>
@@ -259,7 +271,7 @@ console.log("RESULT COUNT:", filtered.length);
 
                 const mobileHTML = data.map(s => `
                     <div class="mobilePopularItem">
-                        <img src="${ s.image?.startsWith("http")? s.image: window.location.origin + s.image}" alt="${s.name}">
+                         <img src="${optimizeImage(s.image?.startsWith('http')? s.image: window.location.origin + s.image,300 )}"alt="${s.name}"loading="lazy"decoding="async">
                         <h4>${s.name}</h4>
                         <div class="mRating">⭐ 4.8</div>
                         <div class="mPrice">₹${s.price || 199}</div>
@@ -288,15 +300,16 @@ console.log("RESULT COUNT:", filtered.length);
 
                 const desktopHTML = categories.map(cat => `
                     <div class="category-box" onclick="openCategory(${cat.id})">
-                       <img src="${ cat.image?.startsWith("http")? cat.image: window.location.origin + cat.image}" alt="${cat.name}">
+                      <img src="${optimizeImage(cat.image?.startsWith('http')? cat.image : window.location.origin + cat.image, 200 )}"
+    alt="${cat.name}" loading="lazy"decoding="async">
                         <h4>${cat.name}</h4>
                     </div>
                 `).join('');
 
                 const mobileHTML = categories.map(cat => `
                     <div class="mobileCatBox" onclick="openCategory(${cat.id})">
-                      <img src="${ cat.image?.startsWith("http") ? cat.image : window.location.origin + cat.image
-}" alt="${cat.name}">
+                      <img src="${optimizeImage(cat.image?.startsWith('http')? cat.image : window.location.origin + cat.image, 200 )}"
+    alt="${cat.name}" loading="lazy"decoding="async">
                         <h4>${cat.name}</h4>
                     </div>
                 `).join('');

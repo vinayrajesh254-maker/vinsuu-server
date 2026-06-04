@@ -1,13 +1,45 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Staff Register - Vinsuu</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap"
-        rel="stylesheet">
-
+    <title>Staff Registration | Vinsuu</title>
+    <meta name="description"
+        content="Register as a Vinsuu service professional. Submit your details, service expertise, identity verification and service area to join the Vinsuu platform.">
+    <meta name="author" content="Vinsuu">
+    <meta name="theme-color" content="#1a3fd4">
+    <meta name="robots" content="noindex,nofollow">
+    <meta name="googlebot" content="noindex,nofollow">
+    <meta name="bingbot" content="noindex,nofollow">
+    <link rel="canonical" href="https://vinsuu.com/staff-register.html">
+    <meta name="description"
+        content="Register as a Vinsuu service professional. Submit your details, service expertise, identity verification and service area to join the Vinsuu platform.">
+    <meta name="author" content="Vinsuu">
+    <meta name="theme-color" content="#1a3fd4">
+    <meta name="robots" content="noindex,nofollow">
+    <meta name="googlebot" content="noindex,nofollow">
+    <meta name="bingbot" content="noindex,nofollow">
+    <link rel="canonical" href="https://vinsuu.com/staff-register.html">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Staff Registration | Vinsuu">
+    <meta name="twitter:description" content="Register as a service professional on Vinsuu.">
+    <meta name="twitter:image" content="https://vinsuu.com/logo.png">
+    <script type="application/ld+json">
+{
+  "@context":"https://schema.org",
+  "@type":"WebPage",
+  "name":"Staff Registration",
+  "url":"https://vinsuu.com/staff-register.html",
+  "isPartOf":{
+    "@type":"WebSite",
+    "name":"Vinsuu",
+    "url":"https://vinsuu.com"
+  }
+}
+</script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap"rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <style>
         :root {
             --primary: #1a3fd4;
@@ -955,8 +987,8 @@
 
         const API = window.location.origin + "/api";
 
-const STAFF_API = API + "/staff";
-const ADMIN_API = API + "/admin";
+        const STAFF_API = API + "/staff";
+        const ADMIN_API = API + "/admin";
 
         let idImageBase64 = null;
         let profileImageBase64 = null;
@@ -1089,14 +1121,12 @@ const ADMIN_API = API + "/admin";
                             data.plus_code?.compound_code ||
                             data.results?.[0]?.formatted_address ||
                             `${lat}, ${lng}`;
-
-                        addressInput.value = address;
-
                         locationEl.innerHTML =
                             `<span style="color:#16a34a;font-weight:bold;">✔ Location updated</span>`;
-
-                        document.getElementById("locationSubText").textContent =
-                            "Location updated";
+                        document.getElementById("locationSubText").innerHTML = `
+    Latitude: ${lat.toFixed(6)}
+ Longitude: ${lng.toFixed(6)}
+`;
 
                     } catch (err) {
 
@@ -1278,7 +1308,7 @@ const ADMIN_API = API + "/admin";
             try { if (typeof loc === "string") loc = JSON.parse(loc); } catch { }
             if (loc?.lat && loc?.lng) {
                 selectedLat = loc.lat; selectedLng = loc.lng;
-                fetch(`${API}/geocode?lat=${lat}&lng=${lng}`)
+                fetch(`${API}/geocode?lat=${loc.lat}&lng=${loc.lng}`)
                     .then(r => r.json())
                     .then(data => {
                         let address = data.plus_code?.compound_code || data.results?.[0]?.formatted_address || "";
@@ -1296,8 +1326,17 @@ const ADMIN_API = API + "/admin";
             let serviceNames = [], serviceIds = [];
             if (Array.isArray(user.service_names)) serviceNames = user.service_names;
             else if (typeof user.service_names === "string") serviceNames = user.service_names.replace(/[{}]/g, "").split(",").map(s => s.trim()).filter(Boolean);
-            if (Array.isArray(user.service_ids)) serviceIds = user.service_ids;
-            else if (typeof user.service_ids === "string") serviceIds = user.service_ids.replace(/[{}]/g, "").split(",").map(id => parseInt(id)).filter(Boolean);
+            if (Array.isArray(user.service_ids)) { serviceIds = user.service_ids; } else if (typeof user.service_ids === "string") {
+                try {
+                    if (user.service_ids.startsWith("[")) {
+                        serviceIds = JSON.parse(user.service_ids);
+                    } else {
+                        serviceIds = user.service_ids.replace(/[{}]/g, "").split(",").map(id => parseInt(id)).filter(Boolean);
+                    }
+                } catch {
+                    serviceIds = [];
+                }
+            }
 
             selectedServices = serviceNames.map((name, i) => ({ id: serviceIds[i] || null, name, experience: user.experience || "" }));
             renderSelected();
@@ -1330,9 +1369,12 @@ const ADMIN_API = API + "/admin";
             }
 
             document.getElementById("agreeTerms").checked = user.agree_terms === true || user.agree_terms === "true";
-            document.querySelectorAll("input, select, textarea").forEach(el => el.disabled = true);
-            const btn = document.querySelector(".saveBtn");
-            btn.innerHTML = "✏ Edit Profile"; btn.onclick = enableEditMode;
+            if (isViewMode) {
+                document.querySelectorAll("input, select, textarea").forEach(el => el.disabled = true);
+                const btn = document.querySelector(".saveBtn");
+                btn.innerHTML = "✏ Edit Profile";
+                btn.onclick = enableEditMode;
+            }
         }
 
         function enableEditMode() {

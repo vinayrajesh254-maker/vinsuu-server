@@ -514,27 +514,7 @@
         function openFeedbackPage() { window.open("rating-feedback.html", "_blank"); }
         function openInvoice(id) { window.open("invoice.html?id=" + id, "_blank"); }
         function openPaymentQR() { window.location.href = "scan-pay.html"; }
-
-        async function openTransactions() {
-            closeStaffMenu();
-            const res = await fetch(API + "/staff/transactions", { headers: { "Authorization": "Bearer " + token } });
-            const data = await res.json();
-            let html = "<h3 style='margin-bottom:12px;'>Transaction History</h3>";
-            if (data.length === 0) html += "<p>No transactions</p>";
-            else data.forEach(t => { html += `<div class="requestCard"><p><b>Amount:</b> ${t.amount}</p><p><b>Type:</b> ${t.type}</p><p>${t.description}</p><p>${new Date(t.created_at).toLocaleString()}</p></div>`; });
-            document.getElementById("requests").innerHTML = html;
-        }
-
-        async function openWorkHistory() {
-            closeStaffMenu();
-            const res = await fetch(API + "/staff/work-history", { headers: { "Authorization": "Bearer " + token } });
-            const data = await res.json();
-            let html = "<h3 style='margin-bottom:12px;'>Work History</h3>";
-            if (data.length === 0) html += "<p>No completed work</p>";
-            else data.forEach(r => { html += `<div class="requestCard"><p><b>Service No.</b> ${r.id}</p><p><b>Heading:</b> ${r.heading}</p><p><b>Location:</b> ${r.pincode}, ${r.location}</p><p><b>Status:</b> ${r.status}</p></div>`; });
-            document.getElementById("requests").innerHTML = html;
-        }
-
+ 
         async function loadRating() {
             try {
                 const res = await fetch(API + "/staff/rating", { headers: { "Authorization": "Bearer " + token } });
