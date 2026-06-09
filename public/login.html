@@ -34,7 +34,10 @@ content="Secure staff login portal for Vinsuu service professionals. Access book
   }
 }
 </script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="preload" href="style.css" as="style">
 <link rel="stylesheet" href="style.css">
 <style>
   *, *::before, *::after {
@@ -54,7 +57,7 @@ content="Secure staff login portal for Vinsuu service professionals. Access book
   }
 
   body {
-    font-family: 'Poppins', sans-serif;
+    font-family: 'Poppins', Arial, sans-serif;
     min-height: 100vh;
     min-height: 100dvh;
     background: #eef2ff;
@@ -820,9 +823,7 @@ async function verifyOTP() {
 
     alert("Login successful");
 
-    setTimeout(() => {
-        window.location.href = "staff.html";
-    }, 300);
+    window.location.href = "staff.html";
 }
 
 // ================= REGISTER =================

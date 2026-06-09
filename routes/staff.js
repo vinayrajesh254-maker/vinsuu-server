@@ -655,6 +655,7 @@ WHERE (
     OR (sr.status = 'completed' AND sr.staff_id = $1)
 )
 ORDER BY sr.id DESC
+LIMIT 50
 `, [staffId]);
 
     const requests = result.rows;
@@ -1484,6 +1485,7 @@ router.get("/feedback", verifyToken, async (req, res) => {
             LEFT JOIN users u ON sr.customer_id = u.id
             WHERE sr.staff_id=$1 AND sr.rating IS NOT NULL
             ORDER BY sr.id DESC
+LIMIT 50
         `, [staff_id]);
 
     res.json(result.rows);
@@ -1534,6 +1536,7 @@ router.get("/feedback/:id", async (req, res) => {
             LEFT JOIN users u ON sr.customer_id = u.id
             WHERE sr.staff_id=$1 AND sr.rating IS NOT NULL
             ORDER BY sr.id DESC
+LIMIT 50
         `, [staff_id]);
 
     res.json(result.rows);
