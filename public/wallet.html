@@ -37,8 +37,7 @@
     <title>Wallet - Vinsuu | Secure Staff Wallet</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap&display=swap"
-      rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
 
     <style>
         :root {
@@ -1206,7 +1205,7 @@
     </div>
 
 
-    <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+    <script src="https://cdn.socket.io/4.7.5/socket.io.min.js" defer></script>
     <script>
         const API = window.location.origin + "/api";
         const token = localStorage.getItem("staffToken");
@@ -1492,7 +1491,7 @@
                 loadWallet();
                 loadTransactions();
                 loadWithdrawStatus();
-            }, 5000);
+            }, 30000);
         });
         // --- Staff name load----
         function loadStaffName() {
@@ -1532,7 +1531,7 @@
             loadStaffName();
         });
     </script>
-    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <script src="https://checkout.razorpay.com/v1/checkout.js" defer></script>
 
 </body>
 
