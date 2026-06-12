@@ -4,9 +4,41 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Wallet - Vinsuu</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap"
-        rel="stylesheet">
+    <meta name="description"
+    content="Secure Vinsuu Staff Wallet to manage wallet balance, unit balance, withdrawals, deposits and transaction history for home service professionals.">
+<meta name="keywords"
+    content="Vinsuu Staff Wallet, Wallet Balance, Staff Wallet, Withdraw Money, Transaction History, Unit Balance, Vinsuu">
+<meta name="robots" content="noindex,nofollow">
+<link rel="canonical" href="https://www.vinsuu.com/wallet.html">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Vinsuu Staff Wallet">
+<meta property="og:description"content="Manage wallet balance, withdrawals, deposits and transaction history securely with Vinsuu Staff Wallet.">
+<meta property="og:url" content="https://www.vinsuu.com/wallet.html">
+<meta property="og:image" content="https://www.vinsuu.com/logo.png">
+<meta property="og:site_name" content="Vinsuu">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Vinsuu Staff Wallet">
+<meta name="twitter:description" content="Manage your wallet balance, withdrawals and transaction history securely.">
+<meta name="twitter:image" content="https://www.vinsuu.com/logo.png">
+<meta name="theme-color" content="#1a3fd4">
+<script type="application/ld+json">
+{
+  "@context":"https://schema.org",
+  "@type":"WebPage",
+  "name":"Vinsuu Staff Wallet",
+  "url":"https://www.vinsuu.com/wallet.html",
+  "isPartOf":{
+    "@type":"WebSite",
+    "name":"Vinsuu",
+    "url":"https://www.vinsuu.com"
+  }
+}
+</script>
+    <title>Wallet - Vinsuu | Secure Staff Wallet</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap&display=swap"
+      rel="stylesheet">
 
     <style>
         :root {
@@ -1193,6 +1225,7 @@
         // ── LOAD WALLET ──
         async function loadWallet() {
             const res = await fetch(API + "/staff/wallet", { headers: { Authorization: "Bearer " + token } });
+            console.log("Authorization:", "Bearer " + token);
             const data = await res.json();
 
             let wallet = Number(data.wallet_balance || 0);
@@ -1207,6 +1240,7 @@
                 btn.style.opacity = wallet <= 0 ? "0.45" : "1";
             }
             console.log("WALLET API:", data);
+            console.log("Token:", token);
         }
 
         // ── LOAD TRANSACTIONS ──

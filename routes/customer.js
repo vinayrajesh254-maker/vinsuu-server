@@ -6,6 +6,7 @@ const { verifyToken } = require("../middleware/auth");
 const multer = require("multer");
 const path = require("path");
 const axios = require("axios");
+const { getIO } = require("../socket");
 const TWO_FACTOR_API_KEY = process.env.TWO_FACTOR_API_KEY;
 
 // ================= MULTER CONFIG =================
@@ -115,6 +116,28 @@ await pool.query(
     confirmation_amount || 0
   ]
 );
+// App notification to staff
+try {
+
+  const io = getIO();
+
+   io.emit("newServiceRequest", {
+    serviceNo: result.rows[0].id,
+    customerName: name,
+    serviceName: heading,
+    distance: distance || 0,
+    price: price || 0,
+    location: location || "",
+    pincode: pincode || "",
+    serviceHeading: heading || "",
+    serviceDetails: details || ""
+  });
+
+} catch (e) {
+
+  console.log("Socket emit error:", e.message);
+
+}
     // CREATE TOKEN
     const jwt = require("jsonwebtoken");
 

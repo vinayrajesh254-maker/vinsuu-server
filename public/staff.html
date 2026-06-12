@@ -5,25 +5,34 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Staff Panel - Vinsuu</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <meta name="description"
+      content="Secure staff dashboard for Vinsuu service professionals to manage profile, wallet, service requests and account details.">
+<meta name="author" content="Vinsuu">
+<meta name="theme-color" content="#1a3fd4">
+<meta name="robots" content="noindex,nofollow">
+<meta name="googlebot" content="noindex,nofollow">
+<link rel="canonical" href="https://www.vinsuu.com/staff.html">
+<meta property="og:title" content="Staff Panel | Vinsuu">
+<meta property="og:description"content="Secure dashboard for Vinsuu staff members.">
+<meta property="og:url"content="https://www.vinsuu.com/staff.html">
+<meta property="og:type" content="website">
+<meta property="og:image"content="https://www.vinsuu.com/logo.png">
+<meta property="og:image:alt"content="Vinsuu Home Services Logo">
+<meta property="og:site_name"content="Vinsuu">
+<meta name="twitter:card"content="summary_large_image">
+<meta name="twitter:title" content="Staff Panel | Vinsuu">
+<meta name="twitter:description"content="Secure dashboard for Vinsuu staff members.">
+<meta name="twitter:image" content="https://www.vinsuu.com/logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap"
-        rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
-    <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
-
-    <style>
-      
-    </style>
-
-    <script>
-   
-    </script>
-    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+ <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 </head>
 
 <body>
-
+<div id="topNotification" class="topNotification"></div>
     <!-- SIDE MENU OVERLAY -->
     <div class="sideOverlay" id="sideOverlay" onclick="closeMenu()"></div>
 
@@ -53,7 +62,7 @@
     <div class="topHeader">
         <div class="topHeaderLeft">
             <button class="backBtn" onclick="history.back()">←</button>
-            <span class="topHeaderTitle">Staff Profile</span>
+            <h1 class="topHeaderTitle">Staff Profile</h1>
         </div>
         <div class="dot-staff-menu">
             <ul class="dot-staff-menu-btn" onclick="toggleStaffMenu(event)">

@@ -5,12 +5,30 @@ let openedFormId = null;
 let isUnitPopupOpen = false;
 let sectionState = JSON.parse(localStorage.getItem("sectionState") || "{}");
 
-console.log("TOKEN IN STAFF.HTML:", token);
 let socket;
 
 document.addEventListener("DOMContentLoaded", () => {
-    console.log("TOKEN:", token);
     if (!token) { alert("Please login first"); window.location.href = "login.html"; return; }
+    document.getElementById("profileBox").innerHTML = `
+    <div class="profileCard" style="padding:20px;text-align:center;">
+        <div style="width:60px;height:60px;border-radius:50%;background:#e5e7eb;margin:auto;"></div>
+        <div style="height:18px;width:140px;background:#e5e7eb;margin:15px auto 8px;border-radius:6px;"></div>
+        <div style="height:14px;width:100px;background:#f1f5f9;margin:auto;border-radius:6px;"></div>
+        <div style="margin-top:15px;color:#666;">Loading profile...</div>
+    </div>
+`;
+document.getElementById("requests").innerHTML = `
+    <div style="display:flex;justify-content:center;align-items:center;padding:30px;">
+        <div style="
+            width:32px;
+            height:32px;
+            border:4px solid #e5e7eb;
+            border-top:4px solid #1a3fd4;
+            border-radius:50%;
+            animation:spin 1s linear infinite;
+        "></div>
+    </div>
+`;
     connectSocket();
     Promise.all([
         loadProfile(),
@@ -20,11 +38,23 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 function connectSocket() {
+
     try {
         socket = io(window.location.origin);
-        console.log("Socket connected");
-        socket.on("new_request", () => { loadRequests(); });
-    } catch (err) { console.log("Socket error:", err); }
+        socket.on("connect", () => {
+            const staffUser = JSON.parse(localStorage.getItem("staffUser") || "{}");
+            if (staffUser && staffUser.id) {
+                socket.emit("joinStaffRoom", staffUser.id);
+            }
+        });
+        socket.on("newServiceRequest", (data) => {
+            document.getElementById("notifySound").play();
+            showTopNotification(data);
+            loadRequests();
+        });
+    } catch (err) {
+        console.log(err);
+    }
 }
 
 // ── PROFILE ──
@@ -87,7 +117,6 @@ async function loadRequests() {
         const res = await fetch(API + "/staff/pending", { headers: { "Authorization": "Bearer " + token } });
         if (!res.ok) { document.getElementById("requests").innerHTML = `<div class="noData"><div class="noDataIcon">📋</div><p>No data</p></div>`; return; }
         allRequests = await res.json();
-        console.log("API RESPONSE:", allRequests);
         if (allRequests.length > lastRequestCount && lastRequestCount !== 0) { document.getElementById("notifySound").play(); alert("🔔 New Service Request Received!"); }
         lastRequestCount = allRequests.length;
         loadStaffRequests();
@@ -324,7 +353,9 @@ async function cancelRequest(id) {
 }
 
 document.addEventListener("focusin", (e) => {
-    if (e.target.tagName === "SELECT" || e.target.tagName === "INPUT") openedFormId = openedFormId || true;
+    if (e.target.tagName === "SELECT" || e.target.tagName === "INPUT") {
+        if (!openedFormId) openedFormId = e.target.closest("[id^='startForm-']")?.id?.replace("startForm-", "") || true;
+    }
 });
 
 function timeAgo(date) {
@@ -455,29 +486,26 @@ async function loadUnitPopup() {
     try {
         const res = await fetch(API + "/staff/unit/all");
         const data = await res.json();
-        console.log("UNIT POPUP DATA:", data);
         if (!Array.isArray(data)) { body.innerHTML = "<tr><td colspan='2'>Error loading</td></tr>"; return; }
         if (data.length === 0) { body.innerHTML = "<tr><td colspan='2'>No unit data</td></tr>"; return; }
         data.sort((a, b) => a.unit - b.unit);
         body.innerHTML = "";
         data.forEach(u => {
             body.innerHTML += `<tr onclick="buyUnit(${u.unit}, ${u.amount})" style="cursor:pointer;"><td>${u.unit} ⭐</td><td>₹ ${u.amount}</td></tr>`;
-            console.log("CLICK:", u.unit, u.amount);
         });
     } catch (err) { console.log(err); body.innerHTML = "<tr><td colspan='2'>Server error</td></tr>"; }
 }
 window.addEventListener("popstate", function () { if (isUnitPopupOpen) closeUnitPopup(); });
 
 async function buyUnit(unit, amount) {
-    console.log("CLICKED:", unit, amount);
     try {
         const res = await fetch(API + "/payment/create-order", { method: "POST", headers: { "Content-Type": "application/json", "Authorization": "Bearer " + localStorage.getItem("staffToken") }, body: JSON.stringify({ amount, unit }) });
         const order = await res.json();
+        const rzpKey = order.key || "";
         const options = {
-            key: "rzp_test_ShfyzJVzrxSupy", amount: order.amount, currency: "INR",
+            key: rzpKey, amount: order.amount, currency: "INR",
             name: "Unit Purchase", description: unit + " Unit Balance", order_id: order.id,
             handler: async function (response) {
-                console.log("PAYMENT SUCCESS", response);
                 await fetch(API + "/payment/verify-payment", { method: "POST", headers: { "Content-Type": "application/json", "Authorization": "Bearer " + localStorage.getItem("staffToken") }, body: JSON.stringify({ razorpay_order_id: response.razorpay_order_id, razorpay_payment_id: response.razorpay_payment_id, razorpay_signature: response.razorpay_signature, amount, unit }) });
                 alert("Payment Success ⭐"); location.reload();
             },
@@ -553,4 +581,23 @@ function toggleBilling(id) {
     const type = document.getElementById("billing-" + id)?.value;
     const box = document.getElementById(type + "Box-" + id);
     if (box) box.style.display = "block";
+}
+// App notification
+function showTopNotification(data){
+const box=document.getElementById("topNotification"); if(!box) return;
+    box.innerHTML=`
+        <div class="notifyHead"> <img class="notifyLogo" src="/logo.png"onerror="this.src='favicon.ico'" >
+            <div class="notifyTitle"> New Service Request </div> <div class="notifyTime"> Just now</div> </div>
+        <div class="notifyBody"> <div class="notifyNo">  Service No. ${data.serviceNo || ""}</div>
+            <div class="notifyRow"> <div class="notifyLabel">Name:</div> <div>${data.customerName || "-"}</div> </div>
+            <div class="notifyRow"><div class="notifyLabel">Service:</div> <div>${data.serviceName || "-"}</div></div>
+            <div class="notifyRow"><div class="notifyLabel">Distance:</div><div>${data.distance || "-"}</div></div>
+            <div class="notifyRow"> <div class="notifyLabel">Price:</div><div>₹ ${data.price || 0}</div> </div>
+            <div class="notifyRow"><div class="notifyLabel">Location:</div><div>${data.location || "-"}</div></div>
+            <div class="notifyRow"><div class="notifyLabel">Heading:</div><div>${data.serviceHeading || "-"}</div> </div>
+            <div class="notifyRow"><div class="notifyLabel">Details:</div> <div>${data.serviceDetails || "-"}</div></div>
+        </div>
+        <div class="notifyFooter"><span class="notifyBtn">  View Details</span></div>
+    `;
+    box.classList.add("show"); setTimeout(()=>{ box.classList.remove("show"); },10000);
 }

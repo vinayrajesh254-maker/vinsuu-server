@@ -152,7 +152,7 @@ console.log("RESULT COUNT:", filtered.length);
                 const data = await res.json();
                 document.querySelectorAll(".logoBox").forEach(box => {
                     if (data.length) {
-                       box.innerHTML = `<img src="${window.location.origin}${data[0].path}" style="height:36px;object-fit:contain;">`;
+                       box.innerHTML = `<img src="${window.location.origin}${data[0].path}" alt="Vinsuu Home Services Logo" style="height:36px;object-fit:contain;">`;
                     } else {
                         box.innerHTML = `<div class="logo-icon">🏠</div> VINSUU`;
                     }
@@ -189,7 +189,7 @@ console.log("RESULT COUNT:", filtered.length);
             }
             if (desktopSlider) {
                 desktopSlider.innerHTML = images.map((img, i) =>
-                    `<a href="${img.link || '#'}" target="_blank"><img src="${optimizeImage(img.path, 800)}"class="${i === 0 ? 'active' : ''}"></a>`
+                    `<a href="${img.link || '#'}" target="_blank"><img src="${optimizeImage(img.path, 800)}" alt="Vinsuu Home Services Banner" class="${i === 0 ? 'active' : ''}"></a>`
                 ).join('');
             }
             if (desktopDots) {
@@ -199,7 +199,7 @@ console.log("RESULT COUNT:", filtered.length);
             }
             if (mobileBanner) {
                 mobileBanner.innerHTML = images.map((img, i) =>
-                    `<img src="${optimizeImage(img.path, 800)}" class="${i === 0 ? 'active' : ''}">`
+                    `<img src="${optimizeImage(img.path, 800)}" alt="Vinsuu Home Services Banner" class="${i === 0 ? 'active' : ''}">`
                 ).join('') + mobileBanner.innerHTML;
             }
             if (mobileDots) {
@@ -261,7 +261,7 @@ console.log("RESULT COUNT:", filtered.length);
 
                 const desktopHTML = data.map(s => `
                     <div class="popularCard">
-                     <img src="${optimizeImage(s.image?.startsWith('http')? s.image: window.location.origin + s.image,300 )}"alt="${s.name}"loading="lazy"decoding="async">
+                     <img src="${optimizeImage(s.image?.startsWith('http')? s.image: window.location.origin + s.image,300 )}"alt="${s.name} Home Service in Silvassa by Vinsuu"loading="lazy"decoding="async">
                         <h4>${s.name}</h4>
                         <div class="rating">⭐ 4.8</div>
                         <div class="price">Starting ₹${s.price || 199}</div>
@@ -271,7 +271,7 @@ console.log("RESULT COUNT:", filtered.length);
 
                 const mobileHTML = data.map(s => `
                     <div class="mobilePopularItem">
-                         <img src="${optimizeImage(s.image?.startsWith('http')? s.image: window.location.origin + s.image,300 )}"alt="${s.name}"loading="lazy"decoding="async">
+                         <img src="${optimizeImage(s.image?.startsWith('http')? s.image: window.location.origin + s.image,300 )}"alt="${s.name} Home Service in Silvassa by Vinsuu"loading="lazy"decoding="async">
                         <h4>${s.name}</h4>
                         <div class="mRating">⭐ 4.8</div>
                         <div class="mPrice">₹${s.price || 199}</div>
@@ -301,7 +301,7 @@ console.log("RESULT COUNT:", filtered.length);
                 const desktopHTML = categories.map(cat => `
                     <div class="category-box" onclick="openCategory(${cat.id})">
                       <img src="${optimizeImage(cat.image?.startsWith('http')? cat.image : window.location.origin + cat.image, 200 )}"
-    alt="${cat.name}" loading="lazy"decoding="async">
+  alt="${cat.name} Home Service Category in Silvassa" loading="lazy"decoding="async">
                         <h4>${cat.name}</h4>
                     </div>
                 `).join('');
@@ -309,7 +309,7 @@ console.log("RESULT COUNT:", filtered.length);
                 const mobileHTML = categories.map(cat => `
                     <div class="mobileCatBox" onclick="openCategory(${cat.id})">
                       <img src="${optimizeImage(cat.image?.startsWith('http')? cat.image : window.location.origin + cat.image, 200 )}"
-    alt="${cat.name}" loading="lazy"decoding="async">
+    alt="${cat.name} Home Service Category in Silvassa" loading="lazy"decoding="async">
                         <h4>${cat.name}</h4>
                     </div>
                 `).join('');
