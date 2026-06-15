@@ -337,7 +337,7 @@ content="https://www.vinsuu.com/logo.png">
     </div>
 
 <script>
-    const API = window.location.origin + "/api";
+    const API = "https://www.vinsuu.com/api";
 
 
     // Category icons map
@@ -408,11 +408,11 @@ content="https://www.vinsuu.com/logo.png">
                     <span class="catChevron">›</span>
                 </div>`;
 
-            // Click opens category
-            box.onclick = () => {
-                const catId = services[0]?.category_id;
-                if (catId) window.location.href = `category.html?id=${catId}`;
-            };
+            // // Click opens category
+            // box.onclick = () => {
+            //     const catId = services[0]?.category_id;
+            //     if (catId) window.location.href = `category.html?id=${catId}`;
+            // };
 
             container.appendChild(box);
         });

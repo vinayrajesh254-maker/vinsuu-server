@@ -1150,5 +1150,99 @@ router.post("/contact", async (req, res) => {
     res.status(500).json({ error: "Server error" });
   }
 });
+// ================= CHECK STAFF ( UPDATE) =================
+// ================= CHECK STAFF ( UPDATE) =================
 
+router.get("/check-staff/:requestId", async (req, res) => {
+
+  try {
+
+    const requestId = req.params.requestId;
+
+    // Get service request
+    const requestResult = await pool.query(
+      `
+      SELECT
+        service_id,
+        latitude,
+        longitude
+      FROM service_requests
+      WHERE id = $1
+      `,
+      [requestId]
+    );
+
+    if (requestResult.rows.length === 0) {
+      return res.status(404).json([]);
+    }
+
+    const requestData = requestResult.rows[0];
+
+    const serviceId = Number(requestData.service_id);
+    const lat = Number(requestData.latitude);
+    const lng = Number(requestData.longitude);
+
+    const result = await pool.query(
+      `
+    SELECT
+    s.id,
+    s.id AS staff_id,
+    s.name,
+    s.mobile,
+
+    (
+        6371 * acos(
+            cos(radians($1))
+            *
+            cos(radians((s.location::json->>'lat')::double precision))
+            *
+            cos(
+                radians((s.location::json->>'lng')::double precision)
+                - radians($2)
+            )
+            +
+            sin(radians($1))
+            *
+            sin(radians((s.location::json->>'lat')::double precision))
+        )
+    ) AS distance
+
+FROM staff s
+
+WHERE
+    s.location IS NOT NULL
+
+    AND EXISTS (
+        SELECT 1
+        FROM json_array_elements_text(s.service_ids::json) j
+        WHERE j::int = $3
+    )
+
+ORDER BY distance ASC;
+      `,
+      [
+        lat,
+        lng,
+        String(serviceId)
+      ]
+    );
+
+    // only within 5 KM
+    const nearbyStaff = result.rows.filter(
+      row => Number(row.distance) <= 5
+    );
+
+    res.json(nearbyStaff);
+
+  } catch (err) {
+
+    console.log("CHECK STAFF ERROR:", err);
+
+    res.status(500).json({
+      error: "Server error"
+    });
+
+  }
+
+});
 module.exports = router;

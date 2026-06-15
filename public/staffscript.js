@@ -1,13 +1,15 @@
-const API = window.location.origin + "/api";
+const API = "https://www.vinsuu.com/api";
 let token = localStorage.getItem("staffToken");
 let lastRequestCount = 0;
 let openedFormId = null;
 let isUnitPopupOpen = false;
 let sectionState = JSON.parse(localStorage.getItem("sectionState") || "{}");
 
+console.log("TOKEN IN STAFF.HTML:", token);
 let socket;
 
 document.addEventListener("DOMContentLoaded", () => {
+    console.log("TOKEN:", token);
     if (!token) { alert("Please login first"); window.location.href = "login.html"; return; }
     document.getElementById("profileBox").innerHTML = `
     <div class="profileCard" style="padding:20px;text-align:center;">
@@ -40,11 +42,13 @@ document.getElementById("requests").innerHTML = `
 function connectSocket() {
 
     try {
-        socket = io(window.location.origin);
+        socket = io("https://www.vinsuu.com");
         socket.on("connect", () => {
+            console.log("Socket connected:", socket.id);
             const staffUser = JSON.parse(localStorage.getItem("staffUser") || "{}");
             if (staffUser && staffUser.id) {
                 socket.emit("joinStaffRoom", staffUser.id);
+                console.log("Joined room:", staffUser.id);
             }
         });
         socket.on("newServiceRequest", (data) => {
@@ -78,7 +82,7 @@ async function loadProfile() {
                 ? user.profile_image
                 : user.profile_image.startsWith('data:')
                     ? user.profile_image
-                    : window.location.origin + user.profile_image
+                    : "https://www.vinsuu.com" + user.profile_image
             }?t=${Date.now()}">`
             : firstLetter
         }
@@ -117,6 +121,7 @@ async function loadRequests() {
         const res = await fetch(API + "/staff/pending", { headers: { "Authorization": "Bearer " + token } });
         if (!res.ok) { document.getElementById("requests").innerHTML = `<div class="noData"><div class="noDataIcon">📋</div><p>No data</p></div>`; return; }
         allRequests = await res.json();
+        console.log("API RESPONSE:", allRequests);
         if (allRequests.length > lastRequestCount && lastRequestCount !== 0) { document.getElementById("notifySound").play(); alert("🔔 New Service Request Received!"); }
         lastRequestCount = allRequests.length;
         loadStaffRequests();
@@ -353,9 +358,7 @@ async function cancelRequest(id) {
 }
 
 document.addEventListener("focusin", (e) => {
-    if (e.target.tagName === "SELECT" || e.target.tagName === "INPUT") {
-        if (!openedFormId) openedFormId = e.target.closest("[id^='startForm-']")?.id?.replace("startForm-", "") || true;
-    }
+    if (e.target.tagName === "SELECT" || e.target.tagName === "INPUT") openedFormId = openedFormId || true;
 });
 
 function timeAgo(date) {
@@ -486,26 +489,29 @@ async function loadUnitPopup() {
     try {
         const res = await fetch(API + "/staff/unit/all");
         const data = await res.json();
+        console.log("UNIT POPUP DATA:", data);
         if (!Array.isArray(data)) { body.innerHTML = "<tr><td colspan='2'>Error loading</td></tr>"; return; }
         if (data.length === 0) { body.innerHTML = "<tr><td colspan='2'>No unit data</td></tr>"; return; }
         data.sort((a, b) => a.unit - b.unit);
         body.innerHTML = "";
         data.forEach(u => {
             body.innerHTML += `<tr onclick="buyUnit(${u.unit}, ${u.amount})" style="cursor:pointer;"><td>${u.unit} ⭐</td><td>₹ ${u.amount}</td></tr>`;
+            console.log("CLICK:", u.unit, u.amount);
         });
     } catch (err) { console.log(err); body.innerHTML = "<tr><td colspan='2'>Server error</td></tr>"; }
 }
 window.addEventListener("popstate", function () { if (isUnitPopupOpen) closeUnitPopup(); });
 
 async function buyUnit(unit, amount) {
+    console.log("CLICKED:", unit, amount);
     try {
         const res = await fetch(API + "/payment/create-order", { method: "POST", headers: { "Content-Type": "application/json", "Authorization": "Bearer " + localStorage.getItem("staffToken") }, body: JSON.stringify({ amount, unit }) });
         const order = await res.json();
-        const rzpKey = order.key || "";
         const options = {
-            key: rzpKey, amount: order.amount, currency: "INR",
+            key: "rzp_test_ShfyzJVzrxSupy", amount: order.amount, currency: "INR",
             name: "Unit Purchase", description: unit + " Unit Balance", order_id: order.id,
             handler: async function (response) {
+                console.log("PAYMENT SUCCESS", response);
                 await fetch(API + "/payment/verify-payment", { method: "POST", headers: { "Content-Type": "application/json", "Authorization": "Bearer " + localStorage.getItem("staffToken") }, body: JSON.stringify({ razorpay_order_id: response.razorpay_order_id, razorpay_payment_id: response.razorpay_payment_id, razorpay_signature: response.razorpay_signature, amount, unit }) });
                 alert("Payment Success ⭐"); location.reload();
             },

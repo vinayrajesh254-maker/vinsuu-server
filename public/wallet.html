@@ -1207,9 +1207,9 @@
 
     <script src="https://cdn.socket.io/4.7.5/socket.io.min.js" defer></script>
     <script>
-        const API = window.location.origin + "/api";
+        const API = "https://www.vinsuu.com/api";
         const token = localStorage.getItem("staffToken");
-        const socket = io();
+        const socket = io("https://www.vinsuu.com");
 
         const staffId = JSON.parse(atob(token.split(".")[1])).id;
         socket.emit("joinStaffRoom", staffId);
