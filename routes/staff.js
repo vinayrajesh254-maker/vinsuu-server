@@ -532,17 +532,38 @@ router.get("/profile", verifyToken, async (req, res) => {
 
 });
 
+
 // ================= WALLET =================
 router.get("/wallet", verifyToken, async (req, res) => {
 
-  const result = await pool.query(
-    "SELECT wallet_balance, unit_balance FROM staff WHERE id=$1",
-    [req.user.id]
-  );
+  try {
 
-  res.json({
-    wallet_balance: result.rows[0]?.wallet_balance || 0
-  });
+    const result = await pool.query(
+      `
+      SELECT
+        COALESCE(wallet_balance,0) AS wallet_balance,
+        COALESCE(unit_balance,0) AS unit_balance
+      FROM staff
+      WHERE id=$1
+      `,
+      [req.user.id]
+    );
+
+    res.json({
+      wallet_balance: Number(result.rows[0]?.wallet_balance || 0),
+      unit_balance: Number(result.rows[0]?.unit_balance || 0)
+    });
+
+  } catch (err) {
+
+    console.log(err);
+
+    res.status(500).json({
+      wallet_balance: 0,
+      unit_balance: 0
+    });
+
+  }
 
 });
 // ================= TRANSECTION =================

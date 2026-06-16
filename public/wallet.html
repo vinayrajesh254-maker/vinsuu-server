@@ -1205,7 +1205,7 @@
     </div>
 
 
-    <script src="https://cdn.socket.io/4.7.5/socket.io.min.js" defer></script>
+    <script src="https://cdn.socket.io/4.7.5/socket.io.min.js" ></script>
     <script>
         const API = "https://www.vinsuu.com/api";
         const token = localStorage.getItem("staffToken");
@@ -1226,7 +1226,7 @@
             const res = await fetch(API + "/staff/wallet", { headers: { Authorization: "Bearer " + token } });
             console.log("Authorization:", "Bearer " + token);
             const data = await res.json();
-
+console.log(data);
             let wallet = Number(data.wallet_balance || 0);
             let unit = Number(data.unit_balance || 0);
 
