@@ -532,7 +532,6 @@ router.get("/profile", verifyToken, async (req, res) => {
 
 });
 
-
 // ================= WALLET =================
 router.get("/wallet", verifyToken, async (req, res) => {
 

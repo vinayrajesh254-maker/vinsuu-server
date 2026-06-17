@@ -31,7 +31,7 @@ content="Read the terms and conditions for Vinsuu service professionals, includi
   }
 }
 </script>
-
+<link rel="stylesheet" href="style.css">
 <style>
 body{
     margin:0;
@@ -66,18 +66,94 @@ h1{
         padding:15px;
     }
 }
+:root{
+    --primary-dark:#1430b0;
+    --primary-mid:#2b52e0;
+}
+
+.topHeader {
+    background: linear-gradient(90deg, var(--primary-mid) 0%, var(--primary-dark) 100%);
+    padding: 14px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 12px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 12px rgba(26, 63, 212, 0.25);
+}
+
+.backBtn{
+    background:rgba(255,255,255,0.15);
+    border:none;
+    color:white;
+    width:34px;
+    height:34px;
+    border-radius:50%;
+    font-size:18px;
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    transition:background 0.2s;
+    flex-shrink:0;
+}
+
+.backBtn:hover{
+    background:rgba(255,255,255,0.25);
+}
+
+.topHeaderTitle{
+    font-size:17px;
+    font-weight:700;
+    color:white;
+       margin-left: 0 !important;
+}
+
 </style>
 </head>
 
 <body>
+    <!-- SIDE MENU OVERLAY -->
+    <div class="sideOverlay" id="sideOverlay" onclick="closeMenu()"></div>
+
+    <!-- SIDE MENU -->
+    <div class="sideMenu" id="sideMenu">
+        <a href="index.html" onclick="closeMenu()">🏠 Home</a>
+        <a href="#" onclick="closeMenu()">📱 App Download</a>
+        <a href="about.html" onclick="closeMenu()">ℹ️ About Us</a>
+        <a href="#footerContact" onclick="closeMenu()">☎️ Contact Us</a>
+    </div>
+
+    <!-- ========================== DESKTOP ========================== -->
+    <!-- HEADER -->
+    <div class="header">
+        <a href="index.html" class="logo" id="logoBox">
+            <div class="logo-icon">🏠</div>VINSUU
+        </a>
+        <nav class="nav">
+            <a href="index.html" >Home</a>
+            <a href="service-list.html">Services </a>
+            <a href="category.html">Categories</a>
+            <a href="about.html" class="active">About Us</a>
+            
+            
+        </nav>
+    </div>
+
+<div class="topHeader">
+    <button class="backBtn" onclick="goBack()">←</button>
+    <span class="topHeaderTitle">Terms & condition for staff</span>
+</div>
+
 
 <div class="container">
     <div class="box">
-        <h1 id="title">Staff terms</h1>
+        <h1 id="title">Terms & condition for staff</h1>
         <div id="content" class="content"></div>
     </div>
 </div>
-
 <script>
 const API = window.location.origin + "/api";
 

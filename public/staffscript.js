@@ -32,10 +32,11 @@ document.getElementById("requests").innerHTML = `
     </div>
 `;
     connectSocket();
-    Promise.all([
-        loadProfile(),
-        loadRequests()
-    ]);
+   loadProfile();
+
+setTimeout(() => {
+    loadRequests();
+}, 100);
     setInterval(() => { if (!openedFormId && !isUnitPopupOpen) loadRequests(); }, 15000);
 });
 

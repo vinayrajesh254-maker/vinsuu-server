@@ -138,15 +138,16 @@
            MOBILE TOP BAR
         ══════════════════════════ */
         .mobileNav {
-            display: none;
-            background: var(--primary);
-            padding: 14px 18px;
-            align-items: center;
-            justify-content: space-between;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
+    display: none;
+    background: var(--primary);
+    padding: 14px 18px;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 12px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
 
         .mobileNavMenu {
             font-size: 22px;
@@ -1002,7 +1003,7 @@
     <div class="mobileNav">
         <div class="mobileNavMenu" onclick="window.history.back()">←</div>
         <div class="mobileNavTitle">Wallet</div>
-        <div class="mobileNavNotif">🔔</div>
+        <!-- <div class="mobileNavNotif">🔔</div> -->
     </div>
 
     <!-- ── PAGE ── -->

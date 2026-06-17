@@ -6,44 +6,35 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Home Service Categories | Vinsuu Home Services Silvassa</title>
     <meta name="description"
-content="Browse home service categories in Silvassa including plumber, electrician, AC repair, cleaning, carpentry, appliance repair and more with Vinsuu.">
+        content="Browse home service categories in Silvassa including plumber, electrician, AC repair, cleaning, carpentry, appliance repair and more with Vinsuu.">
 
-<meta name="keywords"
-content="home services Silvassa, plumber Silvassa, electrician Silvassa, AC repair, cleaning services, carpentry, appliance repair, Vinsuu categories">
+    <meta name="keywords"
+        content="home services Silvassa, plumber Silvassa, electrician Silvassa, AC repair, cleaning services, carpentry, appliance repair, Vinsuu categories">
 
-<meta name="robots"
-content="index,follow">
+    <meta name="robots" content="index,follow">
 
-<link rel="canonical"
-href="https:///category.html">
+    <link rel="canonical" href="https:///category.html">
 
-<meta property="og:title"
-content="Home Service Categories | Vinsuu">
+    <meta property="og:title" content="Home Service Categories | Vinsuu">
 
-<meta property="og:description"
-content="Explore trusted home service categories including plumbing, electrical, cleaning, AC repair and more.">
+    <meta property="og:description"
+        content="Explore trusted home service categories including plumbing, electrical, cleaning, AC repair and more.">
 
-<meta property="og:url"
-content="https://www.vinsuu.com/category.html">
+    <meta property="og:url" content="https://www.vinsuu.com/category.html">
 
-<meta property="og:type"
-content="website">
+    <meta property="og:type" content="website">
 
-<meta property="og:image"
-content="https://www.vinsuu.com/logo.png">
+    <meta property="og:image" content="https://www.vinsuu.com/logo.png">
 
-<meta name="twitter:card"
-content="summary_large_image">
+    <meta name="twitter:card" content="summary_large_image">
 
-<meta name="twitter:title"
-content="vinsuu.comHome Service Categories | Vinsuu">
+    <meta name="twitter:title" content="vinsuu.comHome Service Categories | Vinsuu">
 
-<meta name="twitter:description"
-content="Find trusted home services in Silvassa through Vinsuu service categories.">
+    <meta name="twitter:description"
+        content="Find trusted home services in Silvassa through Vinsuu service categories.">
 
-<meta name="twitter:image"
-content="https://www.vinsuu.com/logo.png">
-<script type="application/ld+json">
+    <meta name="twitter:image" content="https://www.vinsuu.com/logo.png">
+    <script type="application/ld+json">
 {
   "@context":"https://schema.org",
   "@type":"ItemList",
@@ -557,17 +548,20 @@ content="https://www.vinsuu.com/logo.png">
             }
 
             .topHeader {
-                padding: 0 12px;
-                gap: 10px;
+                padding: 0 8px;
+                gap: 6px;
+                justify-content: flex-start;
+            }
+
+            .topHeader .logo {
+                margin: 0;
             }
 
             .topHeader .logo span {
                 display: none;
             }
 
-            .pageTitle {
-                font-size: 13px;
-            }
+        
 
             .catItem {
                 padding: 10px 4px;
@@ -708,11 +702,10 @@ content="https://www.vinsuu.com/logo.png">
                     div.className = "catItem" + (String(cat.id) === String(categoryId) ? " active" : "");
                     div.innerHTML = `
                        <img class="catImg"
-     src="${
-        cat.image?.startsWith('http')
-        ? cat.image
-        : window.location.origin + (cat.image || '')
-     }"
+     src="${cat.image?.startsWith('http')
+                            ? cat.image
+                            : window.location.origin + (cat.image || '')
+                        }"
      alt="${cat.name}"
      onerror="this.src='https://cdn-icons-png.flaticon.com/512/1246/1246640.png'">
                         <span class="catName">${cat.name}</span>
@@ -775,11 +768,10 @@ content="https://www.vinsuu.com/logo.png">
                 grid.innerHTML = filtered.map(service => `
                     <div class="serviceCard" onclick="window.location.href='request.html?service=${service.id}'">
                         <img class="cardImg"
-     src="${
-        service.image?.startsWith('http')
-        ? service.image
-        : window.location.origin + service.image
-     }"
+     src="${service.image?.startsWith('http')
+                        ? service.image
+                        : window.location.origin + service.image
+                    }"
      alt="${service.name}"
                              onerror="this.src='https://via.placeholder.com/300x150?text=Service'">
                         <div class="cardBody">

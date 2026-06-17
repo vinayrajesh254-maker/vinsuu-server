@@ -1279,7 +1279,12 @@
                 localStorage.setItem("user", JSON.stringify(updatedStaffUser));
                 console.log("SAVED STAFF USER:", updatedStaffUser);
                 alert(isViewMode ? "Profile Updated Successfully" : "Registered Successfully");
-                window.location.href = "staff.html";
+
+showStaffLoader();
+
+setTimeout(() => {
+    window.location.href = "staff.html";
+}, 500);
             } else { alert(data.error || "Error saving data"); }
         }
 
@@ -1424,6 +1429,10 @@
         function acceptTerms() { document.getElementById("agreeTerms").checked = true; closeTerms(); }
         function enableIdUpload() { document.getElementById("idUpload").disabled = false; }
         function enablePhotoUpload() { document.getElementById("photoUpload").disabled = false; }
+// ========== STAFF LOADER ===========
+        function showStaffLoader(){
+    document.getElementById("staffLoadingOverlay").style.display = "flex";
+}
     </script>
     <script src="script.js"></script>
 </head>
@@ -1669,6 +1678,41 @@
         </div>
 
     </div><!-- /container -->
+
+    <!-- STAFF LOADER -->
+<div id="staffLoadingOverlay" style="
+display:none;
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:rgba(255,255,255,0.95);
+z-index:99999;
+justify-content:center;
+align-items:center;
+flex-direction:column;
+">
+    <div class="staffLoader"></div>
+    <div style="margin-top:15px;font-size:16px;font-weight:600;color:#1a3fd4;">
+        Wait a minute...
+    </div>
+</div>
+
+<style>
+.staffLoader{
+    width:60px;
+    height:60px;
+    border:6px solid #e5e7eb;
+    border-top:6px solid #1a3fd4;
+    border-radius:50%;
+    animation:staffSpin 1s linear infinite;
+}
+@keyframes staffSpin{
+    from{transform:rotate(0deg);}
+    to{transform:rotate(360deg);}
+}
+</style>
     <script src="script.js"></script>
 </body>
 
