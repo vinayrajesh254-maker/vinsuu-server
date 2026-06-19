@@ -1300,10 +1300,39 @@
             loadUnitRates();
             loadAccountDetails();
             loadMessages();
+            loadContactDetails();
             loadServiceUpdates();
             loadSavedQR();
         });
+        // Phone or email
+async function loadContactDetails() {
 
+    try {
+
+        const phoneRes =
+            await fetch(API + "/admin/content/contactPhone");
+
+        const phoneData = await phoneRes.json();
+
+        if (document.getElementById("contactPhone")) {
+            document.getElementById("contactPhone").value =
+                phoneData.content || "";
+        }
+
+        const emailRes =
+            await fetch(API + "/admin/content/contactEmail");
+
+        const emailData = await emailRes.json();
+
+        if (document.getElementById("contactEmail")) {
+            document.getElementById("contactEmail").value =
+                emailData.content || "";
+        }
+
+    } catch (err) {
+        console.log("Contact load error:", err);
+    }
+}
         // ── SIDEBAR TOGGLE ──
         function toggleSidebar() {
             const sidebar = document.getElementById("sidebar");
@@ -2058,6 +2087,11 @@
                     <input id="contactPhone">
                     <button onclick="savePhone()">Save Phone</button>
                 </div>
+                <div class="row">
+    <label>Email</label>
+    <input id="contactEmail" placeholder="support@vinsuu.com">
+    <button onclick="saveEmail()">Save Email</button>
+</div>
                 <div style="overflow-x:auto;">
                     <table>
                         <thead>
@@ -2286,7 +2320,36 @@
                 let services = []; if (Array.isArray(s.service_names)) services = s.service_names; else if (typeof s.service_names === "string") services = s.service_names.replace(/[{}]/g, "").split(",").map(x => x.trim());
                 const pinDisplay = Array.isArray(s.pincodes) ? s.pincodes.join(", ") : (s.pin_code || '');
                 const w = window.open("", "_blank");
-                w.document.write(`<html><head><title>Staff Profile</title><style>body{font-family:Arial;padding:20px}img{max-width:150px;margin:10px 0;border-radius:8px}.box{border:1px solid #ccc;padding:15px;margin-bottom:10px}</style></head><body><h2>Staff Profile</h2><div class="box"><p><b>ID:</b> ${s.id}</p><p><b>Name:</b> ${s.name || ''}</p><p><b>Mobile:</b> ${s.mobile || ''}</p><p><b>Email:</b> ${s.email || ''}</p><p><b>Qualification:</b> ${s.qualification || ''}</p></div><div class="box"><p><b>Services:</b> ${services.join(", ")}</p><p><b>Experience:</b> ${s.experience || '-'}</p><p><b>Address:</b> ${s.address || '-'}</p><p><b>Pincode:</b> ${pinDisplay}</p></div><div class="box"><p><b>ID Proof:</b> ${s.id_proof || ''} — ${s.id_proof_no || ''}</p></div><div class="box"><h3>Images</h3>${s.profile_image ? `<div><b>Profile:</b><br><img src="${s.profile_image}"></div>` : ""} ${s.id_image ? `<div><b>ID Proof:</b><br><img src="${s.id_image}"></div>` : ""}</div><div class="box"><h3>Change History</h3><table border="1" width="100%"><tr><th>Date</th><th>Time</th><th>Old</th><th>New</th></tr><tbody id="changeHistory"></tbody></table></div><button onclick="window.print()">Print / Save PDF</button></body></html>`);
+                w.document.write(`<html><head><title>Staff Profile</title><style>body{font-family:Arial;padding:20px}img{max-width:150px;margin:10px 0;border-radius:8px}.box{border:1px solid #ccc;padding:15px;margin-bottom:10px}</style></head><body><h2>Staff Profile</h2><div class="box"><p><b>ID:</b> ${s.id}</p><p><b>Name:</b> ${s.name || ''}</p><p><b>Mobile:</b> ${s.mobile || ''}</p><p><b>Email:</b> ${s.email || ''}</p><p><b>Qualification:</b> ${s.qualification || ''}</p></div><div class="box"><p><b>Services:</b></p>
+
+${services.map((serviceName, index) => `
+    <div style="margin-bottom:8px;">
+        <label style="font-weight:bold;">
+            <input type="checkbox"
+                   onchange="document.getElementById('detail_${index}').style.display=this.checked?'block':'none'">
+            ${serviceName}
+        </label>
+
+        <div id="detail_${index}"
+             style="display:none;margin:8px 0 0 25px;padding:10px;background:#f5f7ff;border-radius:6px;border:1px solid #ddd;">
+            ${
+                (() => {
+                    try{
+                        const selected = JSON.parse(s.service_detail_selection || "{}");
+                        const details = selected[serviceName] || [];
+
+                        return details.length
+                            ? details.map(d => `☑ ${d}<br>`).join("")
+                            : "No details selected";
+                    }catch(e){
+                        return "No details selected";
+                    }
+                })()
+            }
+        </div>
+    </div>
+`).join("")}
+<p><b>Experience:</b> ${s.experience || '-'}</p><p><b>Address:</b> ${s.address || '-'}</p><p><b>Pincode:</b> ${pinDisplay}</p></div><div class="box"><p><b>ID Proof:</b> ${s.id_proof || ''} — ${s.id_proof_no || ''}</p></div><div class="box"><h3>Images</h3>${s.profile_image ? `<div><b>Profile:</b><br><img src="${s.profile_image}"></div>` : ""} ${s.id_image ? `<div><b>ID Proof:</b><br><img src="${s.id_image}"></div>` : ""}</div><div class="box"><h3>Change History</h3><table border="1" width="100%"><tr><th>Date</th><th>Time</th><th>Old</th><th>New</th></tr><tbody id="changeHistory"></tbody></table></div><button onclick="window.print()">Print / Save PDF</button></body></html>`);
                 fetch(API + "/admin/staff-changes/" + id).then(r => r.json()).then(data => { const tbody = w.document.getElementById("changeHistory"); data.forEach(c => { const d = new Date(c.changed_at); tbody.innerHTML += `<tr><td>${d.toLocaleDateString()}</td><td>${d.toLocaleTimeString()}</td><td>${c.old_value}</td><td>${c.field}: ${c.new_value}</td></tr>`; }); });
             } catch { alert("Error loading profile"); }
         }
@@ -2376,7 +2439,63 @@
         // MESSAGES
         async function loadMessages() { try { const res = await fetch(API + "/admin/messages"); const data = await res.json(); const tbody = document.getElementById("messageListBody"); if (!tbody) return; tbody.innerHTML = ""; if (!data || !data.length) { tbody.innerHTML = "<tr><td colspan='7'>No messages</td></tr>"; return; } data.forEach((m, i) => { tbody.innerHTML += `<tr><td>${i + 1}</td><td>${new Date(m.created_at).toLocaleDateString()}</td><td>${m.name || '-'}</td><td>${m.mobile || '-'}</td><td>${m.email || '-'}</td><td>${m.pin_code || '-'}</td><td><button onclick="viewMessage(${m.id})">View</button></td></tr>`; }); } catch { } }
         function viewMessage(id) { fetch(API + "/admin/messages").then(r => r.json()).then(data => { const m = data.find(x => x.id === id); if (!m) return; alert(`Name: ${m.name}\nMobile: ${m.mobile || '-'}\nEmail: ${m.email || '-'}\nPin Code: ${m.pin_code || '-'}\n\nMessage:\n${m.message}`); }); }
-        async function savePhone() { const phone = document.getElementById("contactPhone").value; await fetch(API + "/admin/contact-phone", { method: "POST", headers: { "Content-Type": "application/json", "Authorization": "Bearer " + TOKEN }, body: JSON.stringify({ phone }) }); alert("Contact phone updated"); }
+     // SAVE PHONE
+async function savePhone() {
+
+    const phone = document.getElementById("contactPhone").value.trim();
+
+    if (!phone) {
+        alert("Enter phone number");
+        return;
+    }
+
+    const res = await fetch(API + "/admin/content", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            type: "contactPhone",
+            title: "Phone",
+            content: phone
+        })
+    });
+
+    const data = await res.json();
+
+    if (data.success) {
+        alert("Phone saved successfully");
+    }
+}
+// SAVE EMAIL
+async function saveEmail() {
+
+    const email =
+        document.getElementById("contactEmail").value.trim();
+
+    if (!email) {
+        alert("Enter email address");
+        return;
+    }
+
+    const res = await fetch(API + "/admin/content", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            type: "contactEmail",
+            title: "Email",
+            content: email
+        })
+    });
+
+    const data = await res.json();
+
+    if (data.success) {
+        alert("Email saved successfully");
+    }
+}
 
         // SERVICE UPDATES
         let serviceRequests = [], currentTab = "pending";

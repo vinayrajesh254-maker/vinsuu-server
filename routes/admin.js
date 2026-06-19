@@ -1245,4 +1245,5 @@ ORDER BY distance ASC;
   }
 
 });
+
 module.exports = router;

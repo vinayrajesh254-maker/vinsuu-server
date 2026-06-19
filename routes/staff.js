@@ -234,7 +234,9 @@ router.post(
   location,
   id_proof,
   id_proof_no,
-  agree_terms
+  agree_terms,
+  service_detail_selection
+
 } = req.body;
 
 const existing = await pool.query(
@@ -420,8 +422,9 @@ const result = await pool.query(`
     id_image=$14,
     profile_image=$15,
     camera_image=$16,
-    agree_terms=$17
-  WHERE mobile=$18
+    agree_terms=$17,
+service_detail_selection=$18
+     WHERE mobile=$19
   RETURNING *
 `, [
   name,
@@ -446,7 +449,8 @@ parsedLocation
   profile_image || null,
   camera_image || null,
   agree_terms || false,
-  mobile
+service_detail_selection || "[]",
+mobile
 ]);
 
 user = result.rows[0];
@@ -456,8 +460,8 @@ user = result.rows[0];
   // ================= INSERT =================
   const result = await pool.query(
     `INSERT INTO staff 
-(name, mobile, alt_mobile, email, qualification, experience, address, pincodes, service_id, service_ids, service_names, location, id_proof, id_proof_no, id_image, profile_image, camera_image, agree_terms, unit_balance)
-VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19)
+(name, mobile, alt_mobile, email, qualification, experience, address, pincodes, service_id, service_ids, service_names, location, id_proof, id_proof_no, id_image, profile_image, camera_image, agree_terms, service_detail_selection, unit_balance)
+VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20)
 RETURNING *`,
     [
       name,
@@ -483,6 +487,7 @@ parsedLocation
       profile_image || null,
       camera_image || null,
       agree_terms || false,
+      service_detail_selection || null,
       1   // ⭐ FREE UNIT
     ]
   );

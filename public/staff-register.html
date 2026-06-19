@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -37,7 +38,8 @@
   }
 }
 </script>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap"rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <style>
@@ -1056,8 +1058,9 @@
         }
 
         function addService(service) {
+              console.log("SERVICE ADDED:", service);
             if (selectedServices.find(s => s.id === service.id)) { alert("Already added"); return; }
-            selectedServices.push({ id: service.id, name: service.name, experience: "" });
+            selectedServices.push({ id: service.id, name: service.name, experience: "", selected_details: [] });
             renderSelected();
             document.getElementById("serviceSearch").value = selectedServices.map(s => s.name).join(", ");
         }
@@ -1071,7 +1074,21 @@
                 div.innerHTML = `
                 <div class="selectedCardNum">${i + 1}</div>
                 <div class="selectedCardContent">
-                    <div class="selectedCardName">${s.name}</div>
+                    <div style="display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-bottom:8px;">
+
+    <div class="selectedCardName" style="margin-bottom:0;">
+        ${s.name}
+    </div>
+
+    <label style="display:flex;align-items:center;gap:5px;font-size:12px;font-weight:600;color:#1a3fd4;cursor:pointer;">
+        <input type="checkbox"
+               onchange="toggleServiceDetails(${i},this.checked)">
+        View Details
+    </label>
+
+</div>
+
+<div id="detailsBox${i}" style="display:none;"></div>
                     <input placeholder="Experience (in years)" value="${s.experience || ''}" oninput="updateExp(${i},this.value)">
                 </div>
                 <button class="removeBtn" onclick="removeService(${i})">🗑</button>`;
@@ -1094,7 +1111,62 @@
             document.getElementById("serviceDetailsModal").style.display = "flex";
         }
         function closeDetails() { document.getElementById("serviceDetailsModal").style.display = "none"; }
+        function toggleServiceDetails(index, checked) {
 
+            const box = document.getElementById("detailsBox" + index);
+
+            if (!checked) { box.style.display = "none"; return;}
+
+            const service = allServices.find(
+                s => s.id == selectedServices[index].id
+            );
+
+            if (!service) return;
+
+            let details = [];
+
+            try {
+                details = JSON.parse(service.details || "[]");
+            } catch {
+                details = (service.details || "")
+                    .split(",")
+                    .map(x => x.trim())
+                    .filter(Boolean);
+            }
+
+            box.style.display = "block";
+
+            box.innerHTML = details.map(d => `
+<label style="display:block;margin:6px 0;">
+    <input type="checkbox"
+           ${(selectedServices[index].selected_details || []).includes(d) ? "checked" : ""}
+           onchange="saveDetailSelection(${index}, this, '${d}')">
+    ${d}
+</label>
+`).join("");
+        }
+
+        function saveDetailSelection(index, checkbox, detail) {
+
+            if (!selectedServices[index].selected_details) {
+                selectedServices[index].selected_details = [];
+            }
+
+            if (checkbox.checked) {
+
+                if (!selectedServices[index].selected_details.includes(detail)) {
+                    selectedServices[index].selected_details.push(detail);
+                }
+
+            } else {
+
+                selectedServices[index].selected_details =
+                    selectedServices[index].selected_details.filter(
+                        d => d !== detail
+                    );
+
+            }
+        }
         // ── LOCATION ──
         async function useCurrentLocation() {
             const locationEl = document.getElementById("currentLocationText");
@@ -1262,7 +1334,15 @@
                 const blob = await fetch(cameraImageBase64).then(r => r.blob());
                 formData.append("camera_image", blob, "camera.png");
             } else if (existingCameraImage) { formData.append("existing_camera_image", existingCameraImage); }
-
+            formData.append(
+                "service_detail_selection",
+                JSON.stringify(
+                    selectedServices.map(s => ({
+                        service_id: s.id,
+                        details: s.selected_details || []
+                    }))
+                )
+            );
             const res = await fetch(STAFF_API + "/register", { method: "POST", body: formData });
             const data = await res.json();
 
@@ -1280,11 +1360,11 @@
                 console.log("SAVED STAFF USER:", updatedStaffUser);
                 alert(isViewMode ? "Profile Updated Successfully" : "Registered Successfully");
 
-showStaffLoader();
+                showStaffLoader();
 
-setTimeout(() => {
-    window.location.href = "staff.html";
-}, 500);
+                setTimeout(() => {
+                    window.location.href = "staff.html";
+                }, 500);
             } else { alert(data.error || "Error saving data"); }
         }
 
@@ -1293,6 +1373,7 @@ setTimeout(() => {
             const token = localStorage.getItem("staffToken");
             let user = {};
             try {
+
                 const res = await fetch(STAFF_API + "/profile", { headers: { "Authorization": "Bearer " + token } });
                 console.log("PROFILE API DATA:", user);
                 if (res.ok) { user = await res.json(); console.log("PROFILE API DATA:", user); }
@@ -1429,12 +1510,12 @@ setTimeout(() => {
         function acceptTerms() { document.getElementById("agreeTerms").checked = true; closeTerms(); }
         function enableIdUpload() { document.getElementById("idUpload").disabled = false; }
         function enablePhotoUpload() { document.getElementById("photoUpload").disabled = false; }
-// ========== STAFF LOADER ===========
-        function showStaffLoader(){
-    document.getElementById("staffLoadingOverlay").style.display = "flex";
-}
+        // ========== STAFF LOADER ===========
+        function showStaffLoader() {
+            document.getElementById("staffLoadingOverlay").style.display = "flex";
+        }
     </script>
-    <script src="script.js"></script>
+  
 </head>
 
 <body>
@@ -1680,7 +1761,7 @@ setTimeout(() => {
     </div><!-- /container -->
 
     <!-- STAFF LOADER -->
-<div id="staffLoadingOverlay" style="
+    <div id="staffLoadingOverlay" style="
 display:none;
 position:fixed;
 top:0;
@@ -1693,26 +1774,32 @@ justify-content:center;
 align-items:center;
 flex-direction:column;
 ">
-    <div class="staffLoader"></div>
-    <div style="margin-top:15px;font-size:16px;font-weight:600;color:#1a3fd4;">
-        Wait a minute...
+        <div class="staffLoader"></div>
+        <div style="margin-top:15px;font-size:16px;font-weight:600;color:#1a3fd4;">
+            Wait a minute...
+        </div>
     </div>
-</div>
 
-<style>
-.staffLoader{
-    width:60px;
-    height:60px;
-    border:6px solid #e5e7eb;
-    border-top:6px solid #1a3fd4;
-    border-radius:50%;
-    animation:staffSpin 1s linear infinite;
-}
-@keyframes staffSpin{
-    from{transform:rotate(0deg);}
-    to{transform:rotate(360deg);}
-}
-</style>
+    <style>
+        .staffLoader {
+            width: 60px;
+            height: 60px;
+            border: 6px solid #e5e7eb;
+            border-top: 6px solid #1a3fd4;
+            border-radius: 50%;
+            animation: staffSpin 1s linear infinite;
+        }
+
+        @keyframes staffSpin {
+            from {
+                transform: rotate(0deg);
+            }
+
+            to {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
     <script src="script.js"></script>
 </body>
 
