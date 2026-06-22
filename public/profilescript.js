@@ -7,12 +7,18 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!token) { alert("Please login first"); window.location.href = "customer-login.html"; return; }
     loadProfile();
     loadRequests();
+    // Auto refresh requests every 5 seconds
+setInterval(() => {
+    if (!document.hidden) {
+        loadRequests();
+    }
+}, 5000);
 });
 
 // ── PROFILE ──
 async function loadProfile() {
-    const res  = await fetch(API + "/customer/profile", { headers: { "Authorization": "Bearer " + token } });
-    let user   = await res.json();
+    const res = await fetch(API + "/customer/profile", { headers: { "Authorization": "Bearer " + token } });
+    let user = await res.json();
     if (!user.name) { const localUser = JSON.parse(localStorage.getItem("user") || "{}"); user = { ...localUser, ...user }; }
 
     document.getElementById("profileBox").innerHTML = `
@@ -58,18 +64,18 @@ function openFullProfile() {
 }
 function closeFullProfile() {
     document.getElementById("profileBox").style.display = "block";
-    document.getElementById("fullProfile").style.display  = "none";
+    document.getElementById("fullProfile").style.display = "none";
     loadProfile();
 }
 async function fillFullProfile() {
-    const res  = await fetch(API + "/customer/profile", { headers: { "Authorization": "Bearer " + token } });
-    let user   = await res.json();
+    const res = await fetch(API + "/customer/profile", { headers: { "Authorization": "Bearer " + token } });
+    let user = await res.json();
     if (!user.name) { const lu = JSON.parse(localStorage.getItem("user") || "{}"); user = { ...lu, ...user }; }
-    document.getElementById("full_name").value    = user.name    || "";
-    document.getElementById("full_mobile").value  = user.mobile  || "";
-    document.getElementById("full_email").value   = user.email   || "";
+    document.getElementById("full_name").value = user.name || "";
+    document.getElementById("full_mobile").value = user.mobile || "";
+    document.getElementById("full_email").value = user.email || "";
     document.getElementById("full_address").value = user.address || "";
-    document.getElementById("full_image").src = user.image? window.location.origin + user.image: "https://via.placeholder.com/120";
+    document.getElementById("full_image").src = user.image ? window.location.origin + user.image : "https://via.placeholder.com/120";
     disableFull();
 }
 async function toggleEditFull() {
@@ -90,7 +96,7 @@ async function uploadFullImage() {
     const file = document.getElementById("imgInput").files[0];
     if (!file) { alert("Select image"); return; }
     const formData = new FormData(); formData.append("image", file);
-    const res  = await fetch(API + "/customer/upload-image", { method: "POST", headers: { "Authorization": "Bearer " + token }, body: formData });
+    const res = await fetch(API + "/customer/upload-image", { method: "POST", headers: { "Authorization": "Bearer " + token }, body: formData });
     const data = await res.json();
     let user = JSON.parse(localStorage.getItem("user") || "{}"); user.image = data.image; localStorage.setItem("user", JSON.stringify(user));
     alert("Image updated"); closeFullProfile(); loadProfile();
@@ -100,21 +106,21 @@ async function uploadFullImage() {
 let currentTab = "pending";
 function switchTab(tab) {
     currentTab = tab;
-    document.getElementById("pendingTab").classList.toggle("activeTab",   tab === "pending");
+    document.getElementById("pendingTab").classList.toggle("activeTab", tab === "pending");
     document.getElementById("completedTab").classList.toggle("activeTab", tab === "completed");
     loadRequests();
 }
 
 // ── REQUESTS ──
 async function loadRequests() {
-    const res      = await fetch(API + "/customer/my-requests", { headers: { "Authorization": "Bearer " + token } });
+    const res = await fetch(API + "/customer/my-requests", { headers: { "Authorization": "Bearer " + token } });
     const requests = await res.json();
     const container = document.getElementById("requests");
     container.innerHTML = "";
 
     const filtered = requests.filter(r => {
         const s = (r.status || "").toLowerCase();
-        if (currentTab === "pending")   return ["pending","accepted","waiting_customer_confirm","otp_pending","in_progress"].includes(s);
+        if (currentTab === "pending") return ["pending", "accepted", "waiting_customer_confirm", "otp_pending", "in_progress"].includes(s);
         if (currentTab === "completed") return s === "completed";
     });
 
@@ -138,7 +144,7 @@ async function loadRequests() {
             <div class="infoItem"><div class="infoItemLabel">Heading</div><div class="infoItemVal">${req.heading}</div></div>
             <div class="infoItem"><div class="infoItemLabel">Details</div><div class="infoItemVal">${req.details}</div></div>
             <div class="infoItem"><div class="infoItemLabel">Location</div><div class="infoItemVal">${req.pincode}, ${req.location}</div></div>
-            <div class="infoItem"><div class="infoItemLabel">Status</div><div class="infoItemVal"><span class="statusBadge ${req.status}">${req.status.replace(/_/g,' ')}</span></div></div>
+            <div class="infoItem"><div class="infoItemLabel">Status</div><div class="infoItemVal"><span class="statusBadge ${req.status}">${req.status.replace(/_/g, ' ')}</span></div></div>
         </div>
 
         ${req.status === "otp_pending" ? `
@@ -152,8 +158,28 @@ async function loadRequests() {
         ` : ""}
 
         ${req.status === "completed" ? `
-        <button class="invoiceBtn" onclick="openInvoice(${req.id})">🧾 Download Invoice</button>
-        <div id="reviewBox_${req.id}" class="reviewBox">
+${req.admin_remark ? `
+<div style="
+    margin:10px 0;
+    padding:10px;
+    background:#fef2f2;
+    border-left:4px solid #dc2626;
+    border-radius:8px;
+">
+    <div style="font-weight:600;color:#991b1b;">
+        Admin Remark
+    </div>
+    <div style="margin-top:4px;">
+        ${req.admin_remark}
+    </div>
+</div>
+` : ""}
+
+<button class="invoiceBtn" onclick="openInvoice(${req.id})">
+🧾 Download Invoice
+</button>
+
+<div id="reviewBox_${req.id}" class="reviewBox">
             <div class="reviewBoxTitle">⭐ Your Rating</div>
             <div class="starsRow" id="stars_${req.id}">
                 <span class="starSpan" onclick="setRating(${req.id},1)">★</span>
@@ -171,7 +197,7 @@ async function loadRequests() {
         `;
 
         // ── Staff Details Accordion ──
-        if (["accepted","waiting_customer_confirm","otp_pending","in_progress"].includes(req.status) && req.staff_name) {
+        if (["accepted", "waiting_customer_confirm", "otp_pending", "in_progress"].includes(req.status) && req.staff_name) {
             const staffBlock = document.createElement("div");
             staffBlock.innerHTML = `
             <div class="cardDivider"></div>
@@ -185,9 +211,24 @@ async function loadRequests() {
                         <div class="staffLeft">
                             <div class="staffAvatar">👤</div>
                             <div class="staffInfoText">
-                                <div class="staffInfoLine"><b>Staff ID.</b> ${req.staff_id || ""}</div>
-                                <div class="staffInfoLine"><b>Name:</b> ${req.staff_name || ""}</div>
-                                <div class="staffInfoLine"><b>Mob No.</b> ${req.staff_mobile || ""}</div>
+                               <div class="staffInfoLine"><b>Staff ID.</b> ${req.staff_id || ""}</div>
+<div class="staffInfoLine"><b>Name:</b> ${req.staff_name || ""}</div>
+<div class="staffInfoLine"><b>Mob No.</b> ${req.staff_mobile || ""}</div>
+${req.previous_staff_name ? `
+<hr style="margin:10px 0;">
+<div style="font-weight:700;color:#64748b;margin-bottom:6px;">
+Previous Staff
+</div>
+<div class="staffInfoLine">
+<b>Staff ID.</b> ${req.previous_staff_id || ""}
+</div>
+<div class="staffInfoLine">
+<b>Name:</b> ${req.previous_staff_name || ""}
+</div>
+<div class="staffInfoLine">
+<b>Mob No.</b> ${req.previous_staff_mobile || ""}
+</div>
+` : ""}
                             </div>
                         </div>
                         <div class="staffRatingBox">
@@ -205,12 +246,12 @@ async function loadRequests() {
             const staffKey = "staff_" + req.id;
             if (!sectionState[staffKey]) sectionState[staffKey] = "open";
             if (sectionState[staffKey] === "closed") {
-                const el   = document.getElementById(staffKey);
+                const el = document.getElementById(staffKey);
                 const icon = document.getElementById("icon_" + staffKey);
-                const tog  = el ? el.previousElementSibling : null;
-                if (el)   el.style.display   = "none";
+                const tog = el ? el.previousElementSibling : null;
+                if (el) el.style.display = "none";
                 if (icon) icon.classList.add("rotated");
-                if (tog)  tog.classList.remove("open");
+                if (tog) tog.classList.remove("open");
             }
 
             // Load staff rating
@@ -218,7 +259,7 @@ async function loadRequests() {
         }
 
         // ── Service Start Confirmation Accordion ──
-        if (["waiting_customer_confirm","otp_pending","in_progress"].includes(req.status)) {
+        if (["waiting_customer_confirm", "otp_pending", "in_progress"].includes(req.status)) {
             const confirmBlock = document.createElement("div");
             confirmBlock.innerHTML = `
             <div class="cardDivider"></div>
@@ -249,12 +290,12 @@ async function loadRequests() {
             const confirmKey = "confirm_" + req.id;
             if (!sectionState[confirmKey]) sectionState[confirmKey] = "open";
             if (sectionState[confirmKey] === "closed") {
-                const el   = document.getElementById(confirmKey);
+                const el = document.getElementById(confirmKey);
                 const icon = document.getElementById("icon_" + confirmKey);
-                const tog  = el ? el.previousElementSibling : null;
-                if (el)   el.style.display   = "none";
+                const tog = el ? el.previousElementSibling : null;
+                if (el) el.style.display = "none";
                 if (icon) icon.classList.add("rotated");
-                if (tog)  tog.classList.remove("open");
+                if (tog) tog.classList.remove("open");
             }
         }
 
@@ -296,19 +337,19 @@ function timeAgo(date) {
 
 // ── TOGGLE SECTION ──
 function toggleSection(id) {
-    const el   = document.getElementById(id);
+    const el = document.getElementById(id);
     if (!el) return;
     const icon = document.getElementById("icon_" + id);
-    const tog  = el.previousElementSibling;
+    const tog = el.previousElementSibling;
     if (el.style.display === "none") {
         el.style.display = "block";
         if (icon) icon.classList.remove("rotated");
-        if (tog)  tog.classList.add("open");
+        if (tog) tog.classList.add("open");
         sectionState[id] = "open";
     } else {
         el.style.display = "none";
         if (icon) icon.classList.add("rotated");
-        if (tog)  tog.classList.remove("open");
+        if (tog) tog.classList.remove("open");
         sectionState[id] = "closed";
     }
 }
@@ -348,11 +389,11 @@ function setRating(id, rating) {
     });
 }
 async function submitReview(id) {
-    const rating   = document.getElementById("rating_" + id).value;
+    const rating = document.getElementById("rating_" + id).value;
     const feedback = document.getElementById("feedback_" + id).value;
     if (rating == 0) { alert("Please select rating"); return; }
     try {
-        const res  = await fetch(API + "/customer/review", { method: "POST", headers: { "Content-Type": "application/json", "Authorization": "Bearer " + token }, body: JSON.stringify({ request_id: id, rating, feedback }) });
+        const res = await fetch(API + "/customer/review", { method: "POST", headers: { "Content-Type": "application/json", "Authorization": "Bearer " + token }, body: JSON.stringify({ request_id: id, rating, feedback }) });
         const data = await res.json();
         if (!res.ok) { alert(data.error || "Failed"); return; }
         alert("Review submitted");
@@ -367,12 +408,12 @@ async function loadStaffRating(staffId, reqId) {
         const res = await fetch(API + "/staff/rating/" + staffId);
         if (!res.ok) return;
         const data = await res.json();
-        const avg  = Number(data.avg || 0), count = Number(data.count || 0);
-        let stars  = "";
+        const avg = Number(data.avg || 0), count = Number(data.count || 0);
+        let stars = "";
         for (let i = 1; i <= 5; i++) { if (avg >= i) stars += "⭐"; else if (avg >= i - 0.5) stars += "⯪"; else stars += "☆"; }
-        const starEl  = document.getElementById("staffRating_"      + reqId);
+        const starEl = document.getElementById("staffRating_" + reqId);
         const countEl = document.getElementById("staffRatingCount_" + reqId);
-        if (starEl)  starEl.innerHTML  = stars;
+        if (starEl) starEl.innerHTML = stars;
         if (countEl) countEl.innerHTML = `(${avg.toFixed(1)} · ${count} reviews)`;
     } catch (err) { console.log("Rating load error:", err); }
 }

@@ -1058,7 +1058,7 @@
         }
 
         function addService(service) {
-              console.log("SERVICE ADDED:", service);
+            console.log("SERVICE ADDED:", service);
             if (selectedServices.find(s => s.id === service.id)) { alert("Already added"); return; }
             selectedServices.push({ id: service.id, name: service.name, experience: "", selected_details: [] });
             renderSelected();
@@ -1115,7 +1115,7 @@
 
             const box = document.getElementById("detailsBox" + index);
 
-            if (!checked) { box.style.display = "none"; return;}
+            if (!checked) { box.style.display = "none"; return; }
 
             const service = allServices.find(
                 s => s.id == selectedServices[index].id
@@ -1357,6 +1357,11 @@
                 localStorage.setItem("staffId", realStaffId);
                 localStorage.setItem("staffUser", JSON.stringify(updatedStaffUser));
                 localStorage.setItem("user", JSON.stringify(updatedStaffUser));
+
+                if (data.token) {
+                    localStorage.setItem("staffToken", data.token);
+                    localStorage.setItem("token", data.token);
+                }
                 console.log("SAVED STAFF USER:", updatedStaffUser);
                 alert(isViewMode ? "Profile Updated Successfully" : "Registered Successfully");
 
@@ -1515,7 +1520,7 @@
             document.getElementById("staffLoadingOverlay").style.display = "flex";
         }
     </script>
-  
+
 </head>
 
 <body>

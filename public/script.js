@@ -20,6 +20,7 @@
             loadWhyImage();
             loadPopularServices();
             loadAllServices();
+            loadRatings();
         });
 
         // ===== SEARCH SERVICE =====
@@ -263,7 +264,7 @@ console.log("RESULT COUNT:", filtered.length);
                     <div class="popularCard">
                      <img src="${optimizeImage(s.image?.startsWith('http')? s.image: window.location.origin + s.image,300 )}"alt="${s.name} Home Service in Silvassa by Vinsuu"loading="lazy"decoding="async">
                         <h4>${s.name}</h4>
-                        <div class="rating">⭐ 4.8</div>
+                        <div class="rating">⭐ ${Number(s.avg_rating || 0).toFixed(1)}</div>
                         <div class="price">Starting ₹${s.price || 199}</div>
                         <button class="bookBtn" onclick="openService(${s.id})">Book Now</button>
                     </div>
@@ -273,7 +274,7 @@ console.log("RESULT COUNT:", filtered.length);
                     <div class="mobilePopularItem">
                          <img src="${optimizeImage(s.image?.startsWith('http')? s.image: window.location.origin + s.image,300 )}"alt="${s.name} Home Service in Silvassa by Vinsuu"loading="lazy"decoding="async">
                         <h4>${s.name}</h4>
-                        <div class="mRating">⭐ 4.8</div>
+                        <div class="mRating">⭐ ${Number(s.avg_rating || 0).toFixed(1)}</div>
                         <div class="mPrice">₹${s.price || 199}</div>
                         <button class="mBook" onclick="openService(${s.id})">Book Now</button>
                     </div>
@@ -437,3 +438,30 @@ console.log("RESULT COUNT:", filtered.length);
                 alert("Server error");
             }
         }
+     // ===== LOAD RATINGS =====
+        async function loadRatings() {
+
+    try {
+
+        const res = await fetch(API + "/customer/reviews-summary");
+        const data = await res.json();
+
+        const rating = Number(data.avg_rating || 0).toFixed(1);
+
+        const overall = document.getElementById("overallRating");
+        if (overall) overall.innerText = rating + "⭐";
+
+        const mobileOverall =
+            document.getElementById("mobileOverallRating");
+        if (mobileOverall) mobileOverall.innerText = rating;
+
+        const banner =
+            document.getElementById("bannerRating");
+        if (banner)
+            banner.innerText = rating + " Customer Rating";
+
+    } catch (err) {
+        console.log(err);
+    }
+
+}

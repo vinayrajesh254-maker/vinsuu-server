@@ -533,6 +533,34 @@ router.post("/review", verifyToken, async (req, res) => {
 
 });
 
+// ================= MARK COMPLETE (SERVICE DONE) =================
+router.post("/mark-complete", verifyToken, async (req, res) => {
+
+  try {
+
+    const { request_id } = req.body;
+
+    await pool.query(
+      `UPDATE service_requests
+       SET status='completed'
+       WHERE id=$1
+       AND customer_id=$2`,
+      [request_id, req.user.id]
+    );
+
+    res.json({ success: true });
+
+  } catch (err) {
+
+    console.log("MARK COMPLETE ERROR:", err);
+
+    res.status(500).json({
+      error: "Server error"
+    });
+
+  }
+
+});
 // ================= CUSTOMER CANCEL =================
 router.post("/cancel", verifyToken, async (req, res) => {
 
@@ -558,6 +586,36 @@ router.post("/cancel", verifyToken, async (req, res) => {
   } catch (err) {
     console.log("CUSTOMER CANCEL ERROR:", err);
     res.status(500).json({ error: "Server error" });
+  }
+
+});
+
+// ================= REVIEWS SUMMARY =================
+router.get("/reviews-summary", async (req, res) => {
+
+  try {
+
+    const result = await pool.query(`
+      SELECT
+        ROUND(AVG(rating)::numeric,1) AS avg_rating,
+        COUNT(rating) AS total_reviews
+      FROM service_requests
+      WHERE rating IS NOT NULL
+    `);
+
+    res.json({
+      avg_rating: result.rows[0]?.avg_rating || 0,
+      total_reviews: result.rows[0]?.total_reviews || 0
+    });
+
+  } catch (err) {
+
+    console.log("REVIEWS SUMMARY ERROR:", err);
+
+    res.status(500).json({
+      error: "Server error"
+    });
+
   }
 
 });

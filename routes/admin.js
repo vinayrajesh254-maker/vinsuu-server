@@ -292,13 +292,31 @@ router.get("/services", async (req, res) => {
 
   try {
 
-    const result = await pool.query(`
-      SELECT services.*, categories.name as category_name
-      FROM services
-      LEFT JOIN categories
-      ON categories.id = services.category_id
-      ORDER BY services.id DESC
-    `);
+   const result = await pool.query(`
+  SELECT
+    s.*,
+    c.name AS category_name,
+
+    COALESCE(
+      ROUND(AVG(sr.rating)::numeric, 1),
+      0
+    ) AS avg_rating,
+
+    COUNT(sr.rating) AS total_reviews
+
+  FROM services s
+
+  LEFT JOIN categories c
+    ON c.id = s.category_id
+
+  LEFT JOIN service_requests sr
+    ON sr.service_id = s.id
+   AND sr.rating IS NOT NULL
+
+  GROUP BY s.id, c.name
+
+  ORDER BY s.id DESC
+`);
 
     res.json(result.rows);
 
@@ -436,20 +454,45 @@ router.delete("/service/:id", async (req, res) => {
 });
 
 // ✅ GET POPULAR SERVICES
+// ✅ GET POPULAR SERVICES
 router.get("/services/popular", async (req, res) => {
+
   try {
+
     const result = await pool.query(`
-      SELECT * FROM services 
-      WHERE is_popular = true 
-      ORDER BY id DESC
+      SELECT
+        s.*,
+
+        COALESCE(
+          ROUND(AVG(sr.rating)::numeric, 1),
+          0
+        ) AS avg_rating
+
+      FROM services s
+
+      LEFT JOIN service_requests sr
+      ON sr.service_id = s.id
+      AND sr.rating IS NOT NULL
+
+      WHERE s.is_popular = true
+
+      GROUP BY s.id
+
+      ORDER BY s.id DESC
     `);
 
     res.json(result.rows);
 
   } catch (err) {
+
     console.log(err);
-    res.status(500).json({ error: "Server error" });
+
+    res.status(500).json({
+      error: "Server error"
+    });
+
   }
+
 });
 /* =====================================================
    STAFF
@@ -1246,4 +1289,44 @@ ORDER BY distance ASC;
 
 });
 
+// ================= DELETE SERVICE REQUEST WITH REMARK =================
+router.delete("/service-request/:id", async (req, res) => {
+
+  try {
+
+    const id = req.params.id;
+    const { remark } = req.body;
+
+    if (!remark || !remark.trim()) {
+      return res.status(400).json({
+        success: false,
+        error: "Remark required"
+      });
+    }
+
+    await pool.query(`
+  UPDATE service_requests
+  SET
+    status = 'cancel',
+    cancelled_by = 'admin',
+    admin_remark = $1
+  WHERE id = $2
+`, [remark.trim(), id]);
+
+    res.json({
+      success: true
+    });
+
+  } catch (err) {
+
+    console.log("DELETE SERVICE REQUEST ERROR:", err);
+
+    res.status(500).json({
+      success: false,
+      error: "Server error"
+    });
+
+  }
+
+});
 module.exports = router;

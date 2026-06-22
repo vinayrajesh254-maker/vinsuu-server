@@ -54,18 +54,18 @@
         }
 
         /* ══ TOP HEADER ══ */
-     .topHeader {
-    background: linear-gradient(90deg, var(--primary-mid) 0%, var(--primary-dark) 100%);
-    padding: 14px 20px;
-    display: flex;
-    align-items: center;
-    justify-content: flex-start;
-    gap: 12px;
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    box-shadow: 0 2px 12px rgba(26, 63, 212, 0.25);
-}
+        .topHeader {
+            background: linear-gradient(90deg, var(--primary-mid) 0%, var(--primary-dark) 100%);
+            padding: 14px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            gap: 12px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 12px rgba(26, 63, 212, 0.25);
+        }
 
         .backBtn {
             background: rgba(255, 255, 255, 0.15);
@@ -584,7 +584,7 @@
     </div>
     <!-- TOP HEADER -->
     <h1 class="topHeader">
-        <button class="backBtn" onclick="history.back()">←</button>
+        <button class="backBtn" onclick="goBack()">←</button>
         <span class="topHeaderTitle">Request a Service</span>
     </h1>
 
@@ -681,11 +681,13 @@
                     </div>
                 </div>
                 <div class="fieldGroup">
-                    <div class="fieldLabel">Service Heading <span class="req">*</span></div>
-                    <div class="inputWrap">
-                        <span class="iIcon">📋</span>
-                        <input type="text" id="heading" placeholder="Service heading">
+                    <div class="fieldLabel">
+                        Service Heading <span class="req">*</span>
+                        <span class="detailsLink" onclick="openSubHeadingModal()" style="margin-left:auto;"> Service
+                            Heading Details ⓘ </span>
                     </div>
+                    <div class="inputWrap"> <span class="iIcon">📋</span><input type="text" id="heading"
+                            placeholder="Service heading"></div>
                 </div>
             </div>
 
@@ -762,6 +764,38 @@
         <button onclick="location.href='profile.html'">
             <span class="bnIcon">😊</span>Profile
         </button>
+    </div>
+
+    <!-- SUB HEADING MODAL -->
+    <div id="subHeadingModal" style="
+display:none;
+position:fixed;
+inset:0;
+background:rgba(0,0,0,.45);
+z-index:1000;
+justify-content:center;
+align-items:center;
+padding:16px;
+">
+        <div style="
+    background:#fff;
+    width:100%;
+    max-width:400px;
+    border-radius:18px;
+    padding:20px;
+    max-height:80vh;
+    overflow:auto;
+    position:relative;
+    ">
+            <button onclick="closeSubHeadingModal()"
+                style="position:absolute;top:10px;right:10px;border:none;background:#fee2e2;color:red;width:30px;height:30px;border-radius:50%;cursor:pointer;">
+                ✕
+            </button>
+
+            <h3 style="margin-bottom:15px;">Select Service Sub Heading</h3>
+
+            <div id="subHeadingList"></div>
+        </div>
     </div>
     <script>
         const API = window.location.origin + "/api";
@@ -1053,16 +1087,97 @@
             });
 
             if (res.ok) {
+
+                const responseData = await res.json();
                 localStorage.setItem("user", JSON.stringify({
                     name: document.getElementById("customerName").value,
                     mobile: document.getElementById("mobile").value,
                     email: document.getElementById("email").value,
                     address: document.getElementById("address").value
                 }));
+                if (responseData.token) {
+                    localStorage.setItem("customerToken", responseData.token);
+                    localStorage.setItem("token", responseData.token);
+                }
                 alert("Service requested successfully");
                 window.location.href = "profile.html";
             } else { alert("Error submitting request"); }
         }
+
+        // SErvice Sub Heading Modal
+        function openSubHeadingModal() {
+
+            const modal = document.getElementById("subHeadingModal");
+            const list = document.getElementById("subHeadingList");
+
+            list.innerHTML = "";
+
+            let details = [];
+
+            try {
+                details = JSON.parse(serviceData.details || "[]");
+            } catch (e) {
+                details = [];
+            }
+
+            if (details.length === 0) {
+                list.innerHTML = "<p>No sub headings available</p>";
+            } else {
+
+                details.forEach(item => {
+
+                    const div = document.createElement("div");
+
+                    div.style.cssText = `
+                padding:12px;
+                border:1px solid #e5e7eb;
+                border-radius:10px;
+                margin-bottom:10px;
+                cursor:pointer;
+                background:#f8faff;
+            `;
+
+                    div.textContent = item;
+
+                    div.onclick = () => {
+                        div.onclick = () => {
+                            document.getElementById("heading").value = item;
+                            closeSubHeadingModal();
+                        };
+                        document.getElementById("heading").value = item;
+                        document.getElementById("subHeading").value = "";
+                        closeSubHeadingModal();
+                    };
+
+                    list.appendChild(div);
+                });
+            }
+
+            modal.style.display = "flex";
+            history.pushState({ modal: true }, "");
+        }
+
+        function closeSubHeadingModal() {
+            document.getElementById("subHeadingModal").style.display = "none";
+            document.getElementById("subHeadingModal").addEventListener("click", function (e) {
+                if (e.target === this) {
+                    closeSubHeadingModal();
+                }
+            });
+
+        }
+        window.addEventListener("popstate", () => {
+            const modal = document.getElementById("subHeadingModal");
+
+            if (modal.style.display === "flex") {
+                closeSubHeadingModal();
+            }
+        });
+
+        function goBack() {
+            window.location.href = document.referrer || "index.html";
+        }
+
     </script>
     <script src="script.js"></script>
 </body>

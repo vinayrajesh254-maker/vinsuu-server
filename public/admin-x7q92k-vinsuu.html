@@ -2509,21 +2509,64 @@ async function saveEmail() {
             filtered.forEach((s, i) => {
                 body.innerHTML += `<tr><td>${i + 1}</td><td>${new Date(s.created_at).toLocaleDateString()}</td><td>${s.customer_id || ''}</td><td>${s.customer_name || ''}</td>${s.status !== "pending" ? `<td>${s.staff_id || ''}</td><td>${s.staff_name || ''}</td>` : `<td></td><td></td>`}<td>${s.mobile || ''}</td><td>${s.location || ''}</td><td>${s.pin_code || ''}</td> 
        <td><button onclick="viewService(${s.id})">View</button></td> <td> <button onclick="checkStaff(${s.id})" style="background:#e0f2fe;color:#0369a1;border:1.5px solid #bae6fd;"> Check Staff </button> </td>
-<td> <button style="background:#fee2e2;color:var(--red);border:1.5px solid #fecaca;"> ✕ </button> </td></tr>`;
+<td>
+  <button
+    onclick="showDeleteBox(${s.id})"
+    style="background:#fee2e2;color:var(--red);border:1.5px solid #fecaca;">
+    ✕
+  </button>
+
+  <textarea
+    id="remark_${s.id}"
+    placeholder="Enter delete remark"
+    style="
+        width:180px;
+        min-height:60px;
+        padding:6px;
+        margin-bottom:6px;
+    ">
+</textarea>
+
+    <button
+      onclick="deleteWithRemark(${s.id})"
+      style="background:#dc2626;color:#fff;margin-top:5px;">
+      Delete
+    </button>
+  </div>
+</td></tr>`;
             });
         }
         function filterService() {
             const pin = document.getElementById("searchServicePin").value.toLowerCase(), cid = document.getElementById("searchServiceCustomerId").value.toLowerCase(), sid = document.getElementById("searchServiceStaffId").value.toLowerCase(); let filtered = currentTab === "all" ? serviceRequests : serviceRequests.filter(s => s.status === currentTab); filtered = filtered.filter(s => (!pin || (s.pin_code || "").toString().includes(pin)) && (!cid || (s.customer_id || "").toString().includes(cid)) && (!sid || ((s.staff_id && s.staff_id.toString().includes(sid)) || currentTab === "pending"))); const body = document.getElementById("serviceUpdateBody"); body.innerHTML = ""; filtered.forEach((s, i) => {
                 body.innerHTML += `<tr><td>${i + 1}</td><td>${new Date(s.created_at).toLocaleDateString()}</td><td>${s.customer_id || ''}</td><td>${s.customer_name || ''}</td>${s.status !== "pending" ? `<td>${s.staff_id || ''}</td><td>${s.staff_name || ''}</td>` : `<td></td><td></td>`}<td>${s.mobile || ''}</td><td>${s.location || ''}</td><td>${s.pin_code || ''}</td>
    <td><button onclick="viewService(${s.id})">View</button></td> <td> <button onclick="checkStaff(${s.id})" style="background:#e0f2fe;color:#0369a1;border:1.5px solid #bae6fd;"> Check Staff </button> </td>
-<td> <button style="background:#fee2e2;color:var(--red);border:1.5px solid #fecaca;"> ✕ </button> </td></tr>`;
+<td>
+  <button
+    onclick="showDeleteBox(${s.id})"
+    style="background:#fee2e2;color:var(--red);border:1.5px solid #fecaca;">
+    ✕
+  </button>
+
+  <div id="deleteBox_${s.id}" style="display:none;margin-top:8px;">
+    <textarea
+     id="remark_${s.id}"
+      placeholder="Enter delete remark"
+      style="width:180px;height:60px;"></textarea>
+
+    <button
+      onclick="deleteWithRemark(${s.id})"
+      style="background:#dc2626;color:#fff;margin-top:5px;">
+      Delete
+    </button>
+  </div>
+</td></tr>`;
             });
         }
         function timeAgo(date) { const s = Math.floor((new Date() - new Date(date)) / 1000); if (s < 60) return "Just now"; if (s < 3600) return Math.floor(s / 60) + " min ago"; if (s < 86400) return Math.floor(s / 3600) + " hr ago"; return Math.floor(s / 86400) + " days ago"; }
         function viewService(id) {
             const s = serviceRequests.find(x => x.id == id); if (!s) return;
             const w = window.open("", "_blank");
-            w.document.write(`<html><head><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Service Details</title><style>body{font-family:Arial;margin:0;padding:15px;background:#f5f5f5;}.card{background:#fff;border-radius:15px;padding:15px;max-width:700px;margin:auto;box-shadow:0 2px 10px rgba(0,0,0,0.1);position:relative;}.time{position:absolute;right:15px;top:10px;font-size:12px;color:#666;}h2{margin-top:0;font-size:20px;}.row{margin:8px 0;font-size:14px;}.label{font-weight:bold;}hr{margin:15px 0;}button{padding:10px;border:none;border-radius:8px;background:#2b52e0;color:white;cursor:pointer;width:100%;}</style></head><body><div class="card"><div class="time">${timeAgo(s.created_at)}</div><h2>Service Details</h2><div class="row"><span class="label">Service No:</span> ${s.id}</div><div class="row"><span class="label">Service Name:</span> ${s.service_name || s.name || "-"}</div><div class="row"><span class="label">Price:</span> ${s.price || s.service_price || "-"}</div><div class="row"><span class="label">Location:</span> ${s.location || '-'}</div><div class="row"><span class="label">Pin Code:</span> ${s.pin_code || s.pincode || "-"}</div><div class="row"><span class="label">Details:</span> ${s.details || '-'}</div>${s.status === "cancel" ? `<hr><div style="padding:10px;background:#fee2e2;border-radius:8px;"><h3 style="color:#b91c1c;">Cancellation Details</h3><div class="row"><span class="label">Cancelled By:</span> ${s.cancelled_by || "-"}</div><div class="row"><span class="label">Remark:</span> ${s.cancel_remark || "-"}</div></div>` : ""}${s.status !== "pending" ? `<hr><h3>Staff Details</h3><div class="row"><span class="label">Staff ID:</span> ${s.staff_id}</div><div class="row"><span class="label">Staff Name:</span> ${s.staff_name}</div><div class="row"><span class="label">Mobile:</span> ${s.staff_mobile || '-'}</div>` : ""} ${s.status === "completed" ? `<hr><div class="row"><span class="label">Payment:</span> Paid</div><button onclick="window.open('/invoice.html?id=${s.id}')">View Invoice</button>` : "</div>"}</body></html>`);
+            w.document.write(`<html><head><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Service Details</title><style>body{font-family:Arial;margin:0;padding:15px;background:#f5f5f5;}.card{background:#fff;border-radius:15px;padding:15px;max-width:700px;margin:auto;box-shadow:0 2px 10px rgba(0,0,0,0.1);position:relative;}.time{position:absolute;right:15px;top:10px;font-size:12px;color:#666;}h2{margin-top:0;font-size:20px;}.row{margin:8px 0;font-size:14px;}.label{font-weight:bold;}hr{margin:15px 0;}button{padding:10px;border:none;border-radius:8px;background:#2b52e0;color:white;cursor:pointer;width:100%;}</style></head><body><div class="card"><div class="time">${timeAgo(s.created_at)}</div><h2>Service Details</h2><div class="row"><span class="label">Service No:</span> ${s.id}</div><div class="row"><span class="label">Service Name:</span> ${s.service_name || s.name || "-"}</div><div class="row"><span class="label">Price:</span> ${s.price || s.service_price || "-"}</div><div class="row"><span class="label">Location:</span> ${s.location || '-'}</div><div class="row"><span class="label">Pin Code:</span> ${s.pin_code || s.pincode || "-"}</div><div class="row"><span class="label">Details:</span> ${s.details || '-'}</div>${s.status === "cancel" ? `<hr><div style="padding:10px;background:#fee2e2;border-radius:8px;"><h3 style="color:#b91c1c;">Cancellation Details</h3><div class="row"><span class="label">Cancelled By:</span> ${s.cancelled_by || "-"}</div><div class="row"><span class="label">Remark:</span>${s.cancel_remark || s.admin_remark || "-"}</div></div>` : ""}${s.status !== "pending" ? `<hr><h3>Staff Details</h3><div class="row"><span class="label">Staff ID:</span> ${s.staff_id}</div><div class="row"><span class="label">Staff Name:</span> ${s.staff_name}</div><div class="row"><span class="label">Mobile:</span> ${s.staff_mobile || '-'}</div>` : ""} ${s.status === "completed" ? `<hr><div class="row"><span class="label">Payment:</span> Paid</div><button onclick="window.open('/invoice.html?id=${s.id}')">View Invoice</button>` : "</div>"}</body></html>`);
         }
         function updateServiceCounts() { const counts = { pending: 0, accepted: 0, confirmation: 0, completed: 0, cancel: 0, all: serviceRequests.length }; serviceRequests.forEach(s => { if (counts[s.status] !== undefined) counts[s.status]++; }); document.querySelectorAll(".serviceTabBtn").forEach(btn => { const tab = btn.innerText.replace(/\s*\(\d+\)/, "").toLowerCase(); let key = tab === "total" ? "all" : tab; if (counts[key] !== undefined) btn.innerHTML = `${tab.charAt(0).toUpperCase() + tab.slice(1)} (${counts[key]})`; }); }
         // CHECK STAFF FOR SERVICE REQUEST (UPDATE)
@@ -2532,6 +2575,73 @@ async function saveEmail() {
         const body = document.getElementById("checkStaffBody");  body.innerHTML = ""; staff.forEach((s, index) => { body.innerHTML += `
           <tr> <td>${index + 1}</td>  <td>${s.staff_id || s.id}</td><td>${s.name || ""}</td> <td>${s.mobile || ""}</td> <td> ${ s.distance ? parseFloat(s.distance).toFixed(1) + " km" : "-" } </td><td> <button onclick="viewStaff(${s.id})"> View </button> </td> </tr> `; });
     } catch (err) { alert("Unable to load nearby staff"); console.log(err); }} function closeCheckStaffPopup() { document.getElementById("checkStaffPopup").style.display = "none";}
+    // Remove service request with remark
+    function showDeleteBox(id) {
+    const box = document.getElementById("deleteBox_" + id);
+
+    if (box.style.display === "none" || !box.style.display) {
+        box.style.display = "block";
+    } else {
+        box.style.display = "none";
+    }
+}
+
+async function deleteWithRemark(id) {
+
+    console.log("DELETE CLICKED", id);
+
+    const remarkEl = document.getElementById("remark_" + id);
+
+    console.log("REMARK ELEMENT", remarkEl);
+
+    if (!remarkEl) {
+    console.log(document.body.innerHTML);
+    alert("Remark box not found for ID: " + id);
+    return;
+}
+
+    const remark = remarkEl.value.trim();
+
+    console.log("REMARK:", remark);
+
+    if (!remark) {
+        alert("Please enter delete remark");
+        return;
+    }
+
+    if (!confirm("Delete this service request?")) return;
+
+    try {
+
+        const res = await fetch(
+            API + "/admin/service-request/" + id,
+            {
+                method: "DELETE",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ remark })
+            }
+        );
+
+        console.log("STATUS:", res.status);
+
+        const data = await res.json();
+
+        console.log("RESPONSE:", data);
+
+        if (data.success) {
+            alert("Deleted successfully");
+            loadServiceUpdates();
+        } else {
+            alert(data.error || "Delete failed");
+        }
+
+    } catch (err) {
+        console.log(err);
+        alert("Server error");
+    }
+}
     </script>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
