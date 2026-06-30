@@ -19,7 +19,7 @@ document.addEventListener("DOMContentLoaded", () => {
         <div style="margin-top:15px;color:#666;">Loading profile...</div>
     </div>
 `;
-document.getElementById("requests").innerHTML = `
+    document.getElementById("requests").innerHTML = `
     <div style="display:flex;justify-content:center;align-items:center;padding:30px;">
         <div style="
             width:32px;
@@ -32,11 +32,11 @@ document.getElementById("requests").innerHTML = `
     </div>
 `;
     connectSocket();
-   loadProfile();
+    loadProfile();
 
-setTimeout(() => {
-    loadRequests();
-}, 100);
+    setTimeout(() => {
+        loadRequests();
+    }, 100);
     setInterval(() => { if (!openedFormId && !isUnitPopupOpen) loadRequests(); }, 15000);
 });
 
@@ -159,8 +159,11 @@ async function loadStaffRequests() {
                     <span class="infoLabel">Name:</span>          <span class="infoVal">${req.customer_name || "-"}</span>
                     <span class="infoLabel">Service name:</span>  <span class="infoVal">${req.service_name || "-"}</span>
                     <span class="infoLabel">Distance:</span>      <span class="infoVal">${parseFloat(req.distance).toFixed(1)} km</span>
-                    <span class="infoLabel">Price:</span>         <span class="infoVal">${req.service_type === "price" ? `₹ ${req.price}` : `${req.unit_cost || 0} Unit Balance`}</span>
-                    <span class="infoLabel">Pin code & location:</span> <span class="infoVal">${req.pincode}, ${req.location}</span>
+                   <span class="infoLabel">Price:</span><span class="infoVal">${req.service_type === "price" ? `₹ ${req.price}` : `${req.unit_cost || 0} Unit Balance`} </span> ${req.service_type === "price" ? `
+<span class="infoLabel">Booking Date:</span> <span class="infoVal"> ${req.booking_date || "-"} </span>
+<span class="infoLabel">Time Slot:</span>  <span class="infoVal"> ${req.booking_slot || "-"} </span>
+` : ""}
+<span class="infoLabel">Pin code & location:</span> <span class="infoVal"> ${req.pincode}, ${req.location} </span>
                     <span class="infoLabel">Service heading:</span>     <span class="infoVal">${req.heading}</span>
                     <span class="infoLabel">Service Details:</span>     <span class="infoVal">${req.details}</span>
                 </div>
@@ -590,21 +593,23 @@ function toggleBilling(id) {
     if (box) box.style.display = "block";
 }
 // App notification
-function showTopNotification(data){
-const box=document.getElementById("topNotification"); if(!box) return;
-    box.innerHTML=`
+function showTopNotification(data) {
+    const box = document.getElementById("topNotification"); if (!box) return;
+    box.innerHTML = `
         <div class="notifyHead"> <img class="notifyLogo" src="/logo.png"onerror="this.src='favicon.ico'" >
             <div class="notifyTitle"> New Service Request </div> <div class="notifyTime"> Just now</div> </div>
         <div class="notifyBody"> <div class="notifyNo">  Service No. ${data.serviceNo || ""}</div>
             <div class="notifyRow"> <div class="notifyLabel">Name:</div> <div>${data.customerName || "-"}</div> </div>
             <div class="notifyRow"><div class="notifyLabel">Service:</div> <div>${data.serviceName || "-"}</div></div>
             <div class="notifyRow"><div class="notifyLabel">Distance:</div><div>${data.distance || "-"}</div></div>
-            <div class="notifyRow"> <div class="notifyLabel">Price:</div><div>₹ ${data.price || 0}</div> </div>
+            <div class="notifyRow"><div class="notifyLabel">Price:</div> <div> ${data.price || 0 ? `₹ ${data.price}` : `${data.unit_cost || 0} Unit Balance`} </div></div> ${data.booking_date ? `
+                <div class="notifyRow"> <div class="notifyLabel">Booking Date:</div><div>${data.booking_date}</div></div>
+<div class="notifyRow"><div class="notifyLabel">Time Slot:</div><div>${data.booking_slot}</div></div> ` : ""}
             <div class="notifyRow"><div class="notifyLabel">Location:</div><div>${data.location || "-"}</div></div>
             <div class="notifyRow"><div class="notifyLabel">Heading:</div><div>${data.serviceHeading || "-"}</div> </div>
             <div class="notifyRow"><div class="notifyLabel">Details:</div> <div>${data.serviceDetails || "-"}</div></div>
         </div>
         <div class="notifyFooter"><span class="notifyBtn">  View Details</span></div>
     `;
-    box.classList.add("show"); setTimeout(()=>{ box.classList.remove("show"); },10000);
+    box.classList.add("show"); setTimeout(() => { box.classList.remove("show"); }, 10000);
 }

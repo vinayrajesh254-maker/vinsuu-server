@@ -452,14 +452,15 @@
       gap: 10px;
       padding: 13px 26px;
       background: white;
-      color: var(--primary);
-      border: 2px solid var(--primary);
+    color: var(--primary-dark);
+      border: 2px solid var(--primary-dark);
       border-radius: 12px;
       font-size: 15px;
-      font-weight: 600;
+      font-weight: 700;            /* was 600 */
       cursor: pointer;
       font-family: 'Poppins', sans-serif;
       transition: all 0.2s;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.18);
   }
 
   .heroBtnSecondary:hover {
@@ -558,15 +559,16 @@
   .sliderBookBtn {
       display: inline-block;
       padding: 11px 28px;
-      background: var(--primary);
-      color: white;
+       background: white;
+       color: var(--primary-dark);
       border: none;
       border-radius: 10px;
       font-size: 14px;
-      font-weight: 600;
+      font-weight: 700;
       cursor: pointer;
       font-family: 'Poppins', sans-serif;
       width: fit-content;
+      box-shadow: 0 3px 12px rgba(0,0,0,0.25);
   }
 
   .sliderNavBtn {
@@ -706,6 +708,8 @@
       display: flex;
       align-items: center;
       gap: 8px;
+       min-height: 44px;
+       padding: 10px 20px;
   }
 
   .mbbPrimary {
@@ -956,7 +960,7 @@
   .popularGrid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-      gap: 18px;
+      gap: 22px;
   }
 
   .popularCard {
@@ -971,6 +975,7 @@
       display: flex;
       flex-direction: column;
       align-items: center;
+       border-top: 3px solid var(--primary);
   }
 
   .popularCard:hover {
@@ -1009,12 +1014,12 @@
   }
 
   .popularCard .bookBtn {
-      background: var(--primary-light);
+       background: var(--primary);
       border: none;
-      color: var(--primary);
-      padding: 9px 0;
-      border-radius: 9px;
-      font-size: 13px;
+      color: white;
+      padding: 10px 0;
+      border-radius: 10px;
+      font-size: 13.5px;
       font-weight: 600;
       cursor: pointer;
       font-family: 'Poppins', sans-serif;
@@ -1023,15 +1028,16 @@
   }
 
   .popularCard .bookBtn:hover {
-      background: var(--primary);
+       background: var(--primary-dark);
       color: white;
+      transform: translateY(-1px);
   }
 
   /* ===== CATEGORIES GRID ===== */
   .category-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-      gap: 16px;
+      gap: 20px;
   }
 
   .category-box {
@@ -1120,10 +1126,10 @@
   }
 
   .mobilePopularItem {
-      flex: 0 0 130px;
+      flex: 0 0 138px;
       background: white;
       border-radius: 16px;
-      padding: 14px 10px;
+      padding: 16px 10px;
       text-align: center;
       box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
       border: 1.5px solid transparent;
@@ -1167,17 +1173,18 @@
   }
 
   .mobilePopularItem .mBook {
-      background: var(--primary-light);
+        background: var(--primary);
       border: none;
-      color: var(--primary);
-      padding: 6px 0;
-      border-radius: 7px;
-      font-size: 11px;
+      color: white; 
+      padding: 8px 0;
+      border-radius: 8px;
+      font-size: 12px;  
       font-weight: 600;
       cursor: pointer;
       font-family: 'Poppins', sans-serif;
       width: 100%;
       transition: all 0.2s;
+      min-height: 36px
   }
 
   .mobilePopularItem .mBook:hover {
@@ -1690,7 +1697,7 @@
   .bottomNav button {
       border: none;
       background: none;
-      font-size: 11.5px;
+      font-size: 12px;
       color: var(--gray);
       cursor: pointer;
       font-family: 'Poppins', sans-serif;
@@ -1698,7 +1705,7 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 4px;
+      gap: 5px;
       transition: color 0.2s;
       padding: 0 10px;
   }

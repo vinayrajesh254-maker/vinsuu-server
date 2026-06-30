@@ -225,6 +225,7 @@ router.post(
   mobile,
   alt_mobile,
   email,
+  referral_code_used,
   qualification,
   experience,
   address,
@@ -341,6 +342,7 @@ try {
 }
 
     mobile = formatMobile(mobile);
+    const referralCode = "VNS2601" + mobile.slice(-4);
 if (typeof pincodes === "string") {
   try {
     pincodes = JSON.parse(pincodes);
@@ -361,6 +363,37 @@ console.log("FINAL SERVICE ID:", service_id);
     if (existing.rows.length > 0) {
 
       const old = existing.rows[0]; // ✅ FIX
+      // ===== Preserve old images =====
+let oldProfileImages = old.old_profile_images || [];
+let oldIdImages = old.old_id_images || [];
+let oldCameraImages = old.old_camera_images || [];
+
+// Save previous Profile image
+if (
+    profile_image &&
+    old.profile_image &&
+    profile_image !== old.profile_image
+) {
+    oldProfileImages.push(old.profile_image);
+}
+
+// Save previous ID image
+if (
+    id_image &&
+    old.id_image &&
+    id_image !== old.id_image
+) {
+    oldIdImages.push(old.id_image);
+}
+
+// Save previous Live photo
+if (
+    camera_image &&
+    old.camera_image &&
+    camera_image !== old.camera_image
+) {
+    oldCameraImages.push(old.camera_image);
+}
       // example for name change
       if (existing.rows[0].name !== name) {
         await pool.query(
@@ -422,9 +455,12 @@ const result = await pool.query(`
     id_image=$14,
     profile_image=$15,
     camera_image=$16,
-    agree_terms=$17,
-service_detail_selection=$18
-     WHERE mobile=$19
+agree_terms=$17,
+service_detail_selection=$18,
+old_profile_images=$19,
+old_id_images=$20,
+old_camera_images=$21
+WHERE mobile=$22
   RETURNING *
 `, [
   name,
@@ -448,8 +484,12 @@ parsedLocation
   id_image || null,
   profile_image || null,
   camera_image || null,
-  agree_terms || false,
+agree_terms || false,
 service_detail_selection || "[]",
+JSON.stringify(oldProfileImages),
+JSON.stringify(oldIdImages),
+JSON.stringify(oldCameraImages),
+
 mobile
 ]);
 
@@ -460,8 +500,9 @@ user = result.rows[0];
   // ================= INSERT =================
   const result = await pool.query(
     `INSERT INTO staff 
-(name, mobile, alt_mobile, email, qualification, experience, address, pincodes, service_id, service_ids, service_names, location, id_proof, id_proof_no, id_image, profile_image, camera_image, agree_terms, service_detail_selection, unit_balance)
-VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20)
+(name, mobile, alt_mobile, email, qualification, experience, address, pincodes, service_id, service_ids, service_names, location, id_proof, id_proof_no, id_image, profile_image, camera_image, agree_terms, service_detail_selection, unit_balance,referral_code, referred_by)
+VALUES (
+$1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22)
 RETURNING *`,
     [
       name,
@@ -488,12 +529,42 @@ parsedLocation
       camera_image || null,
       agree_terms || false,
       service_detail_selection || null,
-      1   // ⭐ FREE UNIT
-    ]
+      1,   // ⭐ FREE UNIT
+  referralCode,
+  referral_code_used || null
+]
   );
 
   user = result.rows[0];
+// referral code logic
+if (
+  referral_code_used &&
+  referral_code_used !== referralCode
+) {
+
+  const referrer = await pool.query(
+    `SELECT id
+     FROM staff
+     WHERE referral_code=$1`,
+    [referral_code_used]
+  );
+
+  if (referrer.rows.length > 0) {
+
+    await pool.query(`
+      UPDATE staff
+      SET unit_balance =
+          COALESCE(unit_balance,0) + 1
+      WHERE referral_code=$1
+    `, [referral_code_used]);
+
+  }
+
 }
+}
+
+
+
     // ================= TOKEN =================
 const token = jwt.sign(
   { id: user.id, mobile: user.mobile },
@@ -656,8 +727,10 @@ router.get("/pending", verifyToken, async (req, res) => {
 
     // ✅ GET ALL REQUESTS + SERVICE DETAILS
     const result = await pool.query(`
-SELECT 
+SELECT
     sr.*,
+    sr.booking_date,
+    sr.booking_slot,
     u.name AS customer_name,
     u.mobile AS customer_mobile,
     sr.address AS customer_address,
@@ -1870,6 +1943,56 @@ router.post("/create-order", verifyToken, async (req, res) => {
   } catch (err) {
     console.log("CREATE ORDER ERROR:", err);
     res.status(500).json({ error: "Order failed" });
+  }
+
+});
+
+// ================= REWARDS =================
+router.get("/rewards", verifyToken, async (req, res) => {
+
+  try {
+
+    const staffId = req.user.id;
+
+    const staffRes = await pool.query(`
+      SELECT
+        referral_code,
+        COALESCE(unit_balance,0) AS unit_balance
+      FROM staff
+      WHERE id=$1
+    `,[staffId]);
+
+    if (staffRes.rows.length === 0) {
+      return res.status(404).json({
+        error: "Staff not found"
+      });
+    }
+
+    const staff = staffRes.rows[0];
+
+    const historyRes = await pool.query(`
+      SELECT *
+      FROM referral_history
+      WHERE referrer_code=$1
+      ORDER BY id DESC
+    `,[staff.referral_code]);
+
+    res.json({
+      referral_code: staff.referral_code,
+      referral_points: 0,
+      unit_balance: Number(staff.unit_balance || 0),
+      total_referrals: historyRes.rows.length,
+      history: historyRes.rows
+    });
+
+  } catch (err) {
+
+    console.log("REWARDS ERROR:", err);
+
+    res.status(500).json({
+      error: "Server error"
+    });
+
   }
 
 });

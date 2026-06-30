@@ -777,7 +777,7 @@
                         <div class="cardBody">
                             <div class="cardTitle">${service.name}</div>
                             <div class="cardRating">⭐ ${Number(service.avg_rating || 0).toFixed(1)}<span>(${service.total_reviews || 0} reviews)</span></div>
-                            <div class="cardPrice">Starting ₹${service.price || 199}</div>
+                            <div class="cardPrice">${service.service_type === "unit"? `${service.unit_cost || 0} Unit Balance` : `Starting ₹${service.price || 199}`}</div>
                             <button class="bookBtn" onclick="event.stopPropagation(); window.location.href='request.html?service=${service.id}'">Book Now</button>
                         </div>
                     </div>

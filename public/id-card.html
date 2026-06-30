@@ -233,7 +233,7 @@
         display: flex; gap: 24px; margin-bottom: 20px;
         padding-bottom: 16px; border-bottom: 1px solid var(--border);
     }
-   
+    
     .backInfoLabel {
         font-size: 12px; font-weight: 700; color: var(--blue); margin-bottom: 4px;
     }
@@ -265,7 +265,7 @@
         font-size: 26px; font-family: cursive; color: var(--text);
         margin-bottom: 2px; line-height: 1;
     }
-
+    
     .backDateLabel { font-size: 12px; font-weight: 700; color: var(--blue); margin-bottom: 4px; }
     .backDateVal   { font-size: 14px; font-weight: 700; color: var(--text); }
 
@@ -346,13 +346,16 @@
         .frontPhoto     { width: 130px; height: 160px; }
     }
 
-    /* ══════════════════════════
-       PRINT STYLES — Real PVC card
-       size on A4 landscape
-    ══════════════════════════ */
+    /* ══════════════════════════════════════
+       PRINT STYLES
+       A4 landscape — both cards side by side
+       Each card: 85.6 × 54 mm (PVC/credit card)
+       Uses transform:scale so all screen CSS
+       renders at full res then is shrunk.
+    ══════════════════════════════════════ */
     @page {
         size: A4 landscape;
-        margin: 10mm;
+        margin: 8mm;
     }
 
     @media print {
@@ -360,89 +363,109 @@
 
         body {
             background: white !important;
-            padding: 0; margin: 0;
+            margin: 0; padding: 0;
             font-family: 'Poppins', Arial, sans-serif;
         }
 
-        /* Hide everything except print area */
+        /* Hide screen-only UI */
         .topHeader,
         .sectionLabel,
         .featuresRow,
         .printBtn,
         .bottomNav { display: none !important; }
 
-        .pageWrap {
-            padding: 0; margin: 0;
-            max-width: none;
-        }
+        .pageWrap { padding: 0 !important; margin: 0 !important; max-width: none !important; }
 
-        /* Print container: two cards side-by-side on A4 landscape */
+        /* ── PRINT CONTAINER: row of two cards ── */
         .printContainer {
             display: flex !important;
-            flex-direction: column !important;
-            align-items: center !important;
-            gap: 8mm !important;
-            width: 277mm;
-            margin: 0 auto;
+            flex-direction: row !important;
+            align-items: flex-start !important;
+            justify-content: center !important;
+            gap: 10mm !important;
+            width: 277mm !important;
+            margin: 0 auto !important;
+            padding: 0 !important;
         }
 
+        /* ── Each card wrapper: real PVC size ── */
         .cardWrap {
-            box-shadow: none !important;
-            border: 0.5mm solid #ccc !important;
-            border-radius: 3.5mm !important;
+            /* PVC card standard: 85.6 × 54 mm */
+            width:  85.6mm !important;
+            height: 54mm   !important;
+            flex-shrink: 0 !important;
             overflow: hidden !important;
+            border-radius: 3.5mm !important;
+            border: 0.4mm solid #bbb !important;
+            box-shadow: none !important;
             margin: 0 !important;
-            /* Real PVC card: 85.6mm × 54mm */
-            width: 85.6mm !important;
-            height: 54mm !important;
             page-break-inside: avoid !important;
             break-inside: avoid !important;
+            position: relative !important;
         }
 
-        /* Scale front card content */
+        /* ── FRONT: scale full-size content down to fit 85.6×54mm ── */
         .id-front {
-            width: 85.6mm !important; height: 54mm !important;
-            padding: 5mm 6mm !important;
+            /* render at 324×204 px (≈ 85.6×54 mm at 96dpi) */
+            width:  324px !important;
+            height: 204px !important;
             min-height: unset !important;
+            padding: 16px 18px 12px !important;
+            overflow: hidden !important;
+            /* scale from natural screen size (~900px wide) to card width */
+            transform-origin: top left !important;
+            transform: scale(calc(85.6 / (900 * 0.2646))) !important;
         }
-        .frontTopWave   { height: 18mm !important; }
-        .frontBottomWave { height: 14mm !important; }
-        .frontLogoTitle { font-size: 14pt !important; letter-spacing: 2px !important; }
-        .frontLogoSub   { font-size: 5pt !important; letter-spacing: 3px !important; }
-        .frontIdLabel   { font-size: 8pt !important; top: 5mm !important; right: 6mm !important; }
-        .frontContent   { margin-top: 4mm !important; gap: 5mm !important; }
-        .frontPhoto     { width: 20mm !important; height: 26mm !important; border-radius: 2mm !important; border-width: 1.5px !important; }
-        .frontDetail    { gap: 4px !important; margin-bottom: 4px !important; }
-        .detailIcon     { width: 12px !important; height: 12px !important; font-size: 7pt !important; border-radius: 3px !important; }
-        .detailLabel    { font-size: 5pt !important; }
-        .detailVal      { font-size: 7pt !important; }
-        .frontStamp     { width: 18mm !important; height: 18mm !important; right: 6mm !important; bottom: 16mm !important; border-width: 1.5px !important; font-size: 4pt !important; }
-        .stampCheck     { font-size: 10pt !important; }
-        .frontWebsite   { font-size: 5.5pt !important; left: 6mm !important; bottom: 4mm !important; }
 
-        /* Scale back card content */
+        /* Fine-tune front elements for print */
+        .frontTopWave    { height: 56px !important; }
+        .frontBottomWave { height: 46px !important; }
+        .frontLogoTitle  { font-size: 20px !important; letter-spacing: 2px !important; }
+        .frontLogoSub    { font-size: 6px  !important; letter-spacing: 3px !important; }
+        .frontIdLabel    { font-size: 9px  !important; top: 10px !important; right: 14px !important; letter-spacing: 1px !important; }
+        .frontContent    { margin-top: 10px !important; gap: 10px !important; }
+        .frontPhoto      { width: 54px !important; height: 68px !important; border-radius: 5px !important; border-width: 1.5px !important; }
+        .frontDetail     { gap: 4px !important; margin-bottom: 6px !important; }
+        .detailIcon      { width: 16px !important; height: 16px !important; font-size: 8px !important; border-radius: 3px !important; }
+        .detailLabel     { font-size: 5.5px !important; margin-bottom: 0 !important; }
+        .detailVal       { font-size: 8px  !important; line-height: 1.1 !important; }
+        .frontStamp      { width: 42px !important; height: 42px !important; right: 14px !important; bottom: 48px !important; border-width: 1.5px !important; font-size: 4.5px !important; gap: 0 !important; }
+        .stampCheck      { font-size: 12px !important; }
+        .frontWebsite    { font-size: 6px !important; left: 18px !important; bottom: 10px !important; gap: 3px !important; }
+
+        /* ── BACK: same scale approach ── */
         .id-back {
-            width: 85.6mm !important; height: 54mm !important;
-            padding: 5mm 6mm !important;
+            width:  324px !important;
+            height: 204px !important;
             min-height: unset !important;
+            padding: 14px 16px !important;
+            overflow: hidden !important;
+            transform-origin: top left !important;
+            transform: scale(calc(85.6 / (900 * 0.2646))) !important;
         }
-        .backBluePanel  { width: 32% !important; border-top-right-radius: 20mm !important; border-bottom-right-radius: 20mm !important; }
-        .backContent    { gap: 4mm !important; }
-        .backLogoTitle  { font-size: 11pt !important; letter-spacing: 1px !important; }
-        .backLogoSub    { font-size: 4pt !important; letter-spacing: 3px !important; margin-bottom: 3mm !important; }
-        .backTermsTitle { font-size: 5pt !important; margin-bottom: 2mm !important; }
-        .backTermsList  { font-size: 4pt !important; line-height: 1.5 !important; padding-left: 8px !important; }
-        .backTopInfo    { gap: 6mm !important; margin-bottom: 3mm !important; padding-bottom: 2mm !important; }
-        .backInfoLabel  { font-size: 5pt !important; margin-bottom: 1px !important; }
-        .backInfoVal    { font-size: 5.5pt !important; gap: 2px !important; }
-        .backQrBox      { padding: 3px !important; border-radius: 3px !important; margin-bottom: 2mm !important; }
-        .backQrBox img  { width: 18mm !important; height: 18mm !important; }
-        .backQrLabel    { font-size: 5pt !important; margin-bottom: 2mm !important; }
-        .backBottomInfo { padding-top: 2mm !important; }
-        .backSig        { font-size: 4.5pt !important; }
-        .backSigLine    { font-size: 12pt !important; }
-        .backDateLabel  { font-size: 4.5pt !important; }
-        .backDateVal    { font-size: 5.5pt !important; }
+
+        .backBluePanel {
+            width: 34% !important;
+            border-top-right-radius: 55px !important;
+            border-bottom-right-radius: 55px !important;
+        }
+        .backContent    { gap: 12px !important; }
+        .backLeft       { width: 32% !important; }
+        .backLogoTitle  { font-size: 13px !important; letter-spacing: 1px !important; line-height: 1 !important; }
+        .backLogoSub    { font-size: 4.5px !important; letter-spacing: 3px !important; margin-bottom: 6px !important; }
+        .backTermsTitle { font-size: 5.5px !important; margin-bottom: 4px !important; }
+        .backTermsList  { font-size: 4px !important; line-height: 1.5 !important; padding-left: 8px !important; }
+        .backTopInfo    { gap: 10px !important; margin-bottom: 6px !important; padding-bottom: 5px !important; }
+        .backInfoLabel  { font-size: 5px !important; margin-bottom: 1px !important; }
+        .backInfoVal    { font-size: 5.5px !important; gap: 2px !important; }
+        .backQrBox      { padding: 4px !important; border-radius: 4px !important; margin-bottom: 4px !important; display: inline-block !important; }
+        .backQrBox img  { width: 48px !important; height: 48px !important; display: block !important; }
+        .backQrLabel    { font-size: 5px !important; margin-bottom: 5px !important; gap: 3px !important; }
+        .backBottomInfo { padding-top: 5px !important; }
+        .backSig        { font-size: 5px !important; }
+        .backSigLine    { font-size: 14px !important; margin-bottom: 0 !important; }
+        .backDateLabel  { font-size: 5px !important; margin-bottom: 1px !important; }
+        .backDateVal    { font-size: 6px  !important; }
     }
 </style>
 </head>
@@ -587,6 +610,7 @@
 
         <!-- Print button -->
         <button class="printBtn" onclick="downloadIdCard()">🖨️ Download / Print ID Card</button>
+        <button class="printBtn" onclick="saveAsImage()" style="background:linear-gradient(135deg,#16a34a,#15803d);margin-top:10px;box-shadow:0 6px 20px rgba(22,163,74,0.30);">📸 Save as Image (Mobile)</button>
 
     </div><!-- /pageWrap -->
 
@@ -625,8 +649,8 @@
     if (profileImage) {
         if      (profileImage.startsWith("http"))  document.getElementById("staffImage").src = profileImage + "?t=" + Date.now();
         else if (profileImage.startsWith("data:")) document.getElementById("staffImage").src = profileImage;
-       else
-    document.getElementById("staffImage").src = window.location.origin + profileImage + "?t=" + Date.now();}
+        else                                       document.getElementById("staffImage").src = "http://localhost:5000" + profileImage + "?t=" + Date.now();
+    }
 
     // ── ISSUE DATE ──
     const today = new Date();
@@ -635,6 +659,64 @@
 
     // ── PRINT ──
     function downloadIdCard() { window.print(); }
+
+    // ── SAVE AS IMAGE (mobile-friendly) ──
+    async function saveAsImage() {
+        const btn = document.querySelector('.printBtn + .printBtn');
+        const originalText = btn.innerHTML;
+        btn.innerHTML = "⏳ Generating...";
+        btn.disabled = true;
+
+        try {
+            const script = document.createElement('script');
+            script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
+            document.head.appendChild(script);
+            await new Promise(res => script.onload = res);
+
+            const container = document.querySelector('.printContainer');
+
+            // Temporarily make both cards visible and side-by-side for capture
+            container.style.flexDirection = 'row';
+            container.style.display = 'flex';
+            container.style.gap = '20px';
+            container.style.padding = '20px';
+            container.style.background = '#f0f4ff';
+            container.style.borderRadius = '16px';
+
+            // Hide labels temporarily
+            document.querySelectorAll('.sectionLabel').forEach(el => el.style.display = 'none');
+
+            const canvas = await html2canvas(container, {
+                scale: 3,
+                useCORS: true,
+                allowTaint: true,
+                backgroundColor: '#f0f4ff',
+                logging: false
+            });
+
+            // Restore
+            document.querySelectorAll('.sectionLabel').forEach(el => el.style.display = '');
+            container.style.flexDirection = '';
+            container.style.display = '';
+            container.style.gap = '';
+            container.style.padding = '';
+            container.style.background = '';
+            container.style.borderRadius = '';
+
+            // Download
+            const link = document.createElement('a');
+            link.download = 'Vinsuu_ID_Card.png';
+            link.href = canvas.toDataURL('image/png', 1.0);
+            link.click();
+
+        } catch (err) {
+            alert('Could not generate image. Please use the Print button instead.');
+            console.log(err);
+        }
+
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+    }
 </script>
 </body>
 </html>

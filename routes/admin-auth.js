@@ -126,12 +126,14 @@ router.get("/check",(req,res)=>{
 
 // ================= LOGOUT =================
 
-router.post("/logout",(req,res)=>{
+router.post("/logout", (req, res) => {
 
-    req.session.destroy(()=>{
+    req.session.destroy(() => {
+
+        res.clearCookie("connect.sid");
 
         res.json({
-            success:true
+            success: true
         });
 
     });

@@ -33,20 +33,23 @@ router.post("/request-service", async (req, res) => {
   try {
 
     const {
-      service_id,
-      heading,
-      details,
-      address,
-      pincode,
-      location,
-      latitude,
-      longitude,
-      name,
-      mobile,
-      distance,
-      price,
-      confirmation_amount
-    } = req.body;
+  service_id,
+  heading,
+  details,
+  address,
+  pincode,
+  location,
+  latitude,
+  longitude,
+  name,
+  mobile,
+  distance,
+  price,
+  confirmation_amount,
+  referral_code_used,
+    booking_date,
+  booking_slot
+} = req.body;
 
     // FIND OR CREATE USER
     let userResult = await pool.query(
@@ -57,22 +60,83 @@ router.post("/request-service", async (req, res) => {
     let user;
 
     if (userResult.rows.length === 0) {
-
+const referralCode ="VNS2601" + mobile.slice(-4);
       const newUser = await pool.query(
   `INSERT INTO users
-   (name,mobile,email,address)
-   VALUES ($1,$2,$3,$4)
-   RETURNING *`,
+(
+ name,
+ mobile,
+ email,
+ address,
+ referral_code,
+ referred_by
+)
+VALUES ($1,$2,$3,$4,$5,$6)
+RETURNING *`,
   [
-    name,
-    mobile,
-    req.body.email?.trim() || null,
-    address || ""
-  ]
+  name,
+  mobile,
+  req.body.email?.trim() || null,
+  address || "",
+  referralCode,
+  referral_code_used || null
+]
 );
 
       user = newUser.rows[0];
+if (referral_code_used) {
 
+  const checkRef = await pool.query(`
+  SELECT referral_code
+  FROM users
+  WHERE referral_code=$1
+
+  UNION
+
+  SELECT referral_code
+  FROM staff
+  WHERE referral_code=$1
+`, [referral_code_used]);
+
+  if (checkRef.rows.length > 0) {
+
+  // Customer referrer gets referral point
+await pool.query(`
+  UPDATE users
+  SET referral_points =
+    COALESCE(referral_points,0) + 1
+  WHERE referral_code=$1
+`, [referral_code_used]);
+
+// Staff referrer gets unit balance
+await pool.query(`
+  UPDATE staff
+  SET unit_balance =
+    COALESCE(unit_balance,0) + 1
+  WHERE referral_code=$1
+`, [referral_code_used]);
+
+
+
+    await pool.query(`
+      INSERT INTO referral_history
+      (
+        referrer_code,
+        joined_mobile,
+        joined_type,
+        reward_type
+      )
+      VALUES ($1,$2,$3,$4)
+    `,[
+      referral_code_used,
+      mobile,
+      'customer',
+      'referral_point'
+    ]);
+
+  }
+
+}
     } else {
 
       user = userResult.rows[0];
@@ -95,8 +159,8 @@ await pool.query(
    const result = await pool.query(
   `INSERT INTO service_requests
   (service_id,customer_id,heading,details,address,pincode,location,latitude,longitude,status,
-   distance,price,confirmation_amount)
-  VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13)
+   distance,price,confirmation_amount, booking_date, booking_slot)
+  VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15)
   RETURNING id`,
   [
     service_id,
@@ -113,7 +177,9 @@ await pool.query(
     // ✅ ADD THESE
     distance || 0,
     price || 0,
-    confirmation_amount || 0
+    confirmation_amount || 0,
+    booking_date || null,
+    booking_slot || null
   ]
 );
 // App notification to staff
@@ -130,7 +196,9 @@ try {
     location: location || "",
     pincode: pincode || "",
     serviceHeading: heading || "",
-    serviceDetails: details || ""
+    serviceDetails: details || "",
+    booking_date: booking_date || "",
+    booking_slot: booking_slot || "",
   });
 
 } catch (e) {
@@ -290,18 +358,28 @@ router.post("/login-verify", async (req, res) => {
     let user;
 
     // If not found → create new user
-    if (userResult.rows.length === 0) {
-      const newUser = await pool.query(
-        `INSERT INTO users (mobile, name)
-         VALUES ($1,$2)
-         RETURNING *`,
-        [mobile, "Customer"]
-      );
-
-      user = newUser.rows[0];
-    } else {
-      user = userResult.rows[0];
-    }
+   
+if (userResult.rows.length === 0) {
+  const referralCode = "VNS2601" + mobile.slice(-4);
+  const newUser = await pool.query(
+    `INSERT INTO users
+    (
+      mobile,
+      name,
+      referral_code
+    )
+    VALUES ($1,$2,$3)
+    RETURNING *`,
+    [
+      mobile,
+      "Customer",
+      referralCode
+    ]
+  );
+  user = newUser.rows[0];
+} else {
+  user = userResult.rows[0];
+}
 
     // Create token
     const token = jwt.sign(
@@ -538,24 +616,45 @@ router.post("/mark-complete", verifyToken, async (req, res) => {
 
   try {
 
-    const { request_id } = req.body;
+    const {
+      request_id,
+      completed_staff_id,
+      completed_staff_name,
+      outside_work,
+      outside_work_remark
+    } = req.body;
 
     await pool.query(
       `UPDATE service_requests
-       SET status='completed'
-       WHERE id=$1
-       AND customer_id=$2`,
-      [request_id, req.user.id]
+       SET
+         status='completed',
+         completed_at=NOW(),
+         completed_by_staff_id=$1,
+         completed_by_staff_name=$2,
+         outside_work=$3,
+         outside_work_remark=$4
+       WHERE id=$5
+       AND customer_id=$6`,
+      [
+        completed_staff_id || null,
+        completed_staff_name || null,
+        outside_work || false,
+        outside_work_remark || null,
+        request_id,
+        req.user.id
+      ]
     );
 
-    res.json({ success: true });
+    res.json({
+      success:true
+    });
 
   } catch (err) {
 
     console.log("MARK COMPLETE ERROR:", err);
 
     res.status(500).json({
-      error: "Server error"
+      error:"Server error"
     });
 
   }
@@ -611,6 +710,55 @@ router.get("/reviews-summary", async (req, res) => {
   } catch (err) {
 
     console.log("REVIEWS SUMMARY ERROR:", err);
+
+    res.status(500).json({
+      error: "Server error"
+    });
+
+  }
+
+});
+// ================= REWARDS =================
+router.get("/rewards", verifyToken, async (req, res) => {
+
+  try {
+
+    const userId = req.user.id;
+
+    const userRes = await pool.query(`
+      SELECT
+        referral_code,
+        COALESCE(referral_points,0) AS referral_points
+      FROM users
+      WHERE id=$1
+    `,[userId]);
+
+    if (userRes.rows.length === 0) {
+      return res.status(404).json({
+        error: "User not found"
+      });
+    }
+
+    const user = userRes.rows[0];
+
+    const historyRes = await pool.query(`
+      SELECT *
+      FROM referral_history
+      WHERE referrer_code=$1
+      ORDER BY id DESC
+    `,[user.referral_code]);
+
+    res.json({
+      referral_code: user.referral_code,
+      referral_points: Number(user.referral_points || 0),
+      unit_balance: 0,
+      total_referrals: historyRes.rows.length,
+      history: historyRes.rows
+    });
+
+  } catch (err) {
+
+    console.log("CUSTOMER REWARDS ERROR:", err);
 
     res.status(500).json({
       error: "Server error"

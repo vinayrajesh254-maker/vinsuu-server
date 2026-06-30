@@ -452,7 +452,84 @@ router.delete("/service/:id", async (req, res) => {
   }
 
 });
+// ================= EDIT SERVICE =================
+router.put(
+  "/service/:id",
+  upload.single("image"),
+  async (req, res) => {
 
+    try {
+
+      let {
+        name,
+        unit_cost,
+        category_id,
+        details,
+        price,
+        service_type
+      } = req.body;
+
+      const old = await pool.query(
+        "SELECT * FROM services WHERE id=$1",
+        [req.params.id]
+      );
+
+      if (old.rows.length === 0) {
+        return res.status(404).json({
+          success:false,
+          error:"Service not found"
+        });
+      }
+
+      const image = req.file
+        ? req.file.path
+        : old.rows[0].image;
+
+      if (typeof details === "string") {
+        try {
+          details = JSON.parse(details);
+        } catch {
+          details = [];
+        }
+      }
+
+      await pool.query(`
+        UPDATE services
+        SET
+          name=$1,
+          image=$2,
+          unit_cost=$3,
+          category_id=$4,
+          details=$5,
+          price=$6,
+          service_type=$7
+        WHERE id=$8
+      `,[
+        name,
+        image,
+        unit_cost || null,
+        category_id,
+        JSON.stringify(details),
+        price || null,
+        service_type || null,
+        req.params.id
+      ]);
+
+      res.json({ success:true });
+
+    } catch(err) {
+
+      console.log("EDIT SERVICE ERROR:", err);
+
+      res.status(500).json({
+        success:false,
+        error:err.message
+      });
+
+    }
+
+  }
+);
 // ✅ GET POPULAR SERVICES
 // ✅ GET POPULAR SERVICES
 router.get("/services/popular", async (req, res) => {
@@ -963,7 +1040,11 @@ router.get("/service-requests", async (req, res) => {
   try {
     // 
     const result = await pool.query(`
-      SELECT sr.*,
+     SELECT
+       sr.*,
+       sr.booking_date,
+       sr.booking_slot,
+
        u.name as customer_name,
        u.mobile,
 
@@ -972,10 +1053,8 @@ router.get("/service-requests", async (req, res) => {
        st.address as staff_address,
 
        sv.name AS service_name,
-sv.unit_cost,
-sv.service_type   -- ✅ THIS FIX
-       
-
+       sv.unit_cost,
+       sv.service_type
 FROM service_requests sr
 
 LEFT JOIN users u ON u.id = sr.customer_id
@@ -1324,6 +1403,97 @@ router.delete("/service-request/:id", async (req, res) => {
     res.status(500).json({
       success: false,
       error: "Server error"
+    });
+
+  }
+
+});
+// ================= ADD STAFF UNIT =================
+router.post("/staff/:id/add-unit", async (req, res) => {
+
+  try {
+
+    const staffId = req.params.id;
+    const { unit, remark } = req.body;
+
+    const staff = await pool.query(
+      "SELECT unit_balance FROM staff WHERE id=$1",
+      [staffId]
+    );
+
+    if (staff.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        error: "Staff not found"
+      });
+    }
+
+    const opening = Number(staff.rows[0].unit_balance || 0);
+    const received = Number(unit || 0);
+    const closing = opening + received;
+
+    await pool.query(
+      "UPDATE staff SET unit_balance=$1 WHERE id=$2",
+      [closing, staffId]
+    );
+
+    await pool.query(`
+      INSERT INTO staff_unit_balance_history
+      (
+        staff_id,
+        opening_balance,
+        received_balance,
+        used_balance,
+        closing_balance,
+        remark
+      )
+      VALUES($1,$2,$3,$4,$5,$6)
+    `,[
+      staffId,
+      opening,
+      received,
+      0,
+      closing,
+      remark || 'Admin Added'
+    ]);
+
+    res.json({
+      success: true,
+      balance: closing
+    });
+
+  } catch (err) {
+
+    console.log(err);
+
+    res.status(500).json({
+      success: false,
+      error: err.message
+    });
+
+  }
+
+});
+// ================= UNIT HISTORY =================
+router.get("/staff/:id/unit-history", async (req, res) => {
+
+  try {
+
+    const result = await pool.query(`
+      SELECT *
+      FROM staff_unit_balance_history
+      WHERE staff_id=$1
+      ORDER BY id DESC
+    `,[req.params.id]);
+
+    res.json(result.rows);
+
+  } catch (err) {
+
+    console.log(err);
+
+    res.status(500).json({
+      error: err.message
     });
 
   }

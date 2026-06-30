@@ -530,6 +530,79 @@ content="Manage your profile and service requests on Vinsuu.">
             <span class="bnIcon">😊</span>Profile
         </button>
     </div>
+    <!-- Complete Service Overlay (service done) -->
+    <div id="completeOverlay" style="
+display:none;
+position:fixed;
+inset:0;
+background:rgba(0,0,0,.6);
+z-index:9998;
+"></div>
+
+<div id="completePopup" style="
+display:none;
+position:fixed;
+top:50%;
+left:50%;
+transform:translate(-50%,-50%);
+width:95%;
+max-width:500px;
+background:#fff;
+border-radius:16px;
+padding:20px;
+z-index:9999;
+">
+
+<button
+onclick="closeCompletePopup()"
+style="
+position:absolute;
+top:10px;
+right:10px;
+border:none;
+background:none;
+font-size:22px;
+cursor:pointer;
+">
+✕
+</button>
+
+<h3>Select Staff Who Completed Work</h3>
+
+<div id="completeStaffList"></div>
+
+<hr style="margin:15px 0;">
+
+<label>
+<input
+type="checkbox"
+id="outsideWorkCheck">
+ Any Other Staff
+</label>
+
+<div id="outsideWorkBox"
+style="display:none;margin-top:10px;">
+
+<input
+id="outsideStaffName"
+placeholder="Staff Name"
+style="width:100%;margin-bottom:10px;">
+
+<textarea
+id="outsideWorkRemark"
+placeholder="Work Details"
+style="width:100%;height:80px;">
+</textarea>
+
+</div>
+
+<button
+onclick="confirmServiceDone()"
+style="margin-top:15px;">
+Confirm
+</button>
+
+</div>
     <script src="profilescript.js"></script>
 </body>
 </html>

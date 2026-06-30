@@ -8,13 +8,26 @@ document.addEventListener("DOMContentLoaded", () => {
     loadProfile();
     loadRequests();
     // Auto refresh requests every 5 seconds
-setInterval(() => {
-    if (!document.hidden) {
-        loadRequests();
-    }
-}, 5000);
+    setInterval(() => {
+        if (!document.hidden) {
+            loadRequests();
+        }
+    }, 5000);
 });
+// select staff for complete popup
+document.addEventListener("DOMContentLoaded",()=>{
 
+const overlay =
+document.getElementById("completeOverlay");
+
+if(overlay){
+
+overlay.onclick =
+closeCompletePopup;
+
+}
+
+});
 // ── PROFILE ──
 async function loadProfile() {
     const res = await fetch(API + "/customer/profile", { headers: { "Authorization": "Bearer " + token } });
@@ -37,9 +50,10 @@ async function loadProfile() {
                 </div>
             </div>
             <div class="profileActionBtns">
-                <button class="profileBtn profileBtnOutline" onclick="openFullProfile()">👤 View Profile</button>
-                <button class="profileBtn profileBtnRed"     onclick="logoutUser()">↩ Logout</button>
-            </div>
+    <button class="profileBtn profileBtnOutline" onclick="openFullProfile()">👤 View Profile</button>
+    <button class="profileBtn" style="background:#fbbf24;color:#111;" onclick="openRewards()">🎁 Refer & Earn </button>
+    <button class="profileBtn profileBtnRed" onclick="logoutUser()">↩ Logout</button>
+</div>
         </div>
         <div class="profileInfoGrid">
             <div class="profileInfoItem">
@@ -115,13 +129,14 @@ function switchTab(tab) {
 async function loadRequests() {
     const res = await fetch(API + "/customer/my-requests", { headers: { "Authorization": "Bearer " + token } });
     const requests = await res.json();
+    console.log("MY REQUESTS:", requests);
     const container = document.getElementById("requests");
     container.innerHTML = "";
 
     const filtered = requests.filter(r => {
         const s = (r.status || "").toLowerCase();
         if (currentTab === "pending") return ["pending", "accepted", "waiting_customer_confirm", "otp_pending", "in_progress"].includes(s);
-        if (currentTab === "completed") return s === "completed";
+        if (currentTab === "completed")  return ["completed","cancel"].includes(s);
     });
 
     if (filtered.length === 0) {
@@ -157,7 +172,8 @@ async function loadRequests() {
         </div>
         ` : ""}
 
-        ${req.status === "completed" ? `
+        ${["completed","cancel"].includes(req.status) ? `
+
 ${req.admin_remark ? `
 <div style="
     margin:10px 0;
@@ -167,7 +183,7 @@ ${req.admin_remark ? `
     border-radius:8px;
 ">
     <div style="font-weight:600;color:#991b1b;">
-        Admin Remark
+        Vinsuu Remarks
     </div>
     <div style="margin-top:4px;">
         ${req.admin_remark}
@@ -175,25 +191,42 @@ ${req.admin_remark ? `
 </div>
 ` : ""}
 
+${req.status === "completed" ? `
 <button class="invoiceBtn" onclick="openInvoice(${req.id})">
 🧾 Download Invoice
 </button>
 
 <div id="reviewBox_${req.id}" class="reviewBox">
-            <div class="reviewBoxTitle">⭐ Your Rating</div>
-            <div class="starsRow" id="stars_${req.id}">
-                <span class="starSpan" onclick="setRating(${req.id},1)">★</span>
-                <span class="starSpan" onclick="setRating(${req.id},2)">★</span>
-                <span class="starSpan" onclick="setRating(${req.id},3)">★</span>
-                <span class="starSpan" onclick="setRating(${req.id},4)">★</span>
-                <span class="starSpan" onclick="setRating(${req.id},5)">★</span>
-            </div>
-            <input type="hidden" id="rating_${req.id}" value="0">
-            <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:6px;">Feedback</div>
-            <input class="reviewInput" id="feedback_${req.id}" placeholder="Write your feedback here...">
-            <button class="reviewSubmitBtn" onclick="submitReview(${req.id})">Submit Review</button>
-        </div>
-        ` : ""}
+    <div class="reviewBoxTitle">⭐ Your Rating</div>
+
+    <div class="starsRow" id="stars_${req.id}">
+        <span class="starSpan" onclick="setRating(${req.id},1)">★</span>
+        <span class="starSpan" onclick="setRating(${req.id},2)">★</span>
+        <span class="starSpan" onclick="setRating(${req.id},3)">★</span>
+        <span class="starSpan" onclick="setRating(${req.id},4)">★</span>
+        <span class="starSpan" onclick="setRating(${req.id},5)">★</span>
+    </div>
+
+    <input type="hidden" id="rating_${req.id}" value="0">
+
+    <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:6px;">
+        Feedback
+    </div>
+
+    <input
+        class="reviewInput"
+        id="feedback_${req.id}"
+        placeholder="Write your feedback here...">
+
+    <button
+        class="reviewSubmitBtn"
+        onclick="submitReview(${req.id})">
+        Submit Review
+    </button>
+</div>
+` : ""}
+
+` : ""}
         `;
 
         // ── Staff Details Accordion ──
@@ -211,22 +244,67 @@ ${req.admin_remark ? `
                         <div class="staffLeft">
                             <div class="staffAvatar">👤</div>
                             <div class="staffInfoText">
-                               <div class="staffInfoLine"><b>Staff ID.</b> ${req.staff_id || ""}</div>
-<div class="staffInfoLine"><b>Name:</b> ${req.staff_name || ""}</div>
-<div class="staffInfoLine"><b>Mob No.</b> ${req.staff_mobile || ""}</div>
+                              <div style="
+font-weight:700;
+color:#64748b;
+margin-bottom:8px;
+">
+Accepted Staff
+</div>
+
+<div class="staffInfoLine">
+<b>Staff ID.</b> ${req.staff_id || ""}
+</div>
+
+<div class="staffInfoLine">
+<b>Name:</b> ${req.staff_name || ""}
+</div>
+
+<div class="staffInfoLine">
+<b>Mob No.</b> ${req.staff_mobile || ""}
+</div>
+
 ${req.previous_staff_name ? `
 <hr style="margin:10px 0;">
-<div style="font-weight:700;color:#64748b;margin-bottom:6px;">
-Previous Staff
+
+<div style="
+font-weight:700;
+color:#64748b;
+margin-bottom:8px;
+">
+Accepted Staff 2
 </div>
+
 <div class="staffInfoLine">
 <b>Staff ID.</b> ${req.previous_staff_id || ""}
 </div>
+
 <div class="staffInfoLine">
 <b>Name:</b> ${req.previous_staff_name || ""}
 </div>
+
 <div class="staffInfoLine">
 <b>Mob No.</b> ${req.previous_staff_mobile || ""}
+</div>
+` : ""}
+
+${req.completed_by_staff_name ? `
+<hr style="margin:10px 0;">
+
+<div style="
+font-weight:700;
+color:#16a34a;
+margin-bottom:8px;
+">
+✅ Service Done By
+</div>
+
+<div class="staffInfoLine">
+<b>Staff ID.</b> ${req.completed_by_staff_id || ""}
+</div>
+
+<div class="staffInfoLine">
+<b>Name:</b> ${req.completed_by_staff_name || ""}
 </div>
 ` : ""}
                             </div>
@@ -355,10 +433,88 @@ function toggleSection(id) {
 }
 
 // ── ACTIONS ──
-async function markDone(id) {
-    await fetch(API + "/customer/mark-complete", { method: "POST", headers: { "Content-Type": "application/json", "Authorization": "Bearer " + token }, body: JSON.stringify({ request_id: id }) });
-    alert("Service completed"); loadRequests();
+async function markDone(id){ const res = await fetch( API + "/customer/my-requests", { headers:{ "Authorization":"Bearer " + token } } ); const requests = await res.json(); const req = requests.find(r => r.id == id);
+if(!req){ alert("Request not found"); return; } openCompletePopup(req);
 }
+let completeRequestId = null;
+let selectedStaffId = null;
+let selectedStaffName = "";
+
+function openCompletePopup(req){
+
+    completeRequestId = req.id;
+
+    const box =
+    document.getElementById("completeStaffList");
+
+    box.innerHTML = "";
+
+    const staffs = [];
+
+    if(req.staff_id){
+
+        staffs.push({
+            id:req.staff_id,
+            name:req.staff_name
+        });
+
+    }
+
+    if(req.previous_staff_id){
+
+        staffs.push({
+            id:req.previous_staff_id,
+            name:req.previous_staff_name
+        });
+
+    }
+
+    staffs.forEach(staff=>{
+
+        box.innerHTML += `
+        <label style="
+        display:block;
+        margin-bottom:10px;
+        ">
+        <input
+        type="radio"
+        name="completedStaff"
+        value="${staff.id}"
+        data-name="${staff.name}">
+        Staff ID ${staff.id}
+        - ${staff.name}
+        </label>
+        `;
+
+    });
+
+    document.getElementById(
+        "completeOverlay"
+    ).style.display = "block";
+
+    document.getElementById(
+        "completePopup"
+    ).style.display = "block";
+
+}
+function closeCompletePopup(){
+
+    const overlay =
+    document.getElementById("completeOverlay");
+
+    const popup =
+    document.getElementById("completePopup");
+
+    if(overlay){
+        overlay.style.display = "none";
+    }
+
+    if(popup){
+        popup.style.display = "none";
+    }
+
+}
+
 async function findOther(id) {
     await fetch(API + "/customer/find-other", { method: "POST", headers: { "Content-Type": "application/json", "Authorization": "Bearer " + token }, body: JSON.stringify({ request_id: id }) });
     alert("Searching another staff"); loadRequests();
@@ -418,4 +574,5 @@ async function loadStaffRating(staffId, reqId) {
     } catch (err) { console.log("Rating load error:", err); }
 }
 function openFeedbackPage(staffId) { window.open("rating-feedback.html?staff_id=" + staffId, "_blank"); }
+function openRewards() { window.location.href = "rewards.html"; }
 function logoutUser() { localStorage.removeItem("customerToken"); localStorage.removeItem("user"); alert("Logged out"); window.location.href = "customer-login.html"; }

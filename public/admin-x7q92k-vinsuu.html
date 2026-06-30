@@ -1120,6 +1120,46 @@
             background: var(--primary-light);
         }
 
+
+        /* Refer and reward */
+        .adminRewardTable {
+            width: 100%;
+            border-collapse: collapse;
+            background: #fff;
+        }
+
+        .adminRewardTable th {
+            background: #f3f4f6;
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: center;
+            font-weight: 700;
+        }
+
+        .adminRewardTable td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: center;
+        }
+
+        .rewardViewBtn {
+            background: #2563eb;
+            color: #fff;
+            padding: 6px 14px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .rewardDeleteBtn {
+            background: #dc2626;
+            color: #fff;
+            padding: 6px 14px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
         /* Content section boxes */
 
 
@@ -1251,6 +1291,7 @@
         let sidebarOpen = false;
         let serviceCounter = 1;
         let detailsList = [];
+        let editDetailsList = [];
 
         document.addEventListener("DOMContentLoaded", () => {
             document.addEventListener("click", function (e) {
@@ -1303,36 +1344,37 @@
             loadContactDetails();
             loadServiceUpdates();
             loadSavedQR();
+            loadReferralRewards();
         });
         // Phone or email
-async function loadContactDetails() {
+        async function loadContactDetails() {
 
-    try {
+            try {
 
-        const phoneRes =
-            await fetch(API + "/admin/content/contactPhone");
+                const phoneRes =
+                    await fetch(API + "/admin/content/contactPhone");
 
-        const phoneData = await phoneRes.json();
+                const phoneData = await phoneRes.json();
 
-        if (document.getElementById("contactPhone")) {
-            document.getElementById("contactPhone").value =
-                phoneData.content || "";
+                if (document.getElementById("contactPhone")) {
+                    document.getElementById("contactPhone").value =
+                        phoneData.content || "";
+                }
+
+                const emailRes =
+                    await fetch(API + "/admin/content/contactEmail");
+
+                const emailData = await emailRes.json();
+
+                if (document.getElementById("contactEmail")) {
+                    document.getElementById("contactEmail").value =
+                        emailData.content || "";
+                }
+
+            } catch (err) {
+                console.log("Contact load error:", err);
+            }
         }
-
-        const emailRes =
-            await fetch(API + "/admin/content/contactEmail");
-
-        const emailData = await emailRes.json();
-
-        if (document.getElementById("contactEmail")) {
-            document.getElementById("contactEmail").value =
-                emailData.content || "";
-        }
-
-    } catch (err) {
-        console.log("Contact load error:", err);
-    }
-}
         // ── SIDEBAR TOGGLE ──
         function toggleSidebar() {
             const sidebar = document.getElementById("sidebar");
@@ -1386,7 +1428,8 @@ async function loadContactDetails() {
                 imageUpload: "Image Upload", aboutUs: "About Us", terms: "Terms & Conditions",
                 privacy: "Privacy Policy", refund: "Refund / Cancellation",
                 staffTerms: "Terms (Staff)", customerTerms: "Terms (Customer)",
-                unit: "Unit Balance", message: "Messages", update: "Service Updates"
+                unit: "Unit Balance", message: "Messages", update: "Service Updates",
+                referReward: "Refer & Reward"
             };
             const titleEl = document.getElementById("headerPageTitle");
             if (titleEl) titleEl.textContent = titles[id] || id;
@@ -1533,7 +1576,15 @@ async function loadContactDetails() {
                     <span class="sidebarGroupChevron" id="settingChevron">▼</span>
                 </button>
                 <div id="settingMenu" class="sidebarSubMenu">
-                    <button class="sidebarSubItem" onclick="showSection('imageUpload')">Image Upload</button>
+
+                    <button class="sidebarSubItem" onclick="showSection('imageUpload')">
+                        Image Upload
+                    </button>
+
+                    <button class="sidebarSubItem" onclick="showSection('referReward')">
+                        Refer & Reward
+                    </button>
+
                 </div>
             </div>
 
@@ -1825,7 +1876,200 @@ async function loadContactDetails() {
                 </div>
             </div>
         </div>
+        <!-- PROFESSIONAL EDIT SERVICE MODAL -->
+        <div id="editServiceModal" style="
+display:none;
+position:fixed;
+inset:0;
+background:rgba(15,23,42,.75);
+backdrop-filter:blur(4px);
+z-index:99999;
+padding:20px;
+overflow:auto;
+">
 
+            <div style="
+max-width:850px;
+margin:20px auto;
+background:#fff;
+border-radius:20px;
+overflow:hidden;
+box-shadow:0 25px 60px rgba(0,0,0,.25);
+">
+
+                <!-- HEADER -->
+                <div style="
+    background:linear-gradient(135deg,#1a3fd4,#2b52e0);
+    color:#fff;
+    padding:18px 24px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    ">
+                    <div>
+                        <h2 style="margin:0;font-size:22px;">
+                            Edit Service
+                        </h2>
+                        <div style="font-size:13px;opacity:.85;">
+                            Update service information
+                        </div>
+                    </div>
+
+                    <button onclick="document.getElementById('editServiceModal').style.display='none'" style="
+        width:38px;
+        height:38px;
+        border-radius:50%;
+        background:#fff;
+        color:#ef4444;
+        font-size:20px;
+        font-weight:bold;
+        border:none;
+        cursor:pointer;
+        ">
+                        ✕
+                    </button>
+                </div>
+
+                <!-- BODY -->
+                <div style="padding:25px;">
+
+                    <input type="hidden" id="editServiceId">
+
+                    <div style="
+        display:grid;
+        grid-template-columns:1fr 1fr;
+        gap:15px;
+        ">
+
+                        <div>
+                            <label style="font-weight:600;">Service Name</label>
+                            <input id="editServiceName" style="width:100%;margin-top:6px;" placeholder="Service Name">
+                        </div>
+
+                        <div>
+                            <label style="font-weight:600;">Category</label>
+                            <select id="editCategory" style="width:100%;margin-top:6px;">
+                            </select>
+                        </div>
+
+                        <div>
+                            <label style="font-weight:600;">Service Type</label>
+                            <select id="editServiceType" style="width:100%;margin-top:6px;">
+                                <option value="price">Price</option>
+                                <option value="unit">Unit Balance</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label style="font-weight:600;">Price</label>
+                            <input id="editServicePrice" style="width:100%;margin-top:6px;" placeholder="Price">
+                        </div>
+
+                        <div>
+                            <label style="font-weight:600;">Unit Balance</label>
+                            <input id="editUnitCost" style="width:100%;margin-top:6px;" placeholder="Unit Balance">
+                        </div>
+
+                        <div>
+                            <label style="font-weight:600;">Change Image</label>
+                            <input type="file" id="editServiceImage" style="width:100%;margin-top:6px;">
+                        </div>
+                    </div>
+
+                    <!-- IMAGE PREVIEW -->
+                    <div style="margin-top:20px;">
+                        <label style="font-weight:600;">Current Image</label>
+
+                        <div style="
+            margin-top:10px;
+            border:1px solid #e5e7eb;
+            border-radius:12px;
+            padding:10px;
+            text-align:center;
+            background:#f8fafc;
+            ">
+                            <img id="editServicePreview" src="" style="
+                max-width:150px;
+                max-height:150px;
+                border-radius:12px;
+                object-fit:cover;
+                ">
+                        </div>
+                    </div>
+
+                    <!-- DETAILS -->
+                    <div style="margin-top:20px;">
+                        <label style="font-weight:600;">Service Details</label>
+
+                        <div style="margin-top:20px;">
+
+                            <label style="font-weight:600;">
+                                Service Details
+                            </label>
+
+                            <div id="editDetailsBoard" style="
+    margin-top:10px;
+    border:1px solid #e5e7eb;
+    border-radius:12px;
+    padding:12px;
+    background:#f8fafc;
+    min-height:80px;
+    ">
+                            </div>
+
+                        </div>
+
+                        <div style="margin-top:15px;">
+
+                            <label style="font-weight:600;">
+                                Add New Detail
+                            </label>
+
+                            <div style="
+    display:flex;
+    gap:10px;
+    margin-top:8px;
+    ">
+
+                                <input id="newServiceDetail" placeholder="Enter service detail" style="flex:1;">
+
+                                <button type="button" onclick="addEditDetail()">
+                                    Add
+                                </button>
+
+                            </div>
+
+                        </div>
+                    </div>
+
+
+                    <!-- FOOTER BUTTONS -->
+                    <div style="
+        margin-top:25px;
+        display:flex;
+        gap:10px;
+        justify-content:flex-end;
+        flex-wrap:wrap;
+        ">
+
+                        <button onclick="document.getElementById('editServiceModal').style.display='none'" style="
+            background:#e5e7eb;
+            color:#111827;
+            ">
+                            Cancel
+                        </button>
+
+                        <button onclick="updateService()" style="
+            background:#1a3fd4;
+            color:#fff;
+            ">
+                            Save Changes
+                        </button>
+                    </div>
+
+                </div>
+            </div>
+        </div>
         <!-- ══ STAFF LIST ══ -->
         <div id="staffList" class="section">
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
@@ -2039,6 +2283,69 @@ async function loadContactDetails() {
             </div>
         </div>
 
+        <!-- Refer & Reward -->
+        <div id="referReward" class="section">
+            <div class="sectionHeader">
+                <div class="sectionTitle">🎁 Refer & Reward</div>
+                <div class="sectionSub">
+                    Referral rewards and referral history
+                </div>
+            </div>
+
+            <div class="box">
+
+                <div class="row">
+
+                    <div>
+                        <label>Mobile No.</label>
+                        <input id="rewardMobileSearch" placeholder="Search..." onkeyup="filterRewardTable()">
+                    </div>
+
+                    <div>
+                        <label>Customer Id</label>
+                        <input id="rewardCustomerSearch" placeholder="Search..." onkeyup="filterRewardTable()">
+                    </div>
+
+                </div>
+
+                <div style="overflow-x:auto">
+
+                    <table class="adminRewardTable">
+
+                        <thead>
+
+                            <tr>
+                                <th>Sr No</th>
+                                <th>Date</th>
+                                <th>Customer Id</th>
+                                <th>Customer Name</th>
+                                <th>Mobile No</th>
+                                <th>Staff Register</th>
+                                <th>Referral Points</th>
+                                <th>Unit Earned</th>
+                                <th>View</th>
+                                <th>Remove</th>
+                            </tr>
+
+                        </thead>
+
+                        <tbody id="rewardTableBody">
+
+                            <tr>
+                                <td colspan="10">
+                                    No Data Found
+                                </td>
+                            </tr>
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+        </div>
         <!-- ══ CONTENT MANAGEMENT ══ -->
         <div id="aboutUs" class="section contentBox"></div>
         <div id="terms" class="section contentBox"></div>
@@ -2088,10 +2395,10 @@ async function loadContactDetails() {
                     <button onclick="savePhone()">Save Phone</button>
                 </div>
                 <div class="row">
-    <label>Email</label>
-    <input id="contactEmail" placeholder="support@vinsuu.com">
-    <button onclick="saveEmail()">Save Email</button>
-</div>
+                    <label>Email</label>
+                    <input id="contactEmail" placeholder="support@vinsuu.com">
+                    <button onclick="saveEmail()">Save Email</button>
+                </div>
                 <div style="overflow-x:auto;">
                     <table>
                         <thead>
@@ -2156,8 +2463,9 @@ async function loadContactDetails() {
             </div>
         </div>
         <!-- Check Staff Popup -->
-        <div id="checkStaffPopup" style="display:none; position:fixed; left:0; top:0; width:100%; height:100%; background:rgba(0,0,0,.45); z-index:99999; justify-content:center; align-items:center; ">
-    <div style="
+        <div id="checkStaffPopup"
+            style="display:none; position:fixed; left:0; top:0; width:100%; height:100%; background:rgba(0,0,0,.45); z-index:99999; justify-content:center; align-items:center; ">
+            <div style="
     width:95%;
     max-width:900px;
     max-height:90vh;
@@ -2292,9 +2600,209 @@ async function loadContactDetails() {
         function renderServiceList(data) {
             const body = document.getElementById("serviceListBody"); body.innerHTML = "";
             document.getElementById("totalServiceCount").innerText = data.length;
-            data.forEach((s, i) => { const tr = document.createElement("tr"); tr.innerHTML = `<td>${i + 1}</td><td><img src="${s.image.startsWith('http') ? s.image : window.location.origin + s.image}" width="44" style="border-radius:8px;"></td><td>SVC${String(s.id).padStart(4, '0')}</td><td>${s.name}</td><td><button onclick="editService(${s.id})" style="background:var(--primary-light);color:var(--primary);border:1.5px solid rgba(26,63,212,0.2);">Edit</button></td><td><button onclick="deleteService(${s.id})" style="background:#fee2e2;color:var(--red);border:1.5px solid #fecaca;">✕</button></td><td><button onclick="togglePopular(${s.id}, this)" style="padding:6px 14px;border-radius:20px;color:white;background:${s.is_popular ? 'var(--green)' : 'var(--red)'};">${s.is_popular ? 'ON' : 'OFF'}</button></td>`; body.appendChild(tr); });
+            data.forEach((s, i) => {
+                const tr = document.createElement("tr"); tr.innerHTML = `<td>${i + 1}</td><td><img src="${s.image.startsWith('http') ? s.image : window.location.origin + s.image}" width="44" style="border-radius:8px;"></td><td>SVC${String(s.id).padStart(4, '0')}</td><td>${s.name}</td>
+            <td><button onclick="editService(${s.id})"> Edit </button></td><td><button onclick="deleteService(${s.id})" style="background:#fee2e2;color:var(--red);border:1.5px solid #fecaca;">✕</button></td><td><button onclick="togglePopular(${s.id}, this)" style="padding:6px 14px;border-radius:20px;color:white;background:${s.is_popular ? 'var(--green)' : 'var(--red)'};">${s.is_popular ? 'ON' : 'OFF'}</button></td>`; body.appendChild(tr);
+            });
         }
-        async function editService(id) { const name = prompt("New service name:"); if (!name) return; await fetch(API + "/admin/service/" + id, { method: "PUT", headers: { "Content-Type": "application/json", "Authorization": "Bearer " + TOKEN }, body: JSON.stringify({ name }) }); loadServiceList(); }
+        async function editService(id) {
+            const res = await fetch(API + "/admin/services"); const services = await res.json(); const s = services.find(x => x.id == id);
+            if (!s) return; document.getElementById("editServiceId").value = s.id;
+            document.getElementById("editServiceName").value = s.name || "";
+            document.getElementById("editServicePrice").value = s.price || "";
+            document.getElementById("editUnitCost").value = s.unit_cost || "";
+            document.getElementById("editServiceType").value = s.service_type || "price";
+            editDetailsList = [];
+            try {
+                if (Array.isArray(s.details)) { editDetailsList = s.details; } else { editDetailsList = JSON.parse(s.details || "[]"); }
+            } catch {
+                editDetailsList = [];
+            }
+            renderEditDetails(); await loadCategoriesForEdit();
+            document.getElementById("editCategory").value =
+                s.category_id;
+
+            document.getElementById("editServiceModal").style.display =
+                "block";
+
+        }
+        function renderEditDetails() {
+
+            const board =
+                document.getElementById("editDetailsBoard");
+
+            if (!board) return;
+
+            board.innerHTML = "";
+
+            editDetailsList.forEach((detail, index) => {
+
+                board.innerHTML += `
+        <div style="
+        display:flex;
+        align-items:center;
+        gap:10px;
+        margin-bottom:8px;
+        padding:10px 12px;
+        background:#fff;
+        border:1px solid #e5e7eb;
+        border-radius:10px;
+        ">
+
+            <div style="
+            flex:1;
+            font-size:14px;
+            ">
+                ${index + 1}. ${detail}
+            </div>
+
+            <button
+            type="button"
+            onclick="removeEditDetail(${index})"
+            style="
+            background:#ef4444;
+            color:#fff;
+            width:34px;
+            height:34px;
+            padding:0;
+            border:none;
+            border-radius:50%;
+            ">
+                ✕
+            </button>
+
+        </div>
+        `;
+
+            });
+
+        }
+
+        function addEditDetail() {
+
+            const input =
+                document.getElementById("newServiceDetail");
+
+            const value =
+                input.value.trim();
+
+            if (!value) return;
+
+            editDetailsList.push(value);
+
+            input.value = "";
+
+            renderEditDetails();
+
+        }
+
+        function removeEditDetail(index) {
+
+            editDetailsList.splice(index, 1);
+
+            renderEditDetails();
+
+        }
+        async function loadCategoriesForEdit() {
+
+            const res =
+                await fetch(API + "/admin/categories");
+
+            const data =
+                await res.json();
+
+            const dd =
+                document.getElementById("editCategory");
+
+            dd.innerHTML = "";
+
+            data.forEach(c => {
+
+                dd.innerHTML += `
+<option value="${c.id}">
+${c.name}
+</option>
+`;
+
+            });
+
+        }
+
+        async function updateService() {
+
+            const id =
+                document.getElementById("editServiceId").value;
+
+            const fd =
+                new FormData();
+
+            fd.append(
+                "name",
+                document.getElementById("editServiceName").value
+            );
+
+            fd.append(
+                "price",
+                document.getElementById("editServicePrice").value
+            );
+
+            fd.append(
+                "unit_cost",
+                document.getElementById("editUnitCost").value
+            );
+
+            fd.append(
+                "service_type",
+                document.getElementById("editServiceType").value
+            );
+
+            fd.append(
+                "category_id",
+                document.getElementById("editCategory").value
+            );
+
+            fd.append(
+                "details",
+                JSON.stringify(editDetailsList)
+            );
+
+            const file =
+                document.getElementById("editServiceImage").files[0];
+
+            if (file) {
+                fd.append("image", file);
+            }
+
+            const res =
+                await fetch(
+                    API + "/admin/service/" + id,
+                    {
+                        method: "PUT",
+                        body: fd
+                    }
+                );
+
+            const data =
+                await res.json();
+
+            if (data.success) {
+
+                alert("Service updated");
+
+                document.getElementById(
+                    "editServiceModal"
+                ).style.display = "none";
+
+                loadServiceList();
+
+            } else {
+
+                alert(data.error || "Update failed");
+
+            }
+
+        }
+
         async function deleteService(id) { if (!confirm("Delete this service?")) return; const res = await fetch(API + "/admin/service/" + id, { method: "DELETE" }); const data = await res.json(); if (data.success) { alert("Deleted"); loadServiceList(); } else alert("Delete failed"); }
         async function togglePopular(id, btn) { const isOn = btn.innerText === "ON"; const res = await fetch(API + "/admin/toggle-popular/" + id, { method: "PUT" }); const data = await res.json(); if (data.success) { btn.innerText = isOn ? "OFF" : "ON"; btn.style.background = isOn ? "var(--red)" : "var(--green)"; } }
         function loadCategoryFilter(services) { const dd = document.getElementById("filterCategory"); const unique = [...new Map(services.map(s => [s.category_id, s])).values()]; dd.innerHTML = `<option value="">All</option>`; unique.forEach(s => { dd.innerHTML += `<option value="${s.category_id}">${s.category_name}</option>`; }); }
@@ -2319,7 +2827,7 @@ async function loadContactDetails() {
                 const res = await fetch(API + "/admin/staff/" + id); const s = await res.json(); if (!s) return alert("Staff not found");
                 let services = []; if (Array.isArray(s.service_names)) services = s.service_names; else if (typeof s.service_names === "string") services = s.service_names.replace(/[{}]/g, "").split(",").map(x => x.trim());
                 const pinDisplay = Array.isArray(s.pincodes) ? s.pincodes.join(", ") : (s.pin_code || '');
-                const w = window.open("", "_blank");
+                const w = window.open("", "_self");
                 w.document.write(`<html><head><title>Staff Profile</title><style>body{font-family:Arial;padding:20px}img{max-width:150px;margin:10px 0;border-radius:8px}.box{border:1px solid #ccc;padding:15px;margin-bottom:10px}</style></head><body><h2>Staff Profile</h2><div class="box"><p><b>ID:</b> ${s.id}</p><p><b>Name:</b> ${s.name || ''}</p><p><b>Mobile:</b> ${s.mobile || ''}</p><p><b>Email:</b> ${s.email || ''}</p><p><b>Qualification:</b> ${s.qualification || ''}</p></div><div class="box"><p><b>Services:</b></p>
 
 ${services.map((serviceName, index) => `
@@ -2332,24 +2840,183 @@ ${services.map((serviceName, index) => `
 
         <div id="detail_${index}"
              style="display:none;margin:8px 0 0 25px;padding:10px;background:#f5f7ff;border-radius:6px;border:1px solid #ddd;">
-            ${
-                (() => {
-                    try{
-                        const selected = JSON.parse(s.service_detail_selection || "{}");
-                        const details = selected[serviceName] || [];
+        ${(() => {
 
-                        return details.length
-                            ? details.map(d => `☑ ${d}<br>`).join("")
-                            : "No details selected";
-                    }catch(e){
-                        return "No details selected";
-                    }
-                })()
-            }
+                        try {
+
+                            let selected =
+                                typeof s.service_detail_selection === "string"
+                                    ? JSON.parse(s.service_detail_selection)
+                                    : (s.service_detail_selection || []);
+
+                            const service =
+                                selected.find(x =>
+                                    x.service_name === serviceName ||
+                                    Number(x.service_id) === Number(s.service_ids?.[index])
+                                );
+
+                            if (service && service.details && service.details.length) {
+
+                                return service.details
+                                    .map(d => `☑ ${d}<br>`)
+                                    .join("");
+
+                            }
+
+                            return "No details selected";
+
+                        } catch (e) {
+
+                            return "No details selected";
+
+                        }
+
+                    })()}
         </div>
     </div>
 `).join("")}
-<p><b>Experience:</b> ${s.experience || '-'}</p><p><b>Address:</b> ${s.address || '-'}</p><p><b>Pincode:</b> ${pinDisplay}</p></div><div class="box"><p><b>ID Proof:</b> ${s.id_proof || ''} — ${s.id_proof_no || ''}</p></div><div class="box"><h3>Images</h3>${s.profile_image ? `<div><b>Profile:</b><br><img src="${s.profile_image}"></div>` : ""} ${s.id_image ? `<div><b>ID Proof:</b><br><img src="${s.id_image}"></div>` : ""}</div><div class="box"><h3>Change History</h3><table border="1" width="100%"><tr><th>Date</th><th>Time</th><th>Old</th><th>New</th></tr><tbody id="changeHistory"></tbody></table></div><button onclick="window.print()">Print / Save PDF</button></body></html>`);
+<p><b>Experience:</b> ${s.experience || '-'}</p><p><b>Address:</b> ${s.address || '-'}</p><p><b>Pincode:</b> ${pinDisplay}</p></div>
+<div class="box">
+
+<h3>Current Images</h3>
+
+${s.profile_image ? `
+<div>
+<b>Profile</b><br>
+<img src="${s.profile_image}" width="150">
+</div>` : ""}
+
+${s.id_image ? `
+<div>
+<b>ID Proof</b><br>
+<img src="${s.id_image}" width="150">
+</div>` : ""}
+
+${s.camera_image ? `
+<div>
+<b>Live Photo</b><br>
+<img src="${s.camera_image}" width="150">
+</div>` : ""}
+
+<hr>
+
+<h3>Previous Images</h3>
+
+<b>Old Profile Photos</b><br>
+
+${(s.old_profile_images || []).length
+                        ? (s.old_profile_images || []).map(img => `
+<img
+src="${img}"
+onclick="window.open('${img}','_blank')"
+style="
+width:80px;
+height:80px;
+object-fit:cover;
+margin:6px;
+border-radius:10px;
+border:2px solid #ddd;
+cursor:pointer;
+transition:.2s;
+"
+onmouseover="this.style.transform='scale(1.08)'"
+onmouseout="this.style.transform='scale(1)'">
+`).join("")
+                        : "<div style='color:#888'>No previous profile photos</div>"
+                    }
+
+<br><br>
+
+<b>Old ID Proofs</b><br>
+
+${(s.old_id_images || []).length
+                        ? (s.old_id_images || []).map(img => `
+<img
+src="${img}"
+onclick="window.open('${img}','_blank')"
+style="
+width:80px;
+height:80px;
+object-fit:cover;
+margin:6px;
+border-radius:10px;
+border:2px solid #ddd;
+cursor:pointer;
+">
+`).join("")
+                        : "<div style='color:#888'>No previous ID proofs</div>"
+                    }
+
+<br><br>
+
+<b>Old Live Photos</b><br>
+
+${(s.old_camera_images || []).length
+                        ? (s.old_camera_images || []).map(img => `
+<img
+src="${img}"
+onclick="window.open('${img}','_blank')"
+style="
+width:80px;
+height:80px;
+object-fit:cover;
+margin:6px;
+border-radius:10px;
+border:2px solid #ddd;
+cursor:pointer;
+">
+`).join("")
+                        : "<div style='color:#888'>No previous live photos</div>"
+                    }
+
+<hr>
+
+<h3>Unit Balance Record</h3>
+
+<div style="margin-bottom:15px;">
+    <input type="number"
+           id="addUnit"
+           placeholder="Unit balance"
+           style="width:120px;">
+
+    <input type="text"
+           id="unitRemark"
+           placeholder="Type here"
+           style="width:220px;">
+
+    <button onclick="addStaffUnit(${s.id})">
+        Add
+    </button>
+</div>
+
+<div style="overflow-x:auto;">
+<table border="1" width="100%" cellspacing="0" cellpadding="6">
+<thead>
+<tr>
+<th>Sr No</th>
+<th>Date</th>
+<th>Opening Unit</th>
+<th>Received Unit</th>
+<th>Total Unit Balance</th>
+<th>Used Unit</th>
+<th>Service ID</th>
+<th>Closing Unit</th>
+</tr>
+</thead>
+
+<tbody id="unitBalanceRecordBody">
+<tr>
+<td colspan="8" align="center">
+Loading...
+</td>
+</tr>
+</tbody>
+
+</table>
+</div>
+
+</div>
+<div class="box"><h3>Change History</h3><table border="1" width="100%"><tr><th>Date</th><th>Time</th><th>Old</th><th>New</th></tr><tbody id="changeHistory"></tbody></table></div><button onclick="window.print()">Print / Save PDF</button></body></html>`);
                 fetch(API + "/admin/staff-changes/" + id).then(r => r.json()).then(data => { const tbody = w.document.getElementById("changeHistory"); data.forEach(c => { const d = new Date(c.changed_at); tbody.innerHTML += `<tr><td>${d.toLocaleDateString()}</td><td>${d.toLocaleTimeString()}</td><td>${c.old_value}</td><td>${c.field}: ${c.new_value}</td></tr>`; }); });
             } catch { alert("Error loading profile"); }
         }
@@ -2412,7 +3079,45 @@ ${services.map((serviceName, index) => `
         async function uploadMultipleImages() { const files = document.getElementById("imageFiles").files; const type = document.getElementById("imageCategory").value; const link = document.getElementById("imageLink").value; if (!files.length) return alert("Select images"); const fd = new FormData();[...files].forEach(f => fd.append("images", f)); fd.append("type", type); fd.append("link", link); const res = await fetch(API + "/admin/upload-multiple", { method: "POST", body: fd }); const data = await res.json(); if (data.success) { alert("Uploaded"); document.getElementById("previewBox").innerHTML = ""; loadImages(); } }
         async function loadImages() { const type = document.getElementById("imageCategory").value; const res = await fetch(API + "/admin/images/" + type); const data = await res.json(); const box = document.getElementById("imageList"); box.innerHTML = ""; data.forEach(img => { box.innerHTML += `<div style="width:180px;margin:8px;border:1.5px solid var(--border);padding:10px;border-radius:12px;display:inline-block;vertical-align:top;"><a href="${img.link || '#'}" target="_blank"><img src="${window.location.origin}${img.path}" style="width:100%;height:100px;object-fit:cover;border-radius:8px;"></a><p style="font-size:11px;word-break:break-all;margin:6px 0;">${img.link || "No link"}</p><button onclick="deleteImage(${img.id})" style="background:#fee2e2;color:var(--red);border:1.5px solid #fecaca;width:100%;">Delete</button></div>`; }); }
         async function deleteImage(id) { await fetch(API + "/admin/image/" + id, { method: "DELETE" }); loadImages(); }
+        // REFER AND REWARD
+        async function loadReferralRewards() {
+            const body = document.getElementById("rewardTableBody");
+            if (!body) return; body.innerHTML = ` <tr> <td colspan="10"> Loading... </td> </tr> `;
+            const res =
+                await fetch(API + "/admin/referral-rewards");
 
+            const data =
+                await res.json();
+
+            body.innerHTML = "";
+
+            data.forEach((r, index) => {
+
+                body.innerHTML += `
+<tr>
+<td>${index + 1}</td>
+<td>${new Date(r.created_at).toLocaleDateString()}</td>
+<td>${r.customer_id || "-"}</td>
+<td>${r.customer_name || "-"}</td>
+<td>${r.mobile || "-"}</td>
+<td>${r.staff_register || "-"}</td>
+<td>${r.referral_points || 0}</td>
+<td>${r.unit_balance || 0}</td>
+<td>
+<button class="rewardViewBtn">
+View
+</button>
+</td>
+<td>
+<button class="rewardDeleteBtn">
+Remove
+</button>
+</td>
+</tr>
+`;
+            });
+
+        }
         // CONTENT MANAGEMENT
         function loadContentPage(sectionId, title) {
             const box = document.getElementById(sectionId);
@@ -2439,63 +3144,63 @@ ${services.map((serviceName, index) => `
         // MESSAGES
         async function loadMessages() { try { const res = await fetch(API + "/admin/messages"); const data = await res.json(); const tbody = document.getElementById("messageListBody"); if (!tbody) return; tbody.innerHTML = ""; if (!data || !data.length) { tbody.innerHTML = "<tr><td colspan='7'>No messages</td></tr>"; return; } data.forEach((m, i) => { tbody.innerHTML += `<tr><td>${i + 1}</td><td>${new Date(m.created_at).toLocaleDateString()}</td><td>${m.name || '-'}</td><td>${m.mobile || '-'}</td><td>${m.email || '-'}</td><td>${m.pin_code || '-'}</td><td><button onclick="viewMessage(${m.id})">View</button></td></tr>`; }); } catch { } }
         function viewMessage(id) { fetch(API + "/admin/messages").then(r => r.json()).then(data => { const m = data.find(x => x.id === id); if (!m) return; alert(`Name: ${m.name}\nMobile: ${m.mobile || '-'}\nEmail: ${m.email || '-'}\nPin Code: ${m.pin_code || '-'}\n\nMessage:\n${m.message}`); }); }
-     // SAVE PHONE
-async function savePhone() {
+        // SAVE PHONE
+        async function savePhone() {
 
-    const phone = document.getElementById("contactPhone").value.trim();
+            const phone = document.getElementById("contactPhone").value.trim();
 
-    if (!phone) {
-        alert("Enter phone number");
-        return;
-    }
+            if (!phone) {
+                alert("Enter phone number");
+                return;
+            }
 
-    const res = await fetch(API + "/admin/content", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-            type: "contactPhone",
-            title: "Phone",
-            content: phone
-        })
-    });
+            const res = await fetch(API + "/admin/content", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    type: "contactPhone",
+                    title: "Phone",
+                    content: phone
+                })
+            });
 
-    const data = await res.json();
+            const data = await res.json();
 
-    if (data.success) {
-        alert("Phone saved successfully");
-    }
-}
-// SAVE EMAIL
-async function saveEmail() {
+            if (data.success) {
+                alert("Phone saved successfully");
+            }
+        }
+        // SAVE EMAIL
+        async function saveEmail() {
 
-    const email =
-        document.getElementById("contactEmail").value.trim();
+            const email =
+                document.getElementById("contactEmail").value.trim();
 
-    if (!email) {
-        alert("Enter email address");
-        return;
-    }
+            if (!email) {
+                alert("Enter email address");
+                return;
+            }
 
-    const res = await fetch(API + "/admin/content", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-            type: "contactEmail",
-            title: "Email",
-            content: email
-        })
-    });
+            const res = await fetch(API + "/admin/content", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    type: "contactEmail",
+                    title: "Email",
+                    content: email
+                })
+            });
 
-    const data = await res.json();
+            const data = await res.json();
 
-    if (data.success) {
-        alert("Email saved successfully");
-    }
-}
+            if (data.success) {
+                alert("Email saved successfully");
+            }
+        }
 
         // SERVICE UPDATES
         let serviceRequests = [], currentTab = "pending";
@@ -2539,7 +3244,9 @@ async function saveEmail() {
         function filterService() {
             const pin = document.getElementById("searchServicePin").value.toLowerCase(), cid = document.getElementById("searchServiceCustomerId").value.toLowerCase(), sid = document.getElementById("searchServiceStaffId").value.toLowerCase(); let filtered = currentTab === "all" ? serviceRequests : serviceRequests.filter(s => s.status === currentTab); filtered = filtered.filter(s => (!pin || (s.pin_code || "").toString().includes(pin)) && (!cid || (s.customer_id || "").toString().includes(cid)) && (!sid || ((s.staff_id && s.staff_id.toString().includes(sid)) || currentTab === "pending"))); const body = document.getElementById("serviceUpdateBody"); body.innerHTML = ""; filtered.forEach((s, i) => {
                 body.innerHTML += `<tr><td>${i + 1}</td><td>${new Date(s.created_at).toLocaleDateString()}</td><td>${s.customer_id || ''}</td><td>${s.customer_name || ''}</td>${s.status !== "pending" ? `<td>${s.staff_id || ''}</td><td>${s.staff_name || ''}</td>` : `<td></td><td></td>`}<td>${s.mobile || ''}</td><td>${s.location || ''}</td><td>${s.pin_code || ''}</td>
-   <td><button onclick="viewService(${s.id})">View</button></td> <td> <button onclick="checkStaff(${s.id})" style="background:#e0f2fe;color:#0369a1;border:1.5px solid #bae6fd;"> Check Staff </button> </td>
+   <td> ${s.booking_date ? new Date(s.booking_date).toLocaleDateString("en-GB") : "-"} </td>
+<td> ${s.booking_slot || "-"} </td>
+                    <td><button onclick="viewService(${s.id})">View</button></td> <td> <button onclick="checkStaff(${s.id})" style="background:#e0f2fe;color:#0369a1;border:1.5px solid #bae6fd;"> Check Staff </button> </td>
 <td>
   <button
     onclick="showDeleteBox(${s.id})"
@@ -2570,78 +3277,163 @@ async function saveEmail() {
         }
         function updateServiceCounts() { const counts = { pending: 0, accepted: 0, confirmation: 0, completed: 0, cancel: 0, all: serviceRequests.length }; serviceRequests.forEach(s => { if (counts[s.status] !== undefined) counts[s.status]++; }); document.querySelectorAll(".serviceTabBtn").forEach(btn => { const tab = btn.innerText.replace(/\s*\(\d+\)/, "").toLowerCase(); let key = tab === "total" ? "all" : tab; if (counts[key] !== undefined) btn.innerHTML = `${tab.charAt(0).toUpperCase() + tab.slice(1)} (${counts[key]})`; }); }
         // CHECK STAFF FOR SERVICE REQUEST (UPDATE)
-        async function checkStaff(requestId) { try { const res = await fetch(API + "/admin/check-staff/" + requestId); const staff = await res.json();
-        document.getElementById("checkStaffPopup").style.display = "flex"; document.getElementById("checkStaffTotal").innerText = staff.length || 0;
-        const body = document.getElementById("checkStaffBody");  body.innerHTML = ""; staff.forEach((s, index) => { body.innerHTML += `
-          <tr> <td>${index + 1}</td>  <td>${s.staff_id || s.id}</td><td>${s.name || ""}</td> <td>${s.mobile || ""}</td> <td> ${ s.distance ? parseFloat(s.distance).toFixed(1) + " km" : "-" } </td><td> <button onclick="viewStaff(${s.id})"> View </button> </td> </tr> `; });
-    } catch (err) { alert("Unable to load nearby staff"); console.log(err); }} function closeCheckStaffPopup() { document.getElementById("checkStaffPopup").style.display = "none";}
-    // Remove service request with remark
-    function showDeleteBox(id) {
-    const box = document.getElementById("deleteBox_" + id);
+        async function checkStaff(requestId) {
+            try {
+                const res = await fetch(API + "/admin/check-staff/" + requestId); const staff = await res.json();
+                document.getElementById("checkStaffPopup").style.display = "flex"; document.getElementById("checkStaffTotal").innerText = staff.length || 0;
+                const body = document.getElementById("checkStaffBody"); body.innerHTML = ""; staff.forEach((s, index) => {
+                    body.innerHTML += `
+          <tr> <td>${index + 1}</td>  <td>${s.staff_id || s.id}</td><td>${s.name || ""}</td> <td>${s.mobile || ""}</td> <td> ${s.distance ? parseFloat(s.distance).toFixed(1) + " km" : "-"} </td><td> <button onclick="viewStaff(${s.id})"> View </button> </td> </tr> `;
+                });
+            } catch (err) { alert("Unable to load nearby staff"); console.log(err); }
+        } function closeCheckStaffPopup() { document.getElementById("checkStaffPopup").style.display = "none"; }
+        // Remove service request with remark
+        function showDeleteBox(id) {
+            const box = document.getElementById("deleteBox_" + id);
 
-    if (box.style.display === "none" || !box.style.display) {
-        box.style.display = "block";
-    } else {
-        box.style.display = "none";
-    }
-}
-
-async function deleteWithRemark(id) {
-
-    console.log("DELETE CLICKED", id);
-
-    const remarkEl = document.getElementById("remark_" + id);
-
-    console.log("REMARK ELEMENT", remarkEl);
-
-    if (!remarkEl) {
-    console.log(document.body.innerHTML);
-    alert("Remark box not found for ID: " + id);
-    return;
-}
-
-    const remark = remarkEl.value.trim();
-
-    console.log("REMARK:", remark);
-
-    if (!remark) {
-        alert("Please enter delete remark");
-        return;
-    }
-
-    if (!confirm("Delete this service request?")) return;
-
-    try {
-
-        const res = await fetch(
-            API + "/admin/service-request/" + id,
-            {
-                method: "DELETE",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({ remark })
+            if (box.style.display === "none" || !box.style.display) {
+                box.style.display = "block";
+            } else {
+                box.style.display = "none";
             }
-        );
-
-        console.log("STATUS:", res.status);
-
-        const data = await res.json();
-
-        console.log("RESPONSE:", data);
-
-        if (data.success) {
-            alert("Deleted successfully");
-            loadServiceUpdates();
-        } else {
-            alert(data.error || "Delete failed");
         }
 
-    } catch (err) {
-        console.log(err);
-        alert("Server error");
-    }
-}
+        async function deleteWithRemark(id) {
+
+            console.log("DELETE CLICKED", id);
+
+            const remarkEl = document.getElementById("remark_" + id);
+
+            console.log("REMARK ELEMENT", remarkEl);
+
+            if (!remarkEl) {
+                console.log(document.body.innerHTML);
+                alert("Remark box not found for ID: " + id);
+                return;
+            }
+
+            const remark = remarkEl.value.trim();
+
+            console.log("REMARK:", remark);
+
+            if (!remark) {
+                alert("Please enter delete remark");
+                return;
+            }
+
+            if (!confirm("Delete this service request?")) return;
+
+            try {
+
+                const res = await fetch(
+                    API + "/admin/service-request/" + id,
+                    {
+                        method: "DELETE",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({ remark })
+                    }
+                );
+
+                console.log("STATUS:", res.status);
+
+                const data = await res.json();
+
+                console.log("RESPONSE:", data);
+
+                if (data.success) {
+                    alert("Deleted successfully");
+                    loadServiceUpdates();
+                } else {
+                    alert(data.error || "Delete failed");
+                }
+
+            } catch (err) {
+                console.log(err);
+                alert("Server error");
+            }
+        }
+
+        // Unit balance record
+        async function loadUnitHistory(staffId) {
+
+            const res = await fetch(API + "/admin/staff/" + staffId + "/unit-history");
+            const data = await res.json();
+
+            const body = document.getElementById("unitBalanceRecordBody");
+
+            body.innerHTML = "";
+
+            data.forEach((r, i) => {
+
+                body.innerHTML += `
+        <tr>
+            <td>${i + 1}</td>
+            <td>${new Date(r.created_at).toLocaleDateString()}</td>
+            <td>${r.opening_balance}</td>
+            <td>${r.received_balance}</td>
+            <td>${r.opening_balance + r.received_balance}</td>
+            <td>${r.used_balance}</td>
+            <td>${r.service_request_id || "-"}</td>
+            <td>${r.closing_balance}</td>
+        </tr>
+        `;
+
+            });
+
+        }
+        // add unit balance record
+        async function addStaffUnit(staffId) {
+
+            const unit = document.getElementById("addUnit").value;
+            const remark = document.getElementById("unitRemark").value;
+
+            if (!unit) {
+                return alert("Enter unit balance");
+            }
+
+            try {
+
+                const res = await fetch(
+                    API + "/admin/staff/" + staffId + "/add-unit",
+                    {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({
+                            unit: Number(unit),
+                            remark: remark
+                        })
+                    }
+                );
+
+                const data = await res.json();
+
+                if (data.success) {
+
+                    alert("Unit balance added successfully.");
+
+                    document.getElementById("addUnit").value = "";
+                    document.getElementById("unitRemark").value = "";
+
+                    loadUnitHistory(staffId);
+
+                } else {
+
+                    alert(data.error || "Failed");
+
+                }
+
+            } catch (err) {
+
+                console.log(err);
+                alert("Server error");
+
+            }
+
+        }
     </script>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>

@@ -265,7 +265,7 @@ console.log("RESULT COUNT:", filtered.length);
                      <img src="${optimizeImage(s.image?.startsWith('http')? s.image: window.location.origin + s.image,300 )}"alt="${s.name} Home Service in Silvassa by Vinsuu"loading="lazy"decoding="async">
                         <h4>${s.name}</h4>
                         <div class="rating">⭐ ${Number(s.avg_rating || 0).toFixed(1)}</div>
-                        <div class="price">Starting ₹${s.price || 199}</div>
+                        <div class="price">${s.service_type === "unit"? `${s.unit_cost || 0} Unit Balance` : `Starting ₹${s.price || 199}`}</div>
                         <button class="bookBtn" onclick="openService(${s.id})">Book Now</button>
                     </div>
                 `).join('');
@@ -275,7 +275,7 @@ console.log("RESULT COUNT:", filtered.length);
                          <img src="${optimizeImage(s.image?.startsWith('http')? s.image: window.location.origin + s.image,300 )}"alt="${s.name} Home Service in Silvassa by Vinsuu"loading="lazy"decoding="async">
                         <h4>${s.name}</h4>
                         <div class="mRating">⭐ ${Number(s.avg_rating || 0).toFixed(1)}</div>
-                        <div class="mPrice">₹${s.price || 199}</div>
+                        <div class="mPrice">${s.service_type === "unit"? `${s.unit_cost || 0} Unit Balance` : `Starting ₹${s.price || 199}`}</div>
                         <button class="mBook" onclick="openService(${s.id})">Book Now</button>
                     </div>
                 `).join('');

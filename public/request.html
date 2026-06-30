@@ -34,7 +34,7 @@
             --primary-mid: #2b52e0;
             --primary-light: #e8eeff;
             --text: #1a1a2e;
-            --gray: #6b7280;
+            --gray: #4b5563;
             --border: #e5e7eb;
             --light-bg: #f5f7ff;
             --red: #ef4444;
@@ -139,10 +139,10 @@
         }
 
         .fieldLabel {
-            font-size: 12.5px;
+            font-size: 13px;
             font-weight: 700;
             color: var(--text);
-            margin-bottom: 7px;
+            margin-bottom: 8px;
             display: flex;
             align-items: center;
             gap: 4px;
@@ -183,7 +183,14 @@
         .inputWrap:focus-within {
             border-color: var(--primary);
             background: white;
-            box-shadow: 0 0 0 3px rgba(26, 63, 212, 0.10);
+            box-shadow: 0 0 0 3px rgba(26, 63, 212, 0.22);
+            /* was 0.10 */
+            outline: 2px solid transparent;
+        }
+
+        button:focus-visible {
+            outline: 2px solid var(--primary);
+            outline-offset: 3px;
         }
 
         .inputWrap .iIcon {
@@ -215,7 +222,7 @@
 
         .inputWrap input::placeholder,
         .inputWrap textarea::placeholder {
-            color: #adb5bd;
+            color: #9ca3af;
         }
 
         .inputWrap select {
@@ -251,7 +258,7 @@
         /* Two-col row */
         .formRow {
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
             gap: 16px;
             margin-bottom: 18px;
         }
@@ -302,25 +309,29 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 8px;
+            gap: 10px;
             width: 100%;
-            padding: 14px;
-            background: linear-gradient(135deg, var(--primary-mid), var(--primary-dark));
-            color: white;
+            padding: 17px;
+            background: #1430b0;
+            color: #ffffff;
             border: none;
             border-radius: 14px;
-            font-size: 15px;
+            font-size: 16px;
             font-weight: 700;
             cursor: pointer;
             font-family: 'Poppins', sans-serif;
             transition: all 0.2s;
-            box-shadow: 0 6px 20px rgba(26, 63, 212, 0.30);
-            margin-top: 8px;
+            box-shadow: 0 8px 28px rgba(20, 48, 176, 0.42);
+            letter-spacing: 0.3px;
+            margin-top: 16px;
+            animation: ctaPulse 2.5s ease-in-out infinite;
         }
 
         .submitBtn:hover {
+            background: #0f2490;
             transform: translateY(-2px);
-            box-shadow: 0 10px 28px rgba(26, 63, 212, 0.40);
+            box-shadow: 0 14px 36px rgba(20, 48, 176, 0.52);
+            animation: none;
         }
 
         /* ══ DETAILS MODAL ══ */
@@ -359,6 +370,18 @@
             to {
                 opacity: 1;
                 transform: scale(1) translateY(0);
+            }
+        }
+
+        @keyframes ctaPulse {
+
+            0%,
+            100% {
+                box-shadow: 0 8px 28px rgba(20, 48, 176, 0.42);
+            }
+
+            50% {
+                box-shadow: 0 8px 36px rgba(20, 48, 176, 0.65);
             }
         }
 
@@ -479,7 +502,7 @@
         .otpInputsRow input:focus {
             border-color: var(--primary);
             background: white;
-            box-shadow: 0 0 0 3px rgba(26, 63, 212, 0.10);
+            box-shadow: 0 0 0 3px rgba(26, 63, 212, 0.22);
         }
 
         .otpVerifyBtn {
@@ -535,7 +558,11 @@
         /* ══ RESPONSIVE ══ */
         @media (max-width: 600px) {
             .container {
-                padding: 16px 12px 50px;
+                padding: 14px 14px 80px
+            }
+
+            .formCard {
+                padding: 18px 16px;
             }
 
             .formRow {
@@ -548,10 +575,21 @@
                 margin-bottom: 18px;
             }
 
+            .fieldGroup {
+                margin-bottom: 16px;
+            }
+
+            .serviceHero {
+                padding: 20px 16px 16px;
+                margin-bottom: 14px;
+            }
+
             .serviceHero img {
                 width: 100px;
                 height: 100px;
             }
+
+
         }
     </style>
 </head>
@@ -593,7 +631,19 @@
         <!-- Service Image Hero -->
         <div class="serviceHero">
             <div id="serviceImageBox"></div>
-            <div class="serviceHeroText">Fill in the details below to request a service</div>
+            <div class="serviceHeroText">Fill in the details to book your service</div>
+            <div style="display:flex;justify-content:center;gap:16px;
+            flex-wrap:wrap;margin-top:12px;">
+                <span style="font-size:11.5px;font-weight:600;color:#1430b0;
+               background:#e8eeff;padding:4px 12px;
+               border-radius:20px;">✅ Free Booking</span>
+                <span style="font-size:11.5px;font-weight:600;color:#15803d;
+               background:#dcfce7;padding:4px 12px;
+               border-radius:20px;">⚡ Fast Response</span>
+                <span style="font-size:11.5px;font-weight:600;color:#92400e;
+               background:#fef3c7;padding:4px 12px;
+               border-radius:20px;">🔒 OTP Verified</span>
+            </div>
         </div>
 
         <!-- Form Card -->
@@ -637,7 +687,15 @@
                     </div>
                 </div>
             </div>
-
+            <!-- Referral Code -->
+            <div class="fieldGroup">
+                <div class="fieldLabel">Referral Code</div>
+                <div class="inputWrap">
+                    <span class="iIcon">🎁</span>
+                    <input type="text" id="referralCode" placeholder="Enter referral code (optional)"
+                        style="text-transform:uppercase;">
+                </div>
+            </div>
             <!-- Address -->
             <div class="fieldGroup">
                 <div class="fieldLabel">Address <span class="req">*</span></div>
@@ -680,6 +738,77 @@
                         <input type="text" id="servicePriceBox" readonly placeholder="—">
                     </div>
                 </div>
+                <!-- Booking Slot -->
+                <div id="bookingSlotSection" style="display:none;">
+
+                    <div class="fieldLabel">
+                        Booking Slot <span class="req">*</span>
+                    </div>
+
+                    <div class="formRow">
+
+                        <!-- Select Date -->
+                        <div class="fieldGroup">
+
+                            <div class="inputWrap">
+
+                                <select id="bookingDateType" onchange="changeBookingDate()">
+
+                                    <option value="">Select date</option>
+                                    <option value="today">Today</option>
+                                    <option value="tomorrow">Tomorrow</option>
+                                    <option value="calendar">Choose calendar</option>
+
+                                </select>
+
+                            </div>
+
+                        </div>
+
+                        <!-- Selected Date -->
+                        <div class="fieldGroup">
+
+                            <div class="inputWrap">
+
+                                <input type="text" id="bookingDate" placeholder="Selected date" readonly>
+
+                                <input type="date" id="calendarDate" style="display:none" onchange="calendarSelected()">
+
+                            </div>
+
+                        </div>
+
+                        <!-- Time Slot -->
+                        <div class="fieldGroup">
+
+                            <div class="inputWrap">
+
+                                <select id="bookingSlot">
+
+                                    <option value="">Time select</option>
+                                    <option>Immediately</option>
+                                    <option>07:00 AM – 09:00 AM</option>
+                                    <option>09:00 AM – 11:00 AM</option>
+                                    <option>11:00 AM – 01:00 PM</option>
+                                    <option>01:00 PM – 03:00 PM</option>
+                                    <option>03:00 PM – 05:00 PM</option>
+                                    <option>05:00 PM – 07:00 PM</option>
+                                    <option>07:00 PM – 09:00 PM</option>
+                                    <option>09:00 PM – 10:00 PM</option>
+
+                                </select>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+               
+            </div>
+             <!-- Service Heading -->
                 <div class="fieldGroup">
                     <div class="fieldLabel">
                         Service Heading <span class="req">*</span>
@@ -689,8 +818,6 @@
                     <div class="inputWrap"> <span class="iIcon">📋</span><input type="text" id="heading"
                             placeholder="Service heading"></div>
                 </div>
-            </div>
-
             <!-- Service Details -->
             <div class="fieldGroup">
                 <div class="fieldLabel">Service Details <span class="req">*</span></div>
@@ -711,6 +838,17 @@
                         </a>
                     </span>
                 </label>
+            </div>
+            <div style="background:#f0f4ff;border-radius:12px;
+            padding:12px 16px;margin-top:12px;margin-bottom:4px;
+            border-left:4px solid #1a3fd4;">
+                <p style="font-size:12.5px;color:#1430b0;font-weight:600;
+            margin-bottom:4px;">What happens next?</p>
+                <p style="font-size:12px;color:#4b5563;line-height:1.6;margin:0;">
+                    After submitting, OTP verification is required.
+                    A verified professional will be assigned to your request
+                    and you'll receive confirmation on your mobile.
+                </p>
             </div>
             <!-- Submit -->
             <button class="submitBtn" onclick="submitRequest()">
@@ -851,13 +989,94 @@ padding:16px;
             // Price
             const priceBox = document.getElementById("servicePriceBox");
             const type = (serviceData.service_type || "").trim().toLowerCase();
-            if (type === "price" && serviceData.price) {
-                priceBox.value = `₹ ${serviceData.price} onward/visit`;
+            const bookingBox =
+                document.getElementById("bookingSlotSection");
+
+            if (type === "price") {
+
+                bookingBox.style.display = "block";
+
+                priceBox.value =
+                    `₹ ${serviceData.price} onward/visit`;
+
             } else if (type === "unit") {
-                priceBox.value = `${serviceData.unit_cost || 0} Unit Balance`;
+
+                bookingBox.style.display = "none";
+
+                priceBox.value =
+                    `${serviceData.unit_cost || 0} Unit Balance`;
+
             } else {
+
+                bookingBox.style.display = "none";
+
                 priceBox.value = "Price not available";
+
             }
+        }
+
+        // booking date selection
+        function formatDate(date) {
+
+            const d = String(date.getDate()).padStart(2, "0");
+            const m = String(date.getMonth() + 1).padStart(2, "0");
+            const y = date.getFullYear();
+
+            return `${d}/${m}/${y}`;
+
+        }
+
+        function changeBookingDate() {
+
+            const type =
+                document.getElementById("bookingDateType").value;
+
+            const input =
+                document.getElementById("bookingDate");
+
+            const cal =
+                document.getElementById("calendarDate");
+
+            cal.style.display = "none";
+
+            if (type === "today") {
+
+                input.value = formatDate(new Date());
+
+            }
+
+            else if (type === "tomorrow") {
+
+                const t = new Date();
+
+                t.setDate(t.getDate() + 1);
+
+                input.value = formatDate(t);
+
+            }
+
+            else if (type === "calendar") {
+
+                cal.style.display = "block";
+
+                cal.showPicker?.();
+
+            }
+
+        }
+
+        function calendarSelected() {
+
+            const value =
+                document.getElementById("calendarDate").value;
+
+            if (!value) return;
+
+            const d = new Date(value);
+
+            document.getElementById("bookingDate").value =
+                formatDate(d);
+
         }
 
         // ── DETAILS POPUP ──
@@ -1048,7 +1267,16 @@ padding:16px;
                 alert("Please agree to the Terms & Conditions");
                 return;
             }
+            const referral =
+                document.getElementById("referralCode").value.trim();
 
+            if (
+                referral &&
+                !referral.startsWith("VNS2601")
+            ) {
+                alert("Invalid referral code");
+                return;
+            }
             if (!selectedLat || !selectedLng) { alert("Please click 'Use Current Location' before submitting"); return; }
             await sendOTP();
         }
@@ -1056,6 +1284,7 @@ padding:16px;
         async function submitAfterOTP() {
             if (!selectedLat || !selectedLng) { alert("Please click 'Use Current Location'"); return; }
             const token = localStorage.getItem("customerToken");
+
             if (token) {
                 await fetch(API + "/customer/update-location", {
                     method: "POST",
@@ -1077,7 +1306,10 @@ padding:16px;
                 pincode: document.getElementById("pincode").value,
                 location: document.getElementById("location").value,
                 latitude: selectedLat,
-                longitude: selectedLng
+                longitude: selectedLng,
+                referral_code_used: document.getElementById("referralCode").value.trim().toUpperCase(),
+                booking_date: document.getElementById("bookingDate").value,
+                booking_slot: document.getElementById("bookingSlot").value
             };
 
             const res = await fetch(API + "/customer/request-service", {

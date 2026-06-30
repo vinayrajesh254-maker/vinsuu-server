@@ -49,7 +49,7 @@
             --primary-mid: #2b52e0;
             --primary-light: #e8eeff;
             --text: #1a1a2e;
-            --gray: #6b7280;
+            --gray: #4b5563;
             --border: #e5e7eb;
             --light-bg: #f5f7ff;
             --red: #ef4444;
@@ -157,8 +157,8 @@
 
         .sectionHeaderSub {
             font-size: 12px;
-            color: var(--gray);
-            font-weight: 400;
+            color: #4b5563;
+            font-weight: 500;
         }
 
         .sectionBody {
@@ -167,7 +167,7 @@
 
         /* ══ FIELD LABEL ══ */
         .fieldLabel {
-            font-size: 12.5px;
+            font-size: 13px;
             font-weight: 700;
             color: var(--text);
             margin-bottom: 6px;
@@ -206,10 +206,10 @@
         select,
         textarea {
             width: 100%;
-            padding: 11px 14px;
+             padding: 12px 14px;
             border: 1.5px solid var(--border);
             border-radius: 12px;
-            font-size: 13.5px;
+            font-size: 14px;
             font-family: 'Poppins', sans-serif;
             color: var(--text);
             outline: none;
@@ -217,15 +217,18 @@
             background: var(--light-bg);
             -webkit-appearance: none;
             appearance: none;
+            min-height: 44px; 
         }
 
-        input:focus,
-        select:focus,
-        textarea:focus {
-            border-color: var(--primary);
-            background: white;
-            box-shadow: 0 0 0 3px rgba(26, 63, 212, 0.10);
-        }
+       input:focus,
+select:focus,
+textarea:focus {
+  border-color: var(--primary);
+  background: white;
+  box-shadow: 0 0 0 3px rgba(26, 63, 212, 0.22);   /* stronger */
+  outline: 2px solid transparent;    /* hides default ugly outline */
+  outline-offset: 0;
+}
 
         input[readonly],
         input:disabled,
@@ -573,8 +576,7 @@
 
         .uploadRow input[type="file"] {
             flex: 1;
-            padding: 9px 12px;
-            font-size: 12.5px;
+          
             cursor: pointer;
         }
 
@@ -742,30 +744,32 @@
         }
 
         /* ══ SAVE BUTTON ══ */
-        .saveBtn {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            width: 100%;
-            padding: 15px;
-            background: linear-gradient(135deg, var(--primary-mid), var(--primary-dark));
-            color: white;
-            border: none;
-            border-radius: 14px;
-            font-size: 15px;
-            font-weight: 700;
-            cursor: pointer;
-            font-family: 'Poppins', sans-serif;
-            transition: all 0.2s;
-            box-shadow: 0 6px 20px rgba(26, 63, 212, 0.30);
-            margin-top: 4px;
-        }
+     .saveBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 17px;                          /* was 15px */
+  background: #1430b0;                    /* solid, not gradient */
+  color: #ffffff;
+  border: none;
+  border-radius: 14px;
+  font-size: 16px;                        /* was 15px */
+  font-weight: 700;
+  cursor: pointer;
+  font-family: 'Poppins', sans-serif;
+  transition: all 0.2s;
+  box-shadow: 0 8px 24px rgba(20,48,176,0.40);   /* stronger */
+  letter-spacing: 0.3px;
+  margin-top: 4px;
+}
 
-        .saveBtn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 28px rgba(26, 63, 212, 0.40);
-        }
+      .saveBtn:hover {
+  background: #0f2490;
+  transform: translateY(-2px);
+  box-shadow: 0 12px 32px rgba(20,48,176,0.50);
+}
 
         /* ══ OTP POPUP ══ */
         .popupOverlay {
@@ -1088,11 +1092,35 @@
 
 </div>
 
-<div id="detailsBox${i}" style="display:none;"></div>
+<div id="detailsBox${i}"
+     style="display:${(s.selected_details||[]).length ? 'block':'none'};">
+</div>
                     <input placeholder="Experience (in years)" value="${s.experience || ''}" oninput="updateExp(${i},this.value)">
                 </div>
                 <button class="removeBtn" onclick="removeService(${i})">🗑</button>`;
                 box.appendChild(div);
+                if((s.selected_details || []).length){
+    toggleServiceDetails(i, true);
+
+    setTimeout(()=>{
+
+        (s.selected_details || []).forEach(detail=>{
+
+            const checks =
+                document.querySelectorAll(
+                    "#detailsBox"+i+" input[type=checkbox]"
+                );
+
+            checks.forEach(c=>{
+                if(c.parentNode.textContent.trim()===detail){
+                    c.checked = true;
+                }
+            });
+
+        });
+
+    },100);
+}
             });
         }
 
@@ -1269,6 +1297,14 @@
 
         async function saveStaff() {
             if (!validateCompulsoryFields()) return;
+            const referral = document.getElementById("referralCode").value.trim();
+            if (
+                referral &&
+                !referral.startsWith("VNS2601")
+            ) {
+                alert("Invalid referral code");
+                return;
+            }
             await sendOTP(document.getElementById("mobile").value);
         }
 
@@ -1305,7 +1341,12 @@
         }
 
         async function finalSave() {
-            const experienceInput = document.getElementById("experience").value || (selectedServices[0] ? selectedServices[0].experience : "");
+            const expInput = document.getElementById("experience");
+
+const experienceInput =
+expInput
+? expInput.value
+: (selectedServices[0]?.experience || "");
             const formData = new FormData();
             formData.append("service_ids", JSON.stringify(selectedServices.map(s => s.id)));
             formData.append("service_names", JSON.stringify(selectedServices.map(s => s.name)));
@@ -1321,7 +1362,7 @@
             formData.append("id_proof", document.getElementById("id_proof").value);
             formData.append("id_proof_no", document.getElementById("id_proof_no").value);
             formData.append("agree_terms", document.getElementById("agreeTerms").checked);
-
+            formData.append("referral_code_used", document.getElementById("referralCode").value.trim().toUpperCase());
             const idFile = document.getElementById("idUpload").files[0];
             if (idFile) formData.append("id_image", idFile);
             else if (existingIdImage) formData.append("existing_id_image", existingIdImage);
@@ -1381,7 +1422,14 @@
 
                 const res = await fetch(STAFF_API + "/profile", { headers: { "Authorization": "Bearer " + token } });
                 console.log("PROFILE API DATA:", user);
-                if (res.ok) { user = await res.json(); console.log("PROFILE API DATA:", user); }
+                if (res.ok) {
+    user = await res.json();
+
+    console.log("FULL PROFILE =", user);
+    console.log("service_detail_selection =", user.service_detail_selection);
+    console.log("service_names =", user.service_names);
+    console.log("service_ids =", user.service_ids);
+}
             } catch (err) { console.log("Profile fetch error:", err); }
             if (!user || Object.keys(user).length === 0) user = JSON.parse(localStorage.getItem("user") || "{}");
 
@@ -1390,7 +1438,7 @@
             document.getElementById("alt_mobile").value = user.alt_mobile || "";
             document.getElementById("email").value = user.email || "";
             document.getElementById("qualification").value = user.qualification || "";
-            document.getElementById("experience").value = user.experience || "";
+            const expInput = document.getElementById("experience"); if(expInput){ expInput.value = user.experience || "";}
             document.getElementById("address").value = user.address || "";
             document.getElementById("idUpload").disabled = true;
             document.getElementById("photoUpload").disabled = true;
@@ -1429,9 +1477,38 @@
                 }
             }
 
-            selectedServices = serviceNames.map((name, i) => ({ id: serviceIds[i] || null, name, experience: user.experience || "" }));
-            renderSelected();
-            document.getElementById("serviceSearch").value = serviceNames.join(", ");
+            // Restore selected service details also
+let savedSelections = [];
+
+try{
+    savedSelections =
+        typeof user.service_detail_selection === "string"
+        ? JSON.parse(user.service_detail_selection)
+        : (user.service_detail_selection || []);
+}catch(e){
+    savedSelections = [];
+}
+
+selectedServices = serviceNames.map((name,i)=>{
+
+    const saved =
+        savedSelections.find(
+            x => Number(x.service_id) === Number(serviceIds[i])
+        ) || {};
+
+    return{
+        id: serviceIds[i] || null,
+        name,
+        experience: user.experience || "",
+        selected_details: saved.details || []
+    };
+
+});
+
+renderSelected();
+
+document.getElementById("serviceSearch").value =
+    serviceNames.join(", ");
 
             document.getElementById("id_proof").value = user.id_proof || "";
             document.getElementById("id_proof_no").value = user.id_proof_no || "";
@@ -1462,6 +1539,7 @@
             document.getElementById("agreeTerms").checked = user.agree_terms === true || user.agree_terms === "true";
             if (isViewMode) {
                 document.querySelectorAll("input, select, textarea").forEach(el => el.disabled = true);
+               
                 const btn = document.querySelector(".saveBtn");
                 btn.innerHTML = "✏ Edit Profile";
                 btn.onclick = enableEditMode;
@@ -1530,7 +1608,30 @@
         <button class="backBtn" onclick="history.back()">←</button>
         <span class="topHeaderTitle">Register Staff for a Service</span>
     </div>
-
+<!-- ADD this block right after .topHeader div: -->
+<div style="
+  background: linear-gradient(90deg,#1a3fd4,#2b52e0);
+  padding: 10px 20px;
+  display: flex;
+  justify-content: center;
+  gap: 24px;
+  flex-wrap: wrap;
+">
+  <span style="color:white;font-size:12px;font-weight:600;
+               display:flex;align-items:center;gap:6px;">
+    ✅ Free Registration
+  </span>
+  <span style="color:rgba(255,255,255,0.5);font-size:12px;">|</span>
+  <span style="color:white;font-size:12px;font-weight:600;
+               display:flex;align-items:center;gap:6px;">
+    💰 Turn Skills Into Earnings
+  </span>
+  <span style="color:rgba(255,255,255,0.5);font-size:12px;">|</span>
+  <span style="color:white;font-size:12px;font-weight:600;
+               display:flex;align-items:center;gap:6px;">
+    🔒 Verified & Trusted Platform
+  </span>
+</div>
     <!-- OTP POPUP -->
     <div id="otpBox" class="popupOverlay">
         <div class="popupBox">
@@ -1638,8 +1739,9 @@
                     </div>
                 </div>
                 <div class="formGroup">
-                    <label class="fieldLabel">Experience (in years)</label>
-                    <input type="number" id="experience" placeholder="e.g. 3">
+                    <label class="fieldLabel">Referral Code</label>
+                    <input type="text" id="referralCode" placeholder="Enter referral code (optional)"
+                        style="text-transform:uppercase;">
                 </div>
                 <div class="formGroup">
                     <label class="fieldLabel">Address <span class="req">*</span></label>
@@ -1759,6 +1861,7 @@
                     </label>
                 </div>
                 <br>
+                <p style="text-align:center;font-size:12.5px;color:#4b5563;margin-bottom:12px;">🔒 Your data is secure. OTP verification required before saving.</p>
                 <button onclick="saveStaff()" class="saveBtn">💾 Save</button>
             </div>
         </div>
@@ -1805,7 +1908,8 @@ flex-direction:column;
             }
         }
     </style>
-    <script src="script.js"></script>
+    
+    
 </body>
 
 </html>
