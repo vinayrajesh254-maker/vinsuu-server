@@ -218,226 +218,226 @@ router.post(
   ]),
   async (req, res) => {
 
-  try {
+    try {
 
-    let {
-  name,
-  mobile,
-  alt_mobile,
-  email,
-  referral_code_used,
-  qualification,
-  experience,
-  address,
-  pincodes,
-  service_ids,
-  service_names,
-  location,
-  id_proof,
-  id_proof_no,
-  agree_terms,
-  service_detail_selection
+      let {
+        name,
+        mobile,
+        alt_mobile,
+        email,
+        referral_code_used,
+        qualification,
+        experience,
+        address,
+        pincodes,
+        service_ids,
+        service_names,
+        location,
+        id_proof,
+        id_proof_no,
+        agree_terms,
+        service_detail_selection
 
-} = req.body;
+      } = req.body;
 
-const existing = await pool.query(
-  "SELECT * FROM staff WHERE mobile=$1",
-  [mobile]
-);
+      const existing = await pool.query(
+        "SELECT * FROM staff WHERE mobile=$1",
+        [mobile]
+      );
 
-const existingUser =
-  existing.rows.length > 0
-    ? existing.rows[0]
-    : null;
+      const existingUser =
+        existing.rows.length > 0
+          ? existing.rows[0]
+          : null;
 
-const id_image =
-  req.files?.id_image?.[0]?.path ||
-  req.body.existing_id_image ||
-  existingUser?.id_image ||
-  null;
+      const id_image =
+        req.files?.id_image?.[0]?.path ||
+        req.body.existing_id_image ||
+        existingUser?.id_image ||
+        null;
 
-const profile_image =
-  req.files?.profile_image?.[0]?.path ||
-  req.body.existing_profile_image ||
-  existingUser?.profile_image ||
-  null;
+      const profile_image =
+        req.files?.profile_image?.[0]?.path ||
+        req.body.existing_profile_image ||
+        existingUser?.profile_image ||
+        null;
 
-const camera_image =
-  req.files?.camera_image?.[0]?.path ||
-  req.body.existing_camera_image ||
-  existingUser?.camera_image ||
-  null;
-
-
-// 🔥 HANDLE STRING OR ARRAY
-let parsedServices = service_ids;
-
-if (typeof service_ids === "string") {
-  try {
-    parsedServices = JSON.parse(service_ids);
-  } catch (e) {
-    parsedServices = [];
-  }
-}
+      const camera_image =
+        req.files?.camera_image?.[0]?.path ||
+        req.body.existing_camera_image ||
+        existingUser?.camera_image ||
+        null;
 
 
-let service_id = null;
+      // 🔥 HANDLE STRING OR ARRAY
+      let parsedServices = service_ids;
 
-if (Array.isArray(parsedServices) && parsedServices.length > 0) {
-  service_id = Number(parsedServices[0]);
-}
-// AFTER parsing (line ~120 area)
-console.log("RAW service_ids:", service_ids);
-console.log("PARSED:", parsedServices);
-console.log("FINAL service_id:", service_id);
+      if (typeof service_ids === "string") {
+        try {
+          parsedServices = JSON.parse(service_ids);
+        } catch (e) {
+          parsedServices = [];
+        }
+      }
 
-// ================= FIX JSON FIELDS =================
 
-let parsedServiceNames = [];
+      let service_id = null;
 
-try {
+      if (Array.isArray(parsedServices) && parsedServices.length > 0) {
+        service_id = Number(parsedServices[0]);
+      }
+      // AFTER parsing (line ~120 area)
+      console.log("RAW service_ids:", service_ids);
+      console.log("PARSED:", parsedServices);
+      console.log("FINAL service_id:", service_id);
 
-  if (Array.isArray(service_names)) {
+      // ================= FIX JSON FIELDS =================
 
-    parsedServiceNames = service_names;
+      let parsedServiceNames = [];
 
-  } else if (typeof service_names === "string") {
+      try {
 
-    // already JSON string
-    if (service_names.startsWith("[")) {
+        if (Array.isArray(service_names)) {
 
-      parsedServiceNames = JSON.parse(service_names);
+          parsedServiceNames = service_names;
 
-    } else {
+        } else if (typeof service_names === "string") {
 
-      parsedServiceNames = [service_names];
-    }
+          // already JSON string
+          if (service_names.startsWith("[")) {
 
-  }
+            parsedServiceNames = JSON.parse(service_names);
 
-} catch (e) {
+          } else {
 
-  parsedServiceNames = [];
+            parsedServiceNames = [service_names];
+          }
 
-}
+        }
 
-let parsedLocation = null;
+      } catch (e) {
 
-try {
+        parsedServiceNames = [];
 
-  if (typeof location === "string") {
+      }
 
-    parsedLocation = JSON.parse(location);
+      let parsedLocation = null;
 
-  } else {
+      try {
 
-    parsedLocation = location;
+        if (typeof location === "string") {
 
-  }
+          parsedLocation = JSON.parse(location);
 
-} catch (e) {
+        } else {
 
-  parsedLocation = null;
+          parsedLocation = location;
 
-}
+        }
 
-    mobile = formatMobile(mobile);
-    const referralCode = "VNS2601" + mobile.slice(-4);
-if (typeof pincodes === "string") {
-  try {
-    pincodes = JSON.parse(pincodes);
-  } catch {
-    pincodes = [];
-  }
-}
-    if (!name || !mobile || !pincodes || pincodes.length === 0) {
-      return res.status(400).json({ error: "Required fields missing" });
-    }
+      } catch (e) {
 
-  
+        parsedLocation = null;
 
-    let user;
-console.log("SERVICE IDS:", service_ids);
-console.log("FINAL SERVICE ID:", service_id);
-    // ================= UPDATE =================
-    if (existing.rows.length > 0) {
+      }
 
-      const old = existing.rows[0]; // ✅ FIX
-      // ===== Preserve old images =====
-let oldProfileImages = old.old_profile_images || [];
-let oldIdImages = old.old_id_images || [];
-let oldCameraImages = old.old_camera_images || [];
+      mobile = formatMobile(mobile);
+      const referralCode = "VNS2601" + mobile.slice(-4);
+      if (typeof pincodes === "string") {
+        try {
+          pincodes = JSON.parse(pincodes);
+        } catch {
+          pincodes = [];
+        }
+      }
+      if (!name || !mobile || !pincodes || pincodes.length === 0) {
+        return res.status(400).json({ error: "Required fields missing" });
+      }
 
-// Save previous Profile image
-if (
-    profile_image &&
-    old.profile_image &&
-    profile_image !== old.profile_image
-) {
-    oldProfileImages.push(old.profile_image);
-}
 
-// Save previous ID image
-if (
-    id_image &&
-    old.id_image &&
-    id_image !== old.id_image
-) {
-    oldIdImages.push(old.id_image);
-}
 
-// Save previous Live photo
-if (
-    camera_image &&
-    old.camera_image &&
-    camera_image !== old.camera_image
-) {
-    oldCameraImages.push(old.camera_image);
-}
-      // example for name change
-      if (existing.rows[0].name !== name) {
-        await pool.query(
-          `INSERT INTO staff_changes (staff_id, field, old_value, new_value)
+      let user;
+      console.log("SERVICE IDS:", service_ids);
+      console.log("FINAL SERVICE ID:", service_id);
+      // ================= UPDATE =================
+      if (existing.rows.length > 0) {
+
+        const old = existing.rows[0]; // ✅ FIX
+        // ===== Preserve old images =====
+        let oldProfileImages = old.old_profile_images || [];
+        let oldIdImages = old.old_id_images || [];
+        let oldCameraImages = old.old_camera_images || [];
+
+        // Save previous Profile image
+        if (
+          profile_image &&
+          old.profile_image &&
+          profile_image !== old.profile_image
+        ) {
+          oldProfileImages.push(old.profile_image);
+        }
+
+        // Save previous ID image
+        if (
+          id_image &&
+          old.id_image &&
+          id_image !== old.id_image
+        ) {
+          oldIdImages.push(old.id_image);
+        }
+
+        // Save previous Live photo
+        if (
+          camera_image &&
+          old.camera_image &&
+          camera_image !== old.camera_image
+        ) {
+          oldCameraImages.push(old.camera_image);
+        }
+        // example for name change
+        if (existing.rows[0].name !== name) {
+          await pool.query(
+            `INSERT INTO staff_changes (staff_id, field, old_value, new_value)
      VALUES ($1,$2,$3,$4)`,
-          [existing.rows[0].id, "Name", existing.rows[0].name, name]
-        );
-      }
+            [existing.rows[0].id, "Name", existing.rows[0].name, name]
+          );
+        }
 
-      // ================= CHANGE TRACKING =================
-      if (old.name !== name) {
-        await pool.query(
-          `INSERT INTO staff_changes (staff_id, field, old_value, new_value)
+        // ================= CHANGE TRACKING =================
+        if (old.name !== name) {
+          await pool.query(
+            `INSERT INTO staff_changes (staff_id, field, old_value, new_value)
            VALUES ($1,$2,$3,$4)`,
-          [old.id, "Name", old.name, name]
-        );
-      }
+            [old.id, "Name", old.name, name]
+          );
+        }
 
-      if (old.email !== email) {
-        await pool.query(
-          `INSERT INTO staff_changes (staff_id, field, old_value, new_value)
+        if (old.email !== email) {
+          await pool.query(
+            `INSERT INTO staff_changes (staff_id, field, old_value, new_value)
            VALUES ($1,$2,$3,$4)`,
-          [old.id, "Email", old.email, email]
-        );
-      }
+            [old.id, "Email", old.email, email]
+          );
+        }
 
-      if (old.id_proof_no !== id_proof_no) {
-        await pool.query(
-          `INSERT INTO staff_changes (staff_id, field, old_value, new_value)
+        if (old.id_proof_no !== id_proof_no) {
+          await pool.query(
+            `INSERT INTO staff_changes (staff_id, field, old_value, new_value)
            VALUES ($1,$2,$3,$4)`,
-          [old.id, "ID Proof No", old.id_proof_no, id_proof_no]
-        );
-      }
+            [old.id, "ID Proof No", old.id_proof_no, id_proof_no]
+          );
+        }
 
-      if (old.service_names?.toString() !== service_names?.toString()) {
-        await pool.query(
-          `INSERT INTO staff_changes (staff_id, field, old_value, new_value)
+        if (old.service_names?.toString() !== service_names?.toString()) {
+          await pool.query(
+            `INSERT INTO staff_changes (staff_id, field, old_value, new_value)
            VALUES ($1,$2,$3,$4)`,
-          [old.id, "Service", old.service_names, service_names]
-        );
-      }
+            [old.id, "Service", old.service_names, service_names]
+          );
+        }
 
-     // ================= UPDATE QUERY ================= 
-const result = await pool.query(`
+        // ================= UPDATE QUERY ================= 
+        const result = await pool.query(`
   UPDATE staff SET
     name=$1,
     alt_mobile=$2,
@@ -463,131 +463,131 @@ old_camera_images=$21
 WHERE mobile=$22
   RETURNING *
 `, [
-  name,
-  alt_mobile,
-  email,
-  qualification,
-  experience,
-  address,
-  pincodes,
+          name,
+          alt_mobile,
+          email,
+          qualification,
+          experience,
+          address,
+          pincodes,
 
-  service_id,   // ✅ FIX ADDED
+          service_id,   // ✅ FIX ADDED
 
-  JSON.stringify(parsedServices || []),
- "{" + (parsedServiceNames || []).join(",") + "}",
+          JSON.stringify(parsedServices || []),
+          "{" + (parsedServiceNames || []).join(",") + "}",
 
-parsedLocation
-  ? JSON.stringify(parsedLocation)
-  : null,
-  id_proof || null,
-  id_proof_no || null,
-  id_image || null,
-  profile_image || null,
-  camera_image || null,
-agree_terms || false,
-service_detail_selection || "[]",
-JSON.stringify(oldProfileImages),
-JSON.stringify(oldIdImages),
-JSON.stringify(oldCameraImages),
+          parsedLocation
+            ? JSON.stringify(parsedLocation)
+            : null,
+          id_proof || null,
+          id_proof_no || null,
+          id_image || null,
+          profile_image || null,
+          camera_image || null,
+          agree_terms || false,
+          service_detail_selection || "[]",
+          JSON.stringify(oldProfileImages),
+          JSON.stringify(oldIdImages),
+          JSON.stringify(oldCameraImages),
 
-mobile
-]);
+          mobile
+        ]);
 
-user = result.rows[0];
+        user = result.rows[0];
 
-} else {
+      } else {
 
-  // ================= INSERT =================
-  const result = await pool.query(
-    `INSERT INTO staff 
+        // ================= INSERT =================
+        const result = await pool.query(
+          `INSERT INTO staff 
 (name, mobile, alt_mobile, email, qualification, experience, address, pincodes, service_id, service_ids, service_names, location, id_proof, id_proof_no, id_image, profile_image, camera_image, agree_terms, service_detail_selection, unit_balance,referral_code, referred_by)
 VALUES (
 $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22)
 RETURNING *`,
-    [
-      name,
-      mobile,
-      alt_mobile,
-      email,
-      qualification,
-      experience,
-      address,
-      pincodes,
+          [
+            name,
+            mobile,
+            alt_mobile,
+            email,
+            qualification,
+            experience,
+            address,
+            pincodes,
 
-      service_id,   // ✅ FIX ADDED
+            service_id,   // ✅ FIX ADDED
 
-   JSON.stringify(parsedServices || []),
-      "{" + (parsedServiceNames || []).join(",") + "}",
+            JSON.stringify(parsedServices || []),
+            "{" + (parsedServiceNames || []).join(",") + "}",
 
-parsedLocation
-  ? JSON.stringify(parsedLocation)
-  : null,
-      id_proof || null,
-      id_proof_no || null,
-      id_image || null,
-      profile_image || null,
-      camera_image || null,
-      agree_terms || false,
-      service_detail_selection || null,
-      1,   // ⭐ FREE UNIT
-  referralCode,
-  referral_code_used || null
-]
-  );
+            parsedLocation
+              ? JSON.stringify(parsedLocation)
+              : null,
+            id_proof || null,
+            id_proof_no || null,
+            id_image || null,
+            profile_image || null,
+            camera_image || null,
+            agree_terms || false,
+            service_detail_selection || null,
+            1,   // ⭐ FREE UNIT
+            referralCode,
+            referral_code_used || null
+          ]
+        );
 
-  user = result.rows[0];
-// referral code logic
-if (
-  referral_code_used &&
-  referral_code_used !== referralCode
-) {
+        user = result.rows[0];
+        // referral code logic
+        if (
+          referral_code_used &&
+          referral_code_used !== referralCode
+        ) {
 
-  const referrer = await pool.query(
-    `SELECT id
+          const referrer = await pool.query(
+            `SELECT id
      FROM staff
      WHERE referral_code=$1`,
-    [referral_code_used]
-  );
+            [referral_code_used]
+          );
 
-  if (referrer.rows.length > 0) {
+          if (referrer.rows.length > 0) {
 
-    await pool.query(`
+            await pool.query(`
       UPDATE staff
       SET unit_balance =
           COALESCE(unit_balance,0) + 1
       WHERE referral_code=$1
     `, [referral_code_used]);
 
-  }
+          }
 
-}
-}
+        }
+      }
 
 
 
-    // ================= TOKEN =================
-const token = jwt.sign(
-  { id: user.id, mobile: user.mobile },
-  process.env.JWT_SECRET,
-  { expiresIn: "7d" }
-);
+      // ================= TOKEN =================
+      const token = jwt.sign(
+        { id: user.id, mobile: user.mobile },
+        process.env.JWT_SECRET,
+        { expiresIn: "7d" }
+      );
 
-res.json({
-  success: true,
-  token,
+      res.json({
+        success: true,
+        token,
 
-  id: user.id,
-  staff_id: user.id,
+        id: user.id,
+        staff_id: user.id,
 
-  user
-});
+        user
+      });
 
-  } catch (err) {
-    console.log(err);
-    res.status(500).json({ error: "Server error" });
-  }
+    } catch (err) {
+      console.log(err);
+      res.status(500).json({ error: "Server error" });
+    }
 
-});
+  });
 
 // ================= STAFF PROFILE =================
 router.get("/profile", verifyToken, async (req, res) => {
@@ -753,7 +753,6 @@ WHERE (
     OR (sr.status = 'completed' AND sr.staff_id = $1)
 )
 ORDER BY sr.id DESC
-LIMIT 50
 `, [staffId]);
 
     const requests = result.rows;
@@ -826,7 +825,10 @@ LIMIT 50
       // ================= LOCATION CHECK =================
 
 
-      if (!req.latitude || !req.longitude) {
+      if (
+        req.latitude == null ||
+        req.longitude == null
+      ) {
         console.log("❌ NO LAT LNG");
         return false;
       }
@@ -838,20 +840,13 @@ LIMIT 50
         req.latitude,
         req.longitude
       );
-
-
-
       if (!distance || distance <= 5) {
-
-
-
+        req.latitude = Number(req.latitude);
+        req.longitude = Number(req.longitude);
         req.distance = distance.toFixed(2);
-
         return true;
       }
-
       console.log("❌ TOO FAR");
-
       return false;
 
     });
@@ -1960,7 +1955,7 @@ router.get("/rewards", verifyToken, async (req, res) => {
         COALESCE(unit_balance,0) AS unit_balance
       FROM staff
       WHERE id=$1
-    `,[staffId]);
+    `, [staffId]);
 
     if (staffRes.rows.length === 0) {
       return res.status(404).json({
@@ -1975,7 +1970,7 @@ router.get("/rewards", verifyToken, async (req, res) => {
       FROM referral_history
       WHERE referrer_code=$1
       ORDER BY id DESC
-    `,[staff.referral_code]);
+    `, [staff.referral_code]);
 
     res.json({
       referral_code: staff.referral_code,

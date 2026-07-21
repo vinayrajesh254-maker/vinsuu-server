@@ -732,11 +732,15 @@
             <!-- Service Price + Heading -->
             <div class="formRow">
                 <div class="fieldGroup">
-                    <div class="fieldLabel">Service Price <span class="req">*</span></div>
+                    <div class="fieldLabel">Service Price <span class="req">*</span>  <span class="detailsLink" style="margin-left:auto;" onclick="openPriceInfo()">
+                        Price Info ⓘ
+                    </span></div>
+                  
                     <div class="inputWrap">
                         <span class="iIcon">₹</span>
                         <input type="text" id="servicePriceBox" readonly placeholder="—">
                     </div>
+                    
                 </div>
                 <!-- Booking Slot -->
                 <div id="bookingSlotSection" style="display:none;">
@@ -772,7 +776,20 @@
 
                                 <input type="text" id="bookingDate" placeholder="Selected date" readonly>
 
-                                <input type="date" id="calendarDate" style="display:none" onchange="calendarSelected()">
+                                <input type="date" id="calendarDate" onchange="calendarSelected()" style="
+        position:fixed;
+        left:50%;
+        top:50%;
+        transform:translate(-50%,-50%);
+        width:320px;
+        max-width:90vw;
+        padding:12px;
+        border-radius:12px;
+        border:2px solid #1a3fd4;
+        background:#fff;
+        z-index:99999;
+        display:none;
+    ">
 
                             </div>
 
@@ -806,18 +823,18 @@
 
                 </div>
 
-               
+
             </div>
-             <!-- Service Heading -->
-                <div class="fieldGroup">
-                    <div class="fieldLabel">
-                        Service Heading <span class="req">*</span>
-                        <span class="detailsLink" onclick="openSubHeadingModal()" style="margin-left:auto;"> Service
-                            Heading Details ⓘ </span>
-                    </div>
-                    <div class="inputWrap"> <span class="iIcon">📋</span><input type="text" id="heading"
-                            placeholder="Service heading"></div>
+            <!-- Service Heading -->
+            <div class="fieldGroup">
+                <div class="fieldLabel">
+                    Service Heading <span class="req">*</span>
+                    <span class="detailsLink" onclick="openSubHeadingModal()" style="margin-left:auto;"> Service
+                        Heading Details ⓘ </span>
                 </div>
+                <div class="inputWrap"> <span class="iIcon">📋</span><input type="text" id="heading"
+                        placeholder="Service heading"></div>
+            </div>
             <!-- Service Details -->
             <div class="fieldGroup">
                 <div class="fieldLabel">Service Details <span class="req">*</span></div>
@@ -935,6 +952,122 @@ padding:16px;
             <div id="subHeadingList"></div>
         </div>
     </div>
+
+    <!-- PRICE INFO MODAL -->
+
+<div id="priceInfoModal"
+style="
+display:none;
+position:fixed;
+inset:0;
+background:rgba(0,0,0,.45);
+z-index:9999;
+justify-content:center;
+align-items:center;
+padding:18px;
+">
+
+<div
+style="
+background:#fff;
+width:100%;
+max-width:420px;
+border-radius:18px;
+padding:22px;
+position:relative;
+box-shadow:0 20px 50px rgba(0,0,0,.25);
+animation:popIn .25s;
+">
+
+<button
+onclick="closePriceInfo()"
+style="
+position:absolute;
+right:12px;
+top:12px;
+width:34px;
+height:34px;
+border:none;
+border-radius:50%;
+background:#fee2e2;
+color:#dc2626;
+font-size:18px;
+font-weight:bold;
+cursor:pointer;
+">
+✕
+</button>
+
+<h3 style="
+margin-bottom:18px;
+color:#1a3fd4;
+font-size:18px;
+font-weight:700;
+">
+Price Information
+</h3>
+
+<div
+style="
+background:#eef4ff;
+padding:14px;
+border-radius:12px;
+margin-bottom:12px;
+line-height:1.7;
+font-size:14px;
+">
+
+✅ The prices listed are the base service charges.
+
+</div>
+
+<div
+style="
+background:#fff7ed;
+padding:14px;
+border-radius:12px;
+margin-bottom:12px;
+line-height:1.7;
+font-size:14px;
+">
+
+⚠️ Any additional work requested or required will be charged separately.
+
+</div>
+
+<div
+style="
+background:#f5f5f5;
+padding:14px;
+border-radius:12px;
+line-height:1.7;
+font-size:14px;
+">
+
+ℹ️ The unit price is for internal reference only and is not the customer price.
+
+</div>
+
+<br>
+
+<button
+onclick="closePriceInfo()"
+style="
+width:100%;
+padding:13px;
+border:none;
+border-radius:10px;
+background:#1a3fd4;
+color:#fff;
+font-weight:600;
+cursor:pointer;
+">
+Back
+</button>
+
+</div>
+
+</div>
     <script>
         const API = window.location.origin + "/api";
         let serviceId = null;
@@ -1027,56 +1160,37 @@ padding:16px;
         }
 
         function changeBookingDate() {
-
-            const type =
-                document.getElementById("bookingDateType").value;
-
-            const input =
-                document.getElementById("bookingDate");
-
-            const cal =
-                document.getElementById("calendarDate");
-
+            const type = document.getElementById("bookingDateType").value;
+            const input = document.getElementById("bookingDate");
+            const cal = document.getElementById("calendarDate");
             cal.style.display = "none";
-
             if (type === "today") {
-
                 input.value = formatDate(new Date());
-
             }
-
             else if (type === "tomorrow") {
-
-                const t = new Date();
-
-                t.setDate(t.getDate() + 1);
-
-                input.value = formatDate(t);
-
+                const d = new Date();
+                d.setDate(d.getDate() + 1);
+                input.value = formatDate(d);
             }
-
             else if (type === "calendar") {
-
                 cal.style.display = "block";
-
-                cal.showPicker?.();
-
+                setTimeout(() => {
+                    cal.focus();
+                    if (cal.showPicker) {
+                        cal.showPicker();
+                    }
+                }, 100);
             }
-
         }
 
         function calendarSelected() {
-
-            const value =
-                document.getElementById("calendarDate").value;
-
-            if (!value) return;
-
-            const d = new Date(value);
-
+            const cal = document.getElementById("calendarDate");
+            if (!cal.value) return;
+            const d = new Date(cal.value);
             document.getElementById("bookingDate").value =
                 formatDate(d);
-
+            cal.style.display = "none";
+            document.getElementById("bookingDateType").selectedIndex = 0;
         }
 
         // ── DETAILS POPUP ──
@@ -1409,7 +1523,37 @@ padding:16px;
         function goBack() {
             window.location.href = document.referrer || "index.html";
         }
+        // Close Price Info Modal
+function openPriceInfo(){
 
+    document.getElementById("priceInfoModal").style.display="flex";
+
+    history.pushState({price:true},"");
+
+}
+
+function closePriceInfo(){
+
+    document.getElementById("priceInfoModal").style.display="none";
+
+}
+document.getElementById("priceInfoModal").addEventListener("click",function(e){
+
+    if(e.target===this){
+
+        closePriceInfo();
+
+    }
+
+});
+const priceModal =
+document.getElementById("priceInfoModal");
+
+if(priceModal.style.display==="flex"){
+
+    closePriceInfo();
+
+}
     </script>
     <script src="script.js"></script>
 </body>

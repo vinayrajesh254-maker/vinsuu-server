@@ -33,23 +33,23 @@ router.post("/request-service", async (req, res) => {
   try {
 
     const {
-  service_id,
-  heading,
-  details,
-  address,
-  pincode,
-  location,
-  latitude,
-  longitude,
-  name,
-  mobile,
-  distance,
-  price,
-  confirmation_amount,
-  referral_code_used,
-    booking_date,
-  booking_slot
-} = req.body;
+      service_id,
+      heading,
+      details,
+      address,
+      pincode,
+      location,
+      latitude,
+      longitude,
+      name,
+      mobile,
+      distance,
+      price,
+      confirmation_amount,
+      referral_code_used,
+      booking_date,
+      booking_slot
+    } = req.body;
 
     // FIND OR CREATE USER
     let userResult = await pool.query(
@@ -60,9 +60,9 @@ router.post("/request-service", async (req, res) => {
     let user;
 
     if (userResult.rows.length === 0) {
-const referralCode ="VNS2601" + mobile.slice(-4);
+      const referralCode = "VNS2601" + mobile.slice(-4);
       const newUser = await pool.query(
-  `INSERT INTO users
+        `INSERT INTO users
 (
  name,
  mobile,
@@ -73,20 +73,20 @@ const referralCode ="VNS2601" + mobile.slice(-4);
 )
 VALUES ($1,$2,$3,$4,$5,$6)
 RETURNING *`,
-  [
-  name,
-  mobile,
-  req.body.email?.trim() || null,
-  address || "",
-  referralCode,
-  referral_code_used || null
-]
-);
+        [
+          name,
+          mobile,
+          req.body.email?.trim() || null,
+          address || "",
+          referralCode,
+          referral_code_used || null
+        ]
+      );
 
       user = newUser.rows[0];
-if (referral_code_used) {
+      if (referral_code_used) {
 
-  const checkRef = await pool.query(`
+        const checkRef = await pool.query(`
   SELECT referral_code
   FROM users
   WHERE referral_code=$1
@@ -98,18 +98,18 @@ if (referral_code_used) {
   WHERE referral_code=$1
 `, [referral_code_used]);
 
-  if (checkRef.rows.length > 0) {
+        if (checkRef.rows.length > 0) {
 
-  // Customer referrer gets referral point
-await pool.query(`
+          // Customer referrer gets referral point
+          await pool.query(`
   UPDATE users
   SET referral_points =
     COALESCE(referral_points,0) + 1
   WHERE referral_code=$1
 `, [referral_code_used]);
 
-// Staff referrer gets unit balance
-await pool.query(`
+          // Staff referrer gets unit balance
+          await pool.query(`
   UPDATE staff
   SET unit_balance =
     COALESCE(unit_balance,0) + 1
@@ -118,7 +118,7 @@ await pool.query(`
 
 
 
-    await pool.query(`
+          await pool.query(`
       INSERT INTO referral_history
       (
         referrer_code,
@@ -127,85 +127,87 @@ await pool.query(`
         reward_type
       )
       VALUES ($1,$2,$3,$4)
-    `,[
-      referral_code_used,
-      mobile,
-      'customer',
-      'referral_point'
-    ]);
+    `, [
+            referral_code_used,
+            mobile,
+            'customer',
+            'referral_point'
+          ]);
 
-  }
+        }
 
-}
+      }
     } else {
 
       user = userResult.rows[0];
 
-await pool.query(
-  `UPDATE users
+      await pool.query(
+        `UPDATE users
    SET name=$1,
        address=$2
    WHERE id=$3`,
-  [
-    name,
-    address || "",
-    user.id
-  ]
-);
+        [
+          name,
+          address || "",
+          user.id
+        ]
+      );
 
     }
 
     // SAVE REQUEST
-   const result = await pool.query(
-  `INSERT INTO service_requests
+    const result = await pool.query(
+      `INSERT INTO service_requests
   (service_id,customer_id,heading,details,address,pincode,location,latitude,longitude,status,
    distance,price,confirmation_amount, booking_date, booking_slot)
   VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15)
   RETURNING id`,
-  [
-    service_id,
-    user.id,
-    heading,
-    details,
-    address,
-    pincode,
-    location,
-    latitude || null,
-    longitude || null,
-    "pending",
+      [
+        service_id,
+        user.id,
+        heading,
+        details,
+        address,
+        pincode,
+        location,
+        latitude || null,
+        longitude || null,
+        "pending",
 
-    // ✅ ADD THESE
-    distance || 0,
-    price || 0,
-    confirmation_amount || 0,
-    booking_date || null,
-    booking_slot || null
-  ]
-);
-// App notification to staff
-try {
+        // ✅ ADD THESE
+        distance || 0,
+        price || 0,
+        confirmation_amount || 0,
+        booking_date || null,
+        booking_slot || null
+      ]
+    );
+    // App notification to staff
+    try {
 
-  const io = getIO();
+      const io = getIO();
 
-   io.emit("newServiceRequest", {
-    serviceNo: result.rows[0].id,
-    customerName: name,
-    serviceName: heading,
-    distance: distance || 0,
-    price: price || 0,
-    location: location || "",
-    pincode: pincode || "",
-    serviceHeading: heading || "",
-    serviceDetails: details || "",
-    booking_date: booking_date || "",
-    booking_slot: booking_slot || "",
-  });
+      io.emit("newServiceRequest", {
+        serviceNo: result.rows[0].id,
+        customerName: name,
+        serviceName: heading,
+        distance: distance || 0,
+        price: price || 0,
+        location: location || "",
+        pincode: pincode || "",
+        serviceHeading: heading || "",
+        serviceDetails: details || "",
+        booking_date: booking_date || "",
+        booking_slot: booking_slot || "",
+        latitude: latitude || null,
+        longitude: longitude || null
+      });
 
-} catch (e) {
+    } catch (e) {
 
-  console.log("Socket emit error:", e.message);
+      console.log("Socket emit error:", e.message);
 
-}
+    }
     // CREATE TOKEN
     const jwt = require("jsonwebtoken");
 
@@ -256,6 +258,8 @@ router.get("/my-requests", verifyToken, async (req, res) => {
     const result = await pool.query(
       `SELECT 
       sr.*,
+        sr.latitude,
+    sr.longitude,
       st.name as staff_name,
       st.mobile as staff_mobile,
       sv.price as service_price
@@ -358,11 +362,11 @@ router.post("/login-verify", async (req, res) => {
     let user;
 
     // If not found → create new user
-   
-if (userResult.rows.length === 0) {
-  const referralCode = "VNS2601" + mobile.slice(-4);
-  const newUser = await pool.query(
-    `INSERT INTO users
+
+    if (userResult.rows.length === 0) {
+      const referralCode = "VNS2601" + mobile.slice(-4);
+      const newUser = await pool.query(
+        `INSERT INTO users
     (
       mobile,
       name,
@@ -370,16 +374,16 @@ if (userResult.rows.length === 0) {
     )
     VALUES ($1,$2,$3)
     RETURNING *`,
-    [
-      mobile,
-      "Customer",
-      referralCode
-    ]
-  );
-  user = newUser.rows[0];
-} else {
-  user = userResult.rows[0];
-}
+        [
+          mobile,
+          "Customer",
+          referralCode
+        ]
+      );
+      user = newUser.rows[0];
+    } else {
+      user = userResult.rows[0];
+    }
 
     // Create token
     const token = jwt.sign(
@@ -436,38 +440,38 @@ router.post("/confirm-start", verifyToken, async (req, res) => {
         error: "Failed to send OTP"
       });
     }
-    
-console.log("CONFIRM START:", request_id);
+
+    console.log("CONFIRM START:", request_id);
     const updateResult = await pool.query(
-  `UPDATE service_requests
+      `UPDATE service_requests
    SET
      status='otp_pending',
      customer_confirmed=TRUE,
      start_otp=$1
    WHERE id=$2
    RETURNING id,status,start_otp`,
-  [
-    otpRes.data.Details,
-    request_id
-  ]
-);
+      [
+        otpRes.data.Details,
+        request_id
+      ]
+    );
 
-console.log("UPDATE RESULT:", updateResult.rows);
+    console.log("UPDATE RESULT:", updateResult.rows);
     res.json({
       success: true
     });
 
-  } catch(err){
+  } catch (err) {
 
-   console.log("CONFIRM START ERROR:");
-   console.log(err);
-   console.log(err.response?.data);
-   console.log(err.message);
+    console.log("CONFIRM START ERROR:");
+    console.log(err);
+    console.log(err.response?.data);
+    console.log(err.message);
 
-   res.status(500).json({
+    res.status(500).json({
       error: err.message
-   });
-}
+    });
+  }
 
 });
 
@@ -646,7 +650,7 @@ router.post("/mark-complete", verifyToken, async (req, res) => {
     );
 
     res.json({
-      success:true
+      success: true
     });
 
   } catch (err) {
@@ -654,7 +658,7 @@ router.post("/mark-complete", verifyToken, async (req, res) => {
     console.log("MARK COMPLETE ERROR:", err);
 
     res.status(500).json({
-      error:"Server error"
+      error: "Server error"
     });
 
   }
@@ -718,6 +722,36 @@ router.get("/reviews-summary", async (req, res) => {
   }
 
 });
+// ================= SERVICE REVIEWS =================
+router.get("/reviews/service/:service_id", async (req, res) => {
+  try {
+
+    const { service_id } = req.params;
+
+    const result = await pool.query(`
+      SELECT
+        u.name AS customer_name,
+        sr.feedback,
+        sr.rating,
+        sr.location
+      FROM service_requests sr
+      LEFT JOIN users u
+        ON sr.customer_id = u.id
+      WHERE sr.service_id = $1
+        AND sr.rating IS NOT NULL
+        AND sr.feedback IS NOT NULL
+        AND TRIM(sr.feedback) <> ''
+      ORDER BY sr.id DESC
+      LIMIT 6
+    `,[service_id]);
+
+    res.json(result.rows);
+
+  } catch(err){
+    console.log(err);
+    res.status(500).json({error:"Server error"});
+  }
+});
 // ================= REWARDS =================
 router.get("/rewards", verifyToken, async (req, res) => {
 
@@ -731,7 +765,7 @@ router.get("/rewards", verifyToken, async (req, res) => {
         COALESCE(referral_points,0) AS referral_points
       FROM users
       WHERE id=$1
-    `,[userId]);
+    `, [userId]);
 
     if (userRes.rows.length === 0) {
       return res.status(404).json({
@@ -746,7 +780,7 @@ router.get("/rewards", verifyToken, async (req, res) => {
       FROM referral_history
       WHERE referrer_code=$1
       ORDER BY id DESC
-    `,[user.referral_code]);
+    `, [user.referral_code]);
 
     res.json({
       referral_code: user.referral_code,

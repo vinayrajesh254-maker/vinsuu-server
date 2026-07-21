@@ -88,10 +88,11 @@ async function loadProfile() {
             : firstLetter
         }
 </div>
-                        <div>
-                            <div class="profileName">${user.name}</div>
-                            <div class="profileMobile">📞 ${user.mobile}</div>
-                            <div class="profileRatingRow">
+                     <div>
+    <div style="font-size:13px;font-weight:600;color:#6b7280;margin-bottom:2px;"> Staff ID: ${user.id || "-"} </div>
+    <div class="profileName">${user.name}</div>
+    <div class="profileMobile">📞 ${user.mobile}</div>
+    <div class="profileRatingRow">
                                 Rating <span class="profileRatingStars" id="avgRating"></span>
                                 <span class="profileRatingCount" id="ratingCount"></span>
                             </div>
@@ -187,7 +188,19 @@ async function loadStaffRequests() {
                         </div>
                         <div class="detailActionBtns">
                             <a href="tel:${req.customer_mobile}" class="callBtn">📞 Call</a>
-                            <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(req.customer_address || req.location)}" target="_blank" class="mapBtn">📍 Open Map</a>
+                           ${req.latitude && req.longitude ? `
+<a href="https://www.google.com/maps/dir/?api=1&destination=${req.latitude},${req.longitude}"
+   target="_blank"
+   class="mapBtn">
+   📍 Direction
+</a>
+` : `
+<a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(req.customer_address || req.location)}"
+   target="_blank"
+   class="mapBtn">
+   📍 Open Map
+</a>
+`}
                         </div>
                     </div>
                 </div>
