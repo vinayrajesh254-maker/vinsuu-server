@@ -24,7 +24,7 @@ router.post("/send", async (req, res) => {
     }
 
     const response = await axios.get(
-      `https://2factor.in/API/V1/${API_KEY}/SMS/${mobile}/AUTOGEN`
+      `https://2factor.in/API/V1/${API_KEY}/SMS/${mobile}/AUTOGEN/VINSUU_AUTH_OTP`
     );
 
     res.json({
