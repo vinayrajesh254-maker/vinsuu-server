@@ -1308,25 +1308,39 @@
                 }
             });
 
-            const socket = io(window.location.origin);
+           // Socket.IO (don't stop the page if Socket.IO fails)
+if (typeof io !== "undefined") {
 
-            socket.on("dashboard_update", (data) => {
-                if (!data || typeof data !== "object") return;
-                updateDashboardUI(data);
-                if (typeof loadDashboardCharts === "function") loadDashboardCharts(data);
-            });
+    const socket = io(window.location.origin);
 
-            socket.on("new_booking", () => {
-                const el = document.getElementById("notifCount");
-                if (el) el.innerText = Number(el.innerText || 0) + 1;
-                const sound = document.getElementById("notifSound");
-                if (sound) sound.play().catch(() => { });
-            });
+    socket.on("dashboard_update", (data) => {
+        if (!data || typeof data !== "object") return;
+        updateDashboardUI(data);
+        if (typeof loadDashboardCharts === "function") {
+            loadDashboardCharts(data);
+        }
+    });
 
-            socket.on("admin_notification", (data) => {
-                alert("🔔 " + data.message);
-                loadWalletRequests();
-            });
+    socket.on("new_booking", () => {
+        const el = document.getElementById("notifCount");
+        if (el) {
+            el.innerText = Number(el.innerText || 0) + 1;
+        }
+
+        const sound = document.getElementById("notifSound");
+        if (sound) {
+            sound.play().catch(() => {});
+        }
+    });
+
+    socket.on("admin_notification", (data) => {
+        alert("🔔 " + data.message);
+        loadWalletRequests();
+    });
+
+} else {
+    console.warn("Socket.IO library not loaded");
+}
 
             showSection("dashboard");
             loadDashboard();
@@ -3030,122 +3044,16 @@ Loading...
         function viewCustomer(id) { const c = customerData.find(x => x.id == id); if (!c) return; const w = window.open("", "_self"); w.document.write(`<h2>Customer Details</h2><p>ID: ${c.id}</p><p>Name: ${c.name || ''}</p><p>Mobile: ${c.mobile || ''}</p><p>Location: ${c.location || ''}</p><p>Pin: ${c.pin_code || ''}</p><button onclick="window.print()">Print</button>`); }
         async function removeCustomer(id) { if (!confirm("Remove customer?")) return; await fetch(API + "/admin/remove-customer/" + id, { method: "DELETE", headers: { "Authorization": "Bearer " + TOKEN } }); loadCustomerList(); }
 
-       // PAYMENT
-let paymentDataMain = [];
-
-async function loadPaymentList() {
-
-    try {
-
-        const res = await fetch(API + "/admin/payments");
-        paymentDataMain = await res.json();
-
-        console.log("PAYMENT DATA:", paymentDataMain);
-
-        renderPaymentList(paymentDataMain);
-
-    } catch (err) {
-
-        console.error(err);
-
-    }
-
-}
-
-function renderPaymentList(data) {
-
-    const body = document.getElementById("paymentListBody");
-    body.innerHTML = "";
-
-    let total = 0;
-
-    data.forEach((p, i) => {
-
-        total += Number(p.amount || 0);
-
-        body.innerHTML += `
-        <tr>
-            <td>${i + 1}</td>
-            <td>${new Date(p.created_at).toLocaleDateString()}</td>
-            <td>${p.staff_id}</td>
-            <td>${p.staff_name || "-"}</td>
-            <td>${Array.isArray(p.service_name) ? p.service_name.join(", ") : (p.service_name || "-")}</td>
-            <td>${Array.isArray(p.pin_code) ? p.pin_code.join(", ") : (p.pin_code || "-")}</td>
-            <td>${p.purchased_unit}</td>
-            <td>₹ ${Number(p.amount).toFixed(2)}</td>
-            <td>${p.remaining_unit}</td>
-            <td>
-                <button onclick="viewPayment(${p.id})">View</button>
-            </td>
-        </tr>`;
-    });
-
-    document.getElementById("totalPaymentCount").innerText =
-        `(Total: ₹${total.toFixed(2)})`;
-}
-
-function filterPayment() {
-
-    const name =
-        document.getElementById("searchPaymentStaff").value.toLowerCase();
-
-    const pin =
-        document.getElementById("searchPaymentPin").value.toLowerCase();
-
-    const date =
-        document.getElementById("searchPaymentDate").value;
-
-    renderPaymentList(paymentDataMain.filter(p => {
-
-        const staff =
-            (p.staff_name || "").toLowerCase();
-
-        const pincode =
-            Array.isArray(p.pin_code)
-                ? p.pin_code.join(",")
-                : (p.pin_code || "");
-
-        return staff.includes(name)
-            && pincode.includes(pin)
-            && (!date ||
-                new Date(p.created_at)
-                .toISOString()
-                .split("T")[0] === date);
-
-    }));
-}
-
-function viewPayment(id) {
-
-    const p = paymentDataMain.find(x => x.id == id);
-
-    if (!p) return;
-
-    const w = window.open("", "_blank");
-
-    w.document.write(`
-        <h2>Unit Payment Details</h2>
-
-        <p><b>Staff ID:</b> ${p.staff_id}</p>
-
-        <p><b>Name:</b> ${p.staff_name}</p>
-
-        <p><b>Purchased Unit:</b> ${p.purchased_unit}</p>
-
-        <p><b>Remaining Unit:</b> ${p.remaining_unit}</p>
-
-        <p><b>Amount:</b> ₹${p.amount}</p>
-
-        <p><b>Payment:</b> ${p.payment_method}</p>
-
-        <p><b>Status:</b> ${p.status}</p>
-
-        <p><b>Date:</b> ${new Date(p.created_at).toLocaleString()}</p>
-
-        <button onclick="window.print()">Print</button>
-    `);
-
-}
+        // PAYMENT
+        let paymentDataMain = [];
+        async function loadPaymentList() { const res = await fetch(API + "/admin/payments"); paymentDataMain = await res.json(); renderPaymentList(paymentDataMain); }
+        function renderPaymentList(data) {
+            const body = document.getElementById("paymentListBody"); body.innerHTML = ""; let total = 0;
+            data.forEach((p, i) => { total += (p.amount || 0); body.innerHTML += `<tr><td>${i + 1}</td><td>${new Date(p.created_at).toLocaleDateString()}</td><td>${p.staff_id}</td><td>${p.staff_name}</td><td>${p.service_name || '-'}</td><td>${p.pin_code || '-'}</td><td>${p.purchased_unit || 0}</td><td>₹ ${p.amount || 0}</td><td>${p.remaining_unit || 0}</td><td><button onclick="viewPayment(${p.id})">View</button></td></tr>`; });
+            document.getElementById("totalPaymentCount").innerText = `(Total: ₹${total})`;
+        }
+        function filterPayment() { const name = document.getElementById("searchPaymentStaff").value.toLowerCase(), pin = document.getElementById("searchPaymentPin").value.toLowerCase(), date = document.getElementById("searchPaymentDate").value; renderPaymentList(paymentDataMain.filter(p => (p.staff_name || "").toLowerCase().includes(name) && (p.pin_code || "").includes(pin) && (!date || new Date(p.created_at).toISOString().split("T")[0] === date))); }
+        function viewPayment(id) { const p = paymentDataMain.find(x => x.id == id); if (!p) return; const w = window.open("", "_blank"); w.document.write(`<h2>Payment Details</h2><p>Staff ID: ${p.staff_id}</p><p>Name: ${p.staff_name || ''}</p><p>Amount: ₹${p.amount || 0}</p><p>Date: ${new Date(p.created_at).toLocaleString()}</p><button onclick="window.print()">Print</button>`); }
         function togglePaymentHistory() { const box = document.getElementById("paymentHistoryBox"); if (box) box.style.display = box.style.display === "none" ? "block" : "none"; }
         async function loadPaymentDetails() {
             try {
