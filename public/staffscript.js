@@ -513,29 +513,107 @@ async function loadUnitPopup() {
         body.innerHTML = "";
         data.forEach(u => {
             body.innerHTML += `<tr onclick="buyUnit(${u.unit}, ${u.amount})" style="cursor:pointer;"><td>${u.unit} ⭐</td><td>₹ ${u.amount}</td></tr>`;
+           
             console.log("CLICK:", u.unit, u.amount);
         });
     } catch (err) { console.log(err); body.innerHTML = "<tr><td colspan='2'>Server error</td></tr>"; }
 }
 window.addEventListener("popstate", function () { if (isUnitPopupOpen) closeUnitPopup(); });
 
+
 async function buyUnit(unit, amount) {
     console.log("CLICKED:", unit, amount);
+
+    const staffUser = JSON.parse(localStorage.getItem("staffUser") || "{}");
+    const staff_id = staffUser.id;
+
     try {
-        const res = await fetch(API + "/payment/create-order", { method: "POST", headers: { "Content-Type": "application/json", "Authorization": "Bearer " + localStorage.getItem("staffToken") }, body: JSON.stringify({ amount, unit }) });
-        const order = await res.json();
-        const options = {
-            key: "rzp_test_ShfyzJVzrxSupy", amount: order.amount, currency: "INR",
-            name: "Unit Purchase", description: unit + " Unit Balance", order_id: order.id,
-            handler: async function (response) {
-                console.log("PAYMENT SUCCESS", response);
-                await fetch(API + "/payment/verify-payment", { method: "POST", headers: { "Content-Type": "application/json", "Authorization": "Bearer " + localStorage.getItem("staffToken") }, body: JSON.stringify({ razorpay_order_id: response.razorpay_order_id, razorpay_payment_id: response.razorpay_payment_id, razorpay_signature: response.razorpay_signature, amount, unit }) });
-                alert("Payment Success ⭐"); location.reload();
+        const res = await fetch(API + "/payment/create-order", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": "Bearer " + localStorage.getItem("staffToken")
             },
-            theme: { color: "#1a3fd4" }
+            body: JSON.stringify({
+                amount,
+                unit,
+                staff_id
+            })
+        });
+
+        const order = await res.json();
+
+   console.log(order);
+
+        const options = {
+            key: "rzp_live_TLAYRvCyTxg79A",
+            amount: order.amount,
+            currency: "INR",
+            name: "Unit Purchase",
+            description: unit + " Unit Balance",
+            order_id: order.id,
+            handler: async function (response) {
+
+    console.log("========== HANDLER START ==========");
+    console.log(response);
+    try {
+  console.log("Calling verify-payment...");
+
+        const verify = await fetch(API + "/payment/verify-payment", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": "Bearer " + localStorage.getItem("staffToken")
+            },
+            body: JSON.stringify({
+                razorpay_order_id: response.razorpay_order_id,
+                razorpay_payment_id: response.razorpay_payment_id,
+                razorpay_signature: response.razorpay_signature,
+                amount,
+                unit,
+                staff_id
+            })
+        });
+  console.log("Verify Status:", verify.status);
+        const data = await verify.json();
+ console.log("Verify Response:", data);
+        if (data.success) {
+            alert("✅ Unit purchased successfully");
+            closeUnitPopup();
+            loadProfile();   // refresh unit balance
+        } else {
+            alert("Payment verified but unit update failed.");
+        }
+
+    } catch (err) {
+          console.error("VERIFY ERROR:", err);
+        alert("Verification failed");
+    }
+
+},
+            theme: {
+                color: "#1a3fd4"
+            }
         };
-        new Razorpay(options).open();
-    } catch (err) { console.log(err); alert("Payment failed"); }
+
+        console.log("Opening Razorpay");
+console.log(order);
+
+       const rzp = new Razorpay(options);
+
+rzp.on("payment.failed", function (response) {
+    console.log("PAYMENT FAILED");
+    console.log(response.error);
+});
+
+console.log("Opening Razorpay");
+
+rzp.open();
+
+    } catch (err) {
+        console.error(err);
+        alert("Payment failed");
+    }
 }
 
 // ── TABS ──

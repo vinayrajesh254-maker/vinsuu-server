@@ -79,7 +79,7 @@ app.use("/api/customer", require("./routes/customer"));
 
 app.use("/api/staff", require("./routes/staff"));
 
-app.use("/api/payment", require("./routes/payment"));
+// app.use("/api/payment", require("./routes/payment"));
 
 app.use("/api/otp", require("./routes/otp"));
 
@@ -202,60 +202,128 @@ const razorpay = new Razorpay({
   key_secret: process.env.RAZORPAY_SECRET
 });
 
-app.post("/api/payment/create-order", async (req,res)=>{
+app.post("/api/payment/create-order", async (req, res) => {
 
-  const { amount, staff_id } = req.body;
+  try {
 
-  const order = await razorpay.orders.create({
-    amount: Math.round(amount * 100),
-    currency: "INR",
-    receipt: "rcpt_" + Date.now(),
-    notes: { staff_id }
-  });
+    const { amount, staff_id } = req.body;
 
-  res.json(order);
+    console.log("Create Order Request:", req.body);
+
+    const order = await razorpay.orders.create({
+      amount: Math.round(Number(amount) * 100),
+      currency: "INR",
+      receipt: "rcpt_" + Date.now(),
+      notes: {
+        staff_id: staff_id || ""
+      }
+    });
+
+    console.log("Order Created:", order);
+
+    res.json(order);
+
+  } catch (err) {
+
+    console.error("Razorpay Create Order Error:");
+    console.error(err);
+    console.log("RAZORPAY_KEY =", process.env.RAZORPAY_KEY);
+console.log("RAZORPAY_SECRET =", process.env.RAZORPAY_SECRET ? "Loaded" : "Missing");
+
+    res.status(500).json({
+      success: false,
+      message: err.error?.description || err.message
+    });
+
+  }
+
 });
 
 const crypto = require("crypto");
+console.log("VERIFY ROUTE VERSION: 2026-08-04");
+app.post("/api/payment/verify-payment", async (req, res) => {
 
-app.post("/api/payment/verify-payment", async (req,res)=>{
+  console.log("========== VERIFY ROUTE ==========");
+  console.log(req.body);
 
-  const {
-    razorpay_order_id,
-    razorpay_payment_id,
-    razorpay_signature,
-    amount
-  } = req.body;
+  try {
 
-  const body = razorpay_order_id + "|" + razorpay_payment_id;
+    const {
+      razorpay_order_id,
+      razorpay_payment_id,
+      razorpay_signature,
+      amount,
+      unit,
+      staff_id
+    } = req.body;
 
-  const expected = crypto
-    .createHmac("sha256", process.env.RAZORPAY_SECRET)
-    .update(body)
-    .digest("hex");
+    console.log("Updating staff:", staff_id);
 
-  if(expected !== razorpay_signature){
-    return res.status(400).json({ success:false });
+    const updateResult = await pool.query(`
+      UPDATE staff
+      SET unit_balance = COALESCE(unit_balance,0)+$1
+      WHERE id=$2
+      RETURNING id, unit_balance;
+    `,[Number(unit), Number(staff_id)]);
+
+    console.log("UPDATE RESULT:", updateResult.rows);
+
+    const balance = await pool.query(`
+      SELECT unit_balance
+      FROM staff
+      WHERE id=$1
+    `,[staff_id]);
+
+    console.log("BALANCE:", balance.rows);
+
+    const insertResult = await pool.query(`
+      INSERT INTO unit_payment_history
+      (
+        staff_id,
+        payment_id,
+        order_id,
+        amount,
+        purchased_unit,
+        remaining_unit,
+        payment_method,
+        status
+      )
+      VALUES
+      ($1,$2,$3,$4,$5,$6,$7,$8)
+      RETURNING *;
+    `,[
+      Number(staff_id),
+      razorpay_payment_id,
+      razorpay_order_id,
+      Number(amount),
+      Number(unit),
+      Number(balance.rows[0].unit_balance),
+      "Razorpay",
+      "success"
+    ]);
+
+    console.log("INSERT RESULT:", insertResult.rows);
+
+    res.json({ success:true });
+
+  } catch(err){
+
+    console.error(err);
+
+    res.status(500).json({
+      success:false,
+      message:err.message
+    });
+
   }
 
-  const staff_id = req.body.staff_id;
-
-  // ✅ UPDATE WALLET
-  await pool.query(`
-    UPDATE staff
-    SET wallet_balance = wallet_balance + $1
-    WHERE id=$2
-  `,[amount, staff_id]);
-
-  // ✅ SAVE TRANSACTION
-  await pool.query(`
-    INSERT INTO wallet_transactions
-    (staff_id, amount, type)
-    VALUES ($1,$2,'deposit')
-  `,[staff_id, amount]);
-
-  res.json({ success:true });
 });
+
+
+ 
+
+ 
+
 // =====================================================
 // SOCKET.IO
 // =====================================================

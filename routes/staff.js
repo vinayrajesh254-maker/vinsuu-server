@@ -1670,89 +1670,7 @@ router.post("/cancel", verifyToken, async (req, res) => {
 
 });
 
-// ================= RAZORPAY VERIFY (DEPOSIT ONLY) =================
-router.post("/verify-payment", verifyToken, async (req, res) => {
 
-  try {
-
-    const {
-      razorpay_order_id,
-      razorpay_payment_id,
-      razorpay_signature,
-      amount,
-      unit   // 🔥 ADD THIS
-    } = req.body;
-
-    const staff_id = req.user.id;
-
-    const crypto = require("crypto");
-
-    // 🔹 VERIFY SIGNATURE
-    const body = razorpay_order_id + "|" + razorpay_payment_id;
-
-    const expected = crypto
-      .createHmac("sha256", process.env.RAZORPAY_SECRET)
-      .update(body)
-      .digest("hex");
-
-    if (expected !== razorpay_signature) {
-      return res.status(400).json({ success: false });
-    }
-    // 🔥 ADD UNIT AFTER PAYMENT SUCCESS
-    if (unit) {
-      await pool.query(`
-    UPDATE staff
-    SET unit_balance = COALESCE(unit_balance,0) + $1
-    WHERE id=$2
-  `, [unit, staff_id]);
-    }
-
-    // 🔹 GET CURRENT WALLET
-    const walletRes = await pool.query(
-      "SELECT wallet_balance, unit_balance FROM staff WHERE id=$1",
-      [staff_id]
-    );
-
-    let opening = Number(walletRes.rows[0]?.wallet_balance || 0);
-
-    // 🔹 NEW BALANCE (ONLY ADD)
-    let closing = opening + Number(amount);
-
-    // 🔹 UPDATE WALLET
-    await pool.query(
-      "UPDATE staff SET wallet_balance=$1 WHERE id=$2",
-      [closing, staff_id]
-    );
-
-    // 🔹 SAVE TRANSACTION (DEPOSIT ONLY)
-    await pool.query(`
-      INSERT INTO wallet_transactions
-      (staff_id, amount, type, opening_balance, closing_balance)
-      VALUES ($1,$2,$3,$4,$5)
-    `, [
-      staff_id,
-      amount,
-      "deposit",   // ✅ ONLY deposit
-      opening,
-      closing
-    ]);
-
-    // 🔹 SOCKET UPDATE (optional but good)
-    const { getIO } = require("../socket");
-    const io = getIO();
-
-    io.to("staff_" + staff_id).emit("staff_notification", {
-      message: "Wallet credited ₹" + amount
-    });
-
-    res.json({ success: true });
-
-  } catch (err) {
-    console.log("VERIFY PAYMENT ERROR:", err);
-    res.status(500).json({ success: false });
-  }
-
-});
 
 // ------UNIT BALANCE-----
 router.get("/unit/all", async (req, res) => {
@@ -1770,92 +1688,7 @@ router.get("/unit/all", async (req, res) => {
   }
 });
 
-// ---- UNIT BALANCE ROJGAR PAY-----
-router.post("/verify-payment", verifyToken, async (req, res) => {
-
-  try {
-
-    const {
-      razorpay_order_id,
-      razorpay_payment_id,
-      razorpay_signature
-    } = req.body;
-
-    const staff_id = req.user.id;
-    const crypto = require("crypto");
-
-    // 🔐 VERIFY SIGNATURE
-    const body = razorpay_order_id + "|" + razorpay_payment_id;
-
-    const expected = crypto
-      .createHmac("sha256", process.env.RAZORPAY_KEY_SECRET)
-      .update(body)
-      .digest("hex");
-
-    if (expected !== razorpay_signature) {
-      return res.status(400).json({ error: "Invalid signature" });
-    }
-
-    // 🔥 GET ORDER FROM DB (NOT FRONTEND)
-    const orderRes = await pool.query(`
-            SELECT * FROM unit_orders 
-            WHERE order_id=$1 AND staff_id=$2
-        `, [razorpay_order_id, staff_id]);
-
-    if (orderRes.rows.length === 0) {
-      return res.status(400).json({ error: "Order not found" });
-    }
-
-    const order = orderRes.rows[0];
-
-    if (order.status === "paid") {
-      return res.json({ success: true }); // already processed
-    }
-
-    // 🔥 VERIFY PAYMENT FROM RAZORPAY SERVER
-    const axios = require("axios");
-
-    const payment = await axios.get(
-      `https://api.razorpay.com/v1/payments/${razorpay_payment_id}`,
-      {
-        auth: {
-          username: process.env.RAZORPAY_KEY_ID,
-          password: process.env.RAZORPAY_KEY_SECRET
-        }
-      }
-    );
-
-    if (payment.data.status !== "captured") {
-      return res.status(400).json({ error: "Payment not completed" });
-    }
-
-    // 🔥 MATCH AMOUNT (IMPORTANT)
-    if (payment.data.amount !== order.amount * 100) {
-      return res.status(400).json({ error: "Amount mismatch" });
-    }
-
-    // 🔥 UPDATE UNIT BALANCE
-    await pool.query(`
-            UPDATE staff
-            SET unit_balance = COALESCE(unit_balance,0) + $1
-            WHERE id=$2
-        `, [order.unit, staff_id]);
-
-    // 🔥 MARK ORDER PAID
-    await pool.query(`
-            UPDATE unit_orders 
-            SET status='paid', payment_id=$1
-            WHERE order_id=$2
-        `, [razorpay_payment_id, razorpay_order_id]);
-
-    res.json({ success: true });
-
-  } catch (err) {
-    console.log("SECURE VERIFY ERROR:", err);
-    res.status(500).json({ error: "Server error" });
-  }
-
-});
+// ================= ADD UNIT BALANCE (ADMIN) =================
 
 router.post("/add-unit", verifyToken, async (req, res) => {
 
@@ -1892,8 +1725,8 @@ router.post("/create-order", verifyToken, async (req, res) => {
     const Razorpay = require("razorpay");
 
     const razorpay = new Razorpay({
-      key_id: process.env.RAZORPAY_KEY_ID,
-      key_secret: process.env.RAZORPAY_KEY_SECRET
+      key_id: process.env.RAZORPAY_KEY,
+      key_secret: process.env.RAZORPAY_SECRET
     });
 
     const { amount, unit } = req.body;

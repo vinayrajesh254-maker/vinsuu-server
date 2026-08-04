@@ -762,18 +762,19 @@ router.get("/payments", async (req, res) => {
   try {
 
    const result = await pool.query(`
-  SELECT 
-    payments.*,
-    users.name,
-    users.mobile,
-    payments.purchased_unit,
-    payments.remaining_unit
-  FROM payment_history ph
-JOIN staff s ON s.id = ph.staff_id
-  ORDER BY payments.id DESC
+SELECT
+    uph.*,
+    s.name AS staff_name,
+    s.mobile,
+    s.service_names AS service_name,
+    s.pincodes AS pin_code
+FROM unit_payment_history uph
+JOIN staff s
+ON s.id = uph.staff_id
+ORDER BY uph.id DESC;
 `);
 
-    res.json(result.rows);
+res.json(result.rows);
 
   } catch (err) {
 
